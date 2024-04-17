@@ -1,0 +1,46 @@
+{
+  "manifest_version": 3,
+  "name": "CWAsisstant",
+  "description": "Introduced a new virtual assistant called CWAsisstant, which allows employee of CO-WELL company to use",
+  "version": "2.5.1",
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "CWA-Assistant",
+    "default_icon": "assets/images/icon.png"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": [
+    "activeTab",
+    "tabs",
+    "bookmarks",
+    "storage",
+    "identity",
+    "scripting"
+  ],
+  "icons": {
+    "16": "assets/images/icon.png",
+    "48": "assets/images/icon.png",
+    "128": "assets/images/icon.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["contentScript.js"]
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "assets/images/icon.png",
+        "assets/images/logo.png",
+        "locales/en/translation.json",
+        "locales/vi/translation.json",
+        "locales/jp/translation.json"
+      ],
+      "matches": ["<all_urls>"],
+      "use_dynamic_url": true
+    }
+  ]
+}

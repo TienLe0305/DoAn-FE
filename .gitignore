@@ -1,0 +1,11 @@
+# Dependency directories
+node_modules/
+
+# Extension build
+build/
+
+# dotenv environment variables file
+.env
+
+# Package-lock files
+package-lock.json

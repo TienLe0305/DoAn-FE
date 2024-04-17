@@ -1,0 +1,48 @@
+{
+  "name": "cw-asisstant",
+  "author": "CWA",
+  "version": "v2.5.1",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "watch": "webpack --watch --progress --config webpack.dev.js",
+    "build": "webpack --watch --progress --config webpack.prod.js"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.188",
+    "@types/react": "^18.2.66",
+    "@types/react-dom": "^18.2.22",
+    "clean-webpack-plugin": "^4.0.0",
+    "copy-webpack-plugin": "^11.0.0",
+    "css-loader": "^6.7.1",
+    "dotenv-webpack": "^8.0.1",
+    "file-loader": "^6.2.0",
+    "html-webpack-plugin": "^5.5.0",
+    "postcss-loader": "^7.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "style-loader": "^3.3.1",
+    "ts-loader": "^9.3.0",
+    "typescript": "^4.9.5",
+    "url-loader": "^4.1.1",
+    "webpack": "^5.90.3",
+    "webpack-cli": "^4.10.0",
+    "webpack-merge": "^5.8.0"
+  },
+  "dependencies": {
+    "@agney/react-loading": "^0.1.2",
+    "axios": "^1.6.7",
+    "bootstrap": "^5.3.3",
+    "dotenv": "^16.4.5",
+    "event-source-polyfill": "^1.0.31",
+    "i18next": "^23.10.1",
+    "i18next-browser-languagedetector": "^7.2.1",
+    "i18next-http-backend": "^2.5.0",
+    "react-i18next": "^14.1.0",
+    "react-router-dom": "6.2",
+    "react-select": "^5.8.0",
+    "react-slick": "^0.30.2",
+    "reconnecting-eventsource": "^1.6.2",
+    "webpack-dev-server": "^5.0.3"
+  }
+}
