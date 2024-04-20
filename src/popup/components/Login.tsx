@@ -12,7 +12,7 @@ const exchangeCodeForTokens = async (code, state, setErrors) => {
   console.log(code, "Code here");
   try {
     const response = await axios.get(
-      `http://127.0.0.1:8004/ext/auth/ext_google_auth`,
+      `http://127.0.0.1:8011/ext/auth/ext_google_auth`,
       {
         params: { code: code , state:state },
       }
@@ -42,7 +42,7 @@ const Login = () => {
     let authUrl = "";
     try {
       const response = await axios.get(
-        `http://127.0.0.1:8004/ext/auth/ext_google_login`
+        `http://127.0.0.1:8011/ext/auth/ext_google_login`
       );
       console.log(response.data);
       authUrl = response.data.details.url;

@@ -30,7 +30,6 @@ const ChatBox = ({ user, setIsOpen }) => {
       text: "",
       avatar: "",
       type: "",
-      reference: "",
     },
   ]);
   const [categories, setCategories] = useState([]);
@@ -192,13 +191,14 @@ const ChatBox = ({ user, setIsOpen }) => {
   const getChatHistory = () => {
     if (authToken) {
       axios
-        .get(`${CWA}/${HISTORY}`, {
+        .get(`http://127.0.0.1:8011/ext/chat_history`, {
           headers: {
             Authorization: `Bearer ${authToken}`,
           },
         })
         .then((res) => {
-          const formattedMessages = res.data.details
+          console.log(res.data, "history");
+          const formattedMessages = res.data
             .map((message) => {
               return [
                 {
@@ -210,7 +210,6 @@ const ChatBox = ({ user, setIsOpen }) => {
                   text: message.assistant_answer,
                   avatar: urls.icon,
                   type: "answer",
-                  reference: message.content_category_name,
                 },
               ];
             })
@@ -250,7 +249,6 @@ const ChatBox = ({ user, setIsOpen }) => {
         text: messageText,
         avatar: user.picture,
         type: "question",
-        reference: titlesCategory,
       };
       setMessages((prevMessage) => [...prevMessage, newQuestion]);
       setMessageText("");
@@ -260,39 +258,36 @@ const ChatBox = ({ user, setIsOpen }) => {
   const getAnswer = async () => {
     let loadingMessage = {
       text: "Thinking...",
-      reference: titlesCategory,
       avatar: urls.icon,
       type: "loading",
     };
     setMessages((prevMessage) => [...prevMessage, loadingMessage]);
-    let categoryIds = selectedCategories.map((category) => category.id);
-    let params = {
-      query: messageText,
-      categories: categoryIds,
-    };
-    const categoriesQueryString = params.categories
-      .map((category) => `categories=${category}`)
-      .join("&");
+
     const eventSource = new EventSourcePolyfill(
-      `${CWA}/${CHAT}?query=${params.query}&${categoriesQueryString}`,
+      `http://127.0.0.1:8011/ext/chat?query=${encodeURIComponent(messageText)}`,
       {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
       }
     );
+
     setIsDisable(true);
     let answer = "";
     eventSource.addEventListener("response", (event) => {
-      const data = event.data;
-      answer += data;
-      let getmess = {
-        text: answer,
-        avatar: urls.icon,
-        type: "answer",
-        reference: titlesCategory,
-      };
-      setMessages((prevMessage) => [...prevMessage.slice(0, -1), getmess]);
+      const data = JSON.parse(event.data);
+      console.log(data, "response");
+
+      for (let char of data.text) {
+        answer += char;
+        console.log(answer, "answer");
+        let getmess = {
+          text: answer,
+          avatar: urls.icon,
+          type: "answer",
+        };
+        setMessages((prevMessage) => [...prevMessage.slice(0, -1), getmess]);
+      }
     });
 
     eventSource.addEventListener("done", (event) => {
@@ -548,9 +543,9 @@ const ChatBox = ({ user, setIsOpen }) => {
                         <p className={`cwa_${message.type} cwa_loading`}>
                           {message.text}
                         </p>
-                        <small className="cwa_message-time">
+                        {/* <small className="cwa_message-time">
                           {t("references")} : {message.reference}
-                        </small>
+                        </small> */}
                       </div>
                     </div>
                   );
@@ -568,11 +563,11 @@ const ChatBox = ({ user, setIsOpen }) => {
                         className={`cwa_message-content cwa_${message.type}`}
                       >
                         <p className={`cwa_${message.type}`}>{message.text}</p>
-                        {message.type === "answer" && (
+                        {/* {message.type === "answer" && (
                           <small className="cwa_message-time">
                             {t("references")} : {message.reference}
                           </small>
-                        )}
+                        )} */}
                       </div>
                     </div>
                   );
