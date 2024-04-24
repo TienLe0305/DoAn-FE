@@ -1,4 +1,5 @@
-@import url("https://fonts.googleapis.com/css?family=Josefin+Sans&display=swap");
+/* @import url("https://fonts.googleapis.com/css?family=Josefin+Sans&display=swap"); */
+@import url("https://fonts.googleapis.com/css2?family=Arvo:ital,wght@0,400;0,700;1,400;1,700&family=Bellefair&family=Comfortaa:wght@300..700&family=Inconsolata:wght@200..900&family=Patrick+Hand&family=Sedan:ital@0;1&display=swap");
 :root {
   --primary-color: #ffffff;
   --h3-color-CWA: #000;
@@ -9,6 +10,119 @@
   --padding-value-CWA: 10px;
   --font-weight-semi-bold: 600;
   --box-shadow-value-CWA: 0 0 10px 10px rgba(0, 0, 0, 0.05);
+  --font-family: CohereText, ui-sans-serif, system-ui, -apple-system,
+    BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans",
+    sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
+    "Noto Color Emoji";
+  --font-family-monospace: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+}
+
+@font-face {
+  font-family: "CohereText";
+  src: url("https://cohere-readme-docs.netlify.app/fonts/CohereText-Regular.woff2")
+      format("woff2"),
+    url("https://cohere-readme-docs.netlify.app/fonts/CohereText-Regular.woff")
+      format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "CohereText";
+  src: url("https://cohere-readme-docs.netlify.app/fonts/CohereVariable.woff2")
+      format("woff2"),
+    url("https://cohere-readme-docs.netlify.app/fonts/CohereVariable.woff")
+      format("woff");
+  font-weight: 500 525;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "CohereHeadline";
+  src: url("https://cohere-readme-docs.netlify.app/fonts/CohereHeadline-Regular.woff2")
+      format("woff2"),
+    url("https://cohere-readme-docs.netlify.app/fonts/CohereHeadline-Regular.woff")
+      format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "CohereHeadline";
+  src: url("https://cohere-readme-docs.netlify.app/fonts/CohereHeadline-Bold.woff2")
+      format("woff2"),
+    url("https://cohere-readme-docs.netlify.app/fonts/CohereHeadline-Bold.woff")
+      format("woff");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "CohereMono";
+  src: url("https://cohere-readme-docs.netlify.app/fonts/CohereMono-Regular.woff2")
+      format("woff2"),
+    url("https://cohere-readme-docs.netlify.app/fonts/CohereMono-Regular.woff")
+      format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "CohereMono";
+  /* In the nature design system, bolded fonts always use Cohere Variable. */
+  src: url("https://cohere-readme-docs.netlify.app/fonts/CohereVariable.woff2")
+      format("woff2"),
+    url("https://cohere-readme-docs.netlify.app/fonts/CohereVariable.woff")
+      format("woff");
+  font-weight: 500 525;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "CohereVariable";
+  src: url("https://cohere-readme-docs.netlify.app/fonts/CohereVariable.woff2")
+      format("woff2"),
+    url("https://cohere-readme-docs.netlify.app/fonts/CohereVariable.woff")
+      format("woff");
+  font-weight: 400 420 450;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "CohereColor";
+  src: url("https://cohere-readme-docs.netlify.app/fonts/CohereColor-Color.woff")
+      format("woff"),
+    url("https://cohere-readme-docs.netlify.app/fonts/CohereColor-Color.woff2")
+      format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "CohereIconDefault";
+  src: url("https://cohere-readme-docs.netlify.app/fonts/CohereIcon-Default.woff")
+    format("woff");
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+@font-face {
+  font-family: "CohereIconOutline";
+  src: url("https://cohere-readme-docs.netlify.app/fonts/CohereIcon-Outline.woff")
+    format("woff");
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
 }
 
 ::-webkit-scrollbar {
@@ -30,6 +144,40 @@
 
 .cwa_autocomplete-dropdown::-webkit-scrollbar {
   display: none !important;
+}
+
+#CWA {
+  display: flex;
+}
+
+#CWA .cwa_box-chat-container {
+  height: 100vh;
+  position: relative;
+  width: 90%;
+}
+
+#CWA .cwa_side-bar-container {
+  height: 100vh;
+  width: 10%;
+  z-index: 1;
+  box-shadow: 0 5px 5px 2px rgba(0, 0, 0, 0.2);
+  padding-top: 1rem !important;
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+#CWA .cwa-btn-side-bar {
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  border-radius: 5px;
+  width: 35px;
+  height: 35px;
+  box-shadow: 0 2px 2px 1px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
 }
 
 #CWA .cwa_container-icon {
@@ -115,11 +263,10 @@
 }
 
 #CWA .cwa_gl-tooltip::after {
-  font-family: "Josefin Sans", sans-serif !important;
+  font-family: var(--font-family) !important;
   letter-spacing: 1px;
   color: var(--primary-color);
   font-size: 1.2rem;
-  font-family: var(--font-weight-semi-bold);
   text-align: center;
   pointer-events: none;
   word-break: break-word;
@@ -144,19 +291,18 @@
 }
 
 #CWA .cwa_container-chat {
-  width: 600px;
+  height: 100vh;
+  width: 500px;
   transform: translateX(0) translateY(-50%);
   top: 50%;
-  font-family: "Josefin Sans", sans-serif !important;
+  font-family: var(--font-family) !important;
   overflow: hidden;
   box-shadow: var(--box-shadow-value-CWA);
   position: fixed;
-  right: 60px;
-  border-radius: var(--border-radius-CWA);
+  right: 0;
   z-index: 9999;
   overflow: hidden;
   background-color: var(--primary-color);
-  padding-top: var(--padding-value-CWA);
   transition: transform 0.5s ease-out;
 }
 
@@ -184,7 +330,6 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: var(--margin-value-CWA);
   padding: 10px 20px;
 }
 
@@ -212,14 +357,64 @@
 }
 
 #CWA .cwa_title .cwa_h3 {
-  font-family: "Josefin Sans", sans-serif !important;
+  font-family: CohereHeadline !important;
   font-size: 22px !important;
-  font-weight: var(--font-weight-semi-bold) !important;
+  font-weight: 700 !important;
   margin: 0 !important;
   display: flex;
   align-items: center;
   color: var(--h3-color-CWA);
   margin-top: 5px !important;
+}
+
+#CWA .cwa_suggestion-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  padding: 10px;
+  gap: 1rem;
+}
+
+#CWA .cwa_box-suggestion {
+  width: 100%;
+  box-shadow: 0 5px 5px 2px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5rem;
+  color: rgb(0, 0, 0, 0.8);
+}
+
+#CWA .cwa_box-suggestion-header h3 {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: black;
+  margin-bottom: 0.2rem;
+}
+
+#CWA .cwa_box-container {
+  width: 100%;
+}
+
+#CWA .cwa_scissors-icon,
+#CWA .cwa_upload-image-icon {
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  border-radius: 5px;
+  width: 30px;
+  height: 30px;
+  box-shadow: 0 2px 2px 1px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+}
+
+#CWA .cwa_scissors-icon:hover,
+#CWA .cwa_upload-image-icon:hover {
+  box-shadow: none;
 }
 
 #CWA .cwa_categories {
@@ -349,7 +544,8 @@
 }
 
 #CWA .cwa_input-area {
-  position: relative;
+  position: absolute;
+  bottom: 10px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -367,8 +563,9 @@
 }
 
 #CWA .cwa_text-value {
+  box-shadow: rgba(0, 0, 0, 0.2) 0px 5px 5px 2px inset;
   box-sizing: border-box;
-  font-family: "Josefin Sans", sans-serif !important;
+  font-family: var(--font-family) !important;
   resize: none;
   overflow: hidden;
   height: 100% !important;
@@ -400,13 +597,13 @@
 }
 
 #CWA .cwa_send-button {
+  box-shadow: 0 5px 15px 1px rgba(0, 0, 0, 0.2);
+  background: #f5f5f5;
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 9%;
+  width: 10%;
   height: 100%;
-  background-color: rgba(86, 187, 85, 0.702);
-  color: var(--primary-color);
   border: none;
   padding: var(--padding-value-CWA);
   border-radius: var(--border-radius-CWA);
@@ -449,7 +646,7 @@
 #CWA .cwa_autocomplete-dropdown .cwa_category-title {
   color: rgb(0, 0, 0);
   font-size: 18px !important;
-  font-weight: 500;
+  font-weight: 400;
   margin: 0 !important;
   margin-bottom: var(--margin-value-CWA) !important;
   line-height: inherit !important;
@@ -483,7 +680,7 @@
 }
 
 #CWA .cwa_no-category {
-  font-family: "Josefin Sans", sans-serif;
+  font-family: "Patrick Hand", cursive !important;
   color: #999;
 }
 
@@ -505,14 +702,18 @@
 }
 
 #CWA .cwa_tip {
-  position: relative;
+  background: white;
+  position: absolute;
+  width: 100%;
+  bottom: 75px;
   padding: var(--padding-value-CWA) var(--padding-value-CWA) 0
     var(--padding-value-CWA);
   display: flex;
   justify-content: left;
   align-items: center;
-  gap: 5px;
-  height: 4vh;
+  gap: 1rem;
+  height: 5vh;
+  z-index: 9999;
 }
 
 #CWA .cwa_tip > * {

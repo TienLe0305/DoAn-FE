@@ -4,12 +4,16 @@ import axios from "axios";
 import { EventSourcePolyfill } from "event-source-polyfill";
 import { useTranslation } from "react-i18next";
 import {
-  AlertIcon,
   ExitIcon,
-  RemoveIcon,
   SendIcon,
-  TipIcon,
+  ScissorsIcon,
   LoadingIcon,
+  UploadImageIcon,
+  ArrowButton,
+  ChatIconSideBar,
+  QuestionIconSideBar,
+  WriteIconSideBar,
+  PDFIconSideBar,
 } from "./SVG";
 
 const CWA = process.env.API_DOMAIN;
@@ -191,11 +195,11 @@ const ChatBox = ({ user, setIsOpen }) => {
   const getChatHistory = () => {
     if (authToken) {
       axios
-        .get(`http://127.0.0.1:8011/ext/chat_history`, {
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-          },
-        })
+        .get(
+          `http://127.0.0.1:8001/ext/chat_history?user_email=${encodeURIComponent(
+            user.email
+          )}`
+        )
         .then((res) => {
           console.log(res.data, "history");
           const formattedMessages = res.data
@@ -264,12 +268,9 @@ const ChatBox = ({ user, setIsOpen }) => {
     setMessages((prevMessage) => [...prevMessage, loadingMessage]);
 
     const eventSource = new EventSourcePolyfill(
-      `http://127.0.0.1:8011/ext/chat?query=${encodeURIComponent(messageText)}`,
-      {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-        },
-      }
+      `http://127.0.0.1:8001/ext/chat?query=${encodeURIComponent(
+        messageText
+      )}&user_email=${encodeURIComponent(user.email)}`
     );
 
     setIsDisable(true);
@@ -476,7 +477,7 @@ const ChatBox = ({ user, setIsOpen }) => {
 
   return (
     <div ref={chatBoxRef} id="CWA">
-      <div>
+      <div className="cwa_box-chat-container">
         <div className="cwa_header">
           <div className="cwa_title">
             <img src={urls.logo} alt="logo" />
@@ -486,41 +487,50 @@ const ChatBox = ({ user, setIsOpen }) => {
             <ExitIcon />
           </div>
         </div>
-        <div className="cwa_categories-container">
-          <div className="cwa_categories">
-            <ul
-              className="cwa_category-list"
-              style={{ transform: `translateX(${scrollX}px)` }}
-            >
-              {selectedCategories.length > 0 &&
-                selectedCategories.map((category, index) => (
-                  <li
-                    key={index}
-                    className="cwa_category-item"
-                    style={{ backgroundColor: categoryColors[category.title] }}
-                  >
-                    <span className="cwa_tag-name">{category.title}</span>
-                    {category.title !== "CWA Guidelines" && (
-                      <button
-                        className="cwa_remove-tag"
-                        onClick={() => handleTagRemove(category.title)}
-                      >
-                        <RemoveIcon />
-                      </button>
-                    )}
-                  </li>
-                ))}
-            </ul>
-            {showScrollButtons && (
-              <>
-                <button className="cwa_prev-btn" onClick={handlePrevClick}>
-                  ❮
-                </button>
-                <button className="cwa_next-btn" onClick={handleNextClick}>
-                  ❯
-                </button>
-              </>
-            )}
+        <div className="cwa_suggestion-container">
+          <div className="cwa_box-suggestion">
+            <div className="cwa_box-container">
+              <div className="cwa_box-suggestion-header">
+                <h3>🤓 Giải thích 1 điều phức tạp</h3>
+              </div>
+              <div className="cwa_box-suggestion-content">
+                <p>
+                  Giải thích về Trí tuệ Nhân tạo sao cho tôi có thể giải thích
+                  nó cho đứa trẻ sáu tuổi của tôi.
+                </p>
+              </div>
+            </div>
+            <div className="cwa_box-suggestion-btn">
+              <ArrowButton />
+            </div>
+          </div>
+          <div className="cwa_box-suggestion">
+            <div className="cwa_box-container">
+              <div className="cwa_box-suggestion-header">
+                <h3>🧠 Nhận đề xuất và tạo ra ý tưởng mới</h3>
+              </div>
+              <div className="cwa_box-suggestion-content">
+                <p>
+                  Xin hãy cho tôi 10 ý tưởng du lịch tốt nhất trên thế giới.
+                </p>
+              </div>
+            </div>
+            <div className="cwa_box-suggestion-btn">
+              <ArrowButton />
+            </div>
+          </div>
+          <div className="cwa_box-suggestion">
+            <div className="cwa_box-container">
+              <div className="cwa_box-suggestion-header">
+                <h3>💭 Dịch, tóm tắt, sửa lỗi ngữ pháp và nhiều hơn nữa...</h3>
+              </div>
+              <div className="cwa_box-suggestion-content">
+                <p>Dịch "I love you", sang tiếng Pháp.</p>
+              </div>
+            </div>
+            <div className="cwa_box-suggestion-btn">
+              <ArrowButton />
+            </div>
           </div>
         </div>
         <div className="cwa_messages-container">
@@ -577,10 +587,12 @@ const ChatBox = ({ user, setIsOpen }) => {
           </div>
         </div>
         <div className="cwa_tip">
-          <i className="cwa_icon-tip">
-            <TipIcon />
-          </i>
-          <h3 className="cwa_h3-tip">{t("tips")}</h3>
+          <div className="cwa_scissors-icon">
+            <ScissorsIcon />
+          </div>
+          <div className="cwa_upload-image-icon">
+            <UploadImageIcon />
+          </div>
         </div>
         <div className="cwa_input-area">
           <input
@@ -590,7 +602,7 @@ const ChatBox = ({ user, setIsOpen }) => {
             value={messageText}
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
-            placeholder={motd}
+            placeholder="Nhập câu hỏi của bạn..."
             style={{ overflow: "hidden" }}
           />
           {showCategories && (
@@ -628,19 +640,22 @@ const ChatBox = ({ user, setIsOpen }) => {
           </button>
         </div>
       </div>
-      <div
-        className={`cwa_error-message cwa_chat-box ${
-          hasAtLeastOneCategory ? "" : "cwa_hide-error"
-        }`}
-        onClick={() => setHasAtLeastOneCategory(false)}
-      >
-        <span
-          className={`${hasAtLeastOneCategory ? "cwa_countdown" : ""}`}
-        ></span>
-        <div className="cwa_alert-icon">
-          <AlertIcon />
+      <div className="cwa_side-bar-container">
+        <div className="cwa_btn-chat-side-bar cwa-btn-side-bar">
+          <ChatIconSideBar />
         </div>
-        <p>You must choose at least 1 category !</p>
+        <div className="cwa_btn-question-side-bar cwa-btn-side-bar">
+          <QuestionIconSideBar />
+        </div>
+        <div className="cwa_btn-write-side-bar cwa-btn-side-bar">
+          <WriteIconSideBar />
+        </div>
+        <div className="cwa_btn-image-side-bar cwa-btn-side-bar">
+          <UploadImageIcon />
+        </div>
+        <div className="cwa_btn-chat-pdf-side-bar cwa-btn-side-bar">
+          <PDFIconSideBar />
+        </div>
       </div>
     </div>
   );
