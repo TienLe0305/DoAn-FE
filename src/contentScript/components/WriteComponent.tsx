@@ -67,6 +67,8 @@ function WriteComponent({ user }) {
   const [selectedTone, setSelectedTone] = useState("");
   const [selectedLength, setSelectedLength] = useState("");
   const [selectedLanguage, setSelectedLanguage] = useState("");
+  const [response, setResponse] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleTextareaChange = (event) => {
     setTextareaContent(event.target.value);
@@ -80,19 +82,16 @@ function WriteComponent({ user }) {
   };
 
   const handleTypeSelect = (type) => {
-    console.log("Type selected: ", type);
     setSelectedType(type);
     setContext((prevContext) => ({ ...prevContext, type }));
   };
 
   const handleToneSelect = (tone) => {
-    console.log("Tone selected: ", tone);
     setSelectedTone(tone);
     setContext((prevContext) => ({ ...prevContext, tone }));
   };
 
   const handleLengthSelect = (length) => {
-    console.log("Length selected: ", length);
     setSelectedLength(length);
     setContext((prevContext) => ({ ...prevContext, length }));
   };
@@ -104,14 +103,8 @@ function WriteComponent({ user }) {
 
   const handleSend = () => {
     const formattedContext = `Hãy giúp tôi viết 1 đoạn composer với chủ đề ${context.subject} với loại văn bản ${context.type} với tone giọng ${context.tone} với độ dài ${context.length} bằng ngôn ngữ ${context.language}`;
-    setFormattedContext(formattedContext);
     return formattedContext;
   };
-
-  const [formattedContext, setFormattedContext] = useState("");
-  const [response, setResponse] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-
 
   const getContextAnswer = async (formattedContext) => {
     setIsLoading(true);
@@ -124,7 +117,6 @@ function WriteComponent({ user }) {
     let answer = "";
     eventSource.addEventListener("response", (event) => {
       const data = JSON.parse(event.data);
-      console.log(data, "response");
 
       for (let char of data.text) {
         answer += char;
