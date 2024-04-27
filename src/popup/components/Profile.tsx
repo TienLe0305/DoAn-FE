@@ -113,7 +113,7 @@ const Logout = ({ user, setUser }) => {
         <div className="cwa_container-header">
           <div className="cwa_container-logo">
             <img src={Logo} className="cwa_logo-img" alt="Logo"></img>
-            <p className="cwa_logo-title">CWAsisstant</p>
+            <p className="cwa_logo-title">nebulAsisstant</p>
           </div>
         </div>
         <div className="cwa_container-body">

@@ -93,7 +93,7 @@ const state = url.searchParams.get("state");
       <div className="cwa_container-popup">
         <div className="cwa_container-logo">
           <img src={Logo} className="cwa_logo-img" alt="Logo"></img>
-          <p className="cwa_logo-title">CWAsisstant</p>
+          <p className="cwa_logo-title">nebulAsisstant</p>
         </div>
         <button onClick={handleLogin} className="cwa_btn-login">
           <img
