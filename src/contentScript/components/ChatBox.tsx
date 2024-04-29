@@ -8,12 +8,12 @@ import {
   QuestionIconSideBar,
   WriteIconSideBar,
   PDFIconSideBar,
+  LogoIcon,
 } from "./SVG";
 import ChatComponent from "./ChatComponent";
 import WriteComponent from "./WriteComponent";
 
 const urls = {
-  logo: chrome.runtime.getURL("assets/images/logo.png"),
   icon: chrome.runtime.getURL("assets/images/icon.png"),
 };
 
@@ -51,7 +51,8 @@ const ChatBox = ({ user, setIsOpen }) => {
       <div className={`cwa_box-chat-container ${selectedComponent === 'Write' ? 'writing' : ''}`}>
         <div className="cwa_header">
           <div className="cwa_title">
-            <img src={urls.logo} alt="logo" />
+            {/* <img src={urls.logo} alt="logo" /> */}
+            <LogoIcon />
             <h3 className="cwa_h3">nebulAsisstant</h3>
           </div>
           <div className="cwa_exit-icon" onClick={handleClose}>

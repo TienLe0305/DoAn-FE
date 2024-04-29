@@ -12,12 +12,12 @@ import {
 } from "./SVG";
 
 const urls = {
-  logo: chrome.runtime.getURL("assets/images/logo.png"),
   icon: chrome.runtime.getURL("assets/images/icon.png"),
 };
 
 function ChatComponent({ user }) {
   const { t, i18n } = useTranslation();
+
   const [messages, setMessages] = useState([
     {
       text: "",
@@ -25,14 +25,26 @@ function ChatComponent({ user }) {
       type: "",
     },
   ]);
-
+  const [followUpQuestions, setFollowUpQuestions] = useState([]);
+  const [isSuggestions, setIsSuggestions] = useState(false);
   const [isDisable, setIsDisable] = useState(false);
   const [messageText, setMessageText] = useState("");
   const [error, setError] = useState(null);
-
   const [authToken, setAuthToken] = useState(null);
+
   const inputRef = useRef(null);
   const endOfMessagesRef = useRef(null);
+
+  let followUpQuestionsPrompts = `- Finally, please suggest me 2-3 follow-up questions.
+  - Follow-up questions can be related to our conversation.
+  - Follow-up questions should help the user understand the content better.
+  - Follow-up questions should be short and concise.
+  - Follow-up questions should be a single sentence.
+  - Follow-up questions should be formated like the follow:
+  Follow-up questions:
+  - <question 1>
+  - <question 2>
+  and so on...`;
 
   useEffect(() => {
     chrome.storage.local.get("language", function (result) {
@@ -57,12 +69,11 @@ function ChatComponent({ user }) {
     if (authToken) {
       axios
         .get(
-          `http://127.0.0.1:8001/ext/chat_history?user_email=${encodeURIComponent(
+          `http://127.0.0.1:8002/ext/chat_history?user_email=${encodeURIComponent(
             user.email
           )}`
         )
         .then((res) => {
-          console.log(res.data, "history");
           const formattedMessages = res.data
             .map((message) => {
               return [
@@ -108,7 +119,7 @@ function ChatComponent({ user }) {
     setMessages((prevMessage) => [...prevMessage, loadingMessage]);
 
     const eventSource = new EventSourcePolyfill(
-      `http://127.0.0.1:8001/ext/chat?query=${encodeURIComponent(
+      `http://127.0.0.1:8002/ext/chat?query=${encodeURIComponent(
         messageText
       )}&user_email=${encodeURIComponent(user.email)}`
     );
@@ -117,11 +128,8 @@ function ChatComponent({ user }) {
     let answer = "";
     eventSource.addEventListener("response", (event) => {
       const data = JSON.parse(event.data);
-      console.log(data, "response");
-
       for (let char of data.text) {
         answer += char;
-        console.log(answer, "answer");
         let getmess = {
           text: answer,
           avatar: urls.icon,
@@ -131,15 +139,63 @@ function ChatComponent({ user }) {
       }
     });
 
+    return new Promise((resolve) => {
+      eventSource.addEventListener("done", (event) => {
+        setIsDisable(false);
+        eventSource.close();
+        resolve(answer);
+      });
+    });
+  };
+
+  const getFollowUpQuestions = async (answer) => {
+    const eventSource = new EventSourcePolyfill(
+      `http://127.0.0.1:8002/ext/chat?query=${encodeURIComponent(
+        answer + followUpQuestionsPrompts
+      )}&user_email=${encodeURIComponent(user.email)}`
+    );
+    let followUpQuestions = "";
+
+    eventSource.addEventListener("response", (event) => {
+      console.log(event.data);
+      const data = JSON.parse(event.data);
+      console.log(data, "data");
+      for (let char of data.text) {
+        followUpQuestions += char;
+      }
+    });
+
     eventSource.addEventListener("done", (event) => {
-      setIsDisable(false);
+      const lines = followUpQuestions.split("\n");
+      const followUpQuestionsIndex = lines.findIndex((line) =>
+        line.includes("Follow-up questions:")
+      );
+      if (followUpQuestionsIndex !== -1) {
+        const questions = lines
+          .slice(followUpQuestionsIndex + 1)
+          .filter((line) => line.trim().startsWith("-"))
+          .map((line) => line.trim().substring(2));
+        setFollowUpQuestions(questions);
+        setIsSuggestions(true);
+      } else {
+        setFollowUpQuestions([]);
+      }
+
       eventSource.close();
     });
   };
 
+  useEffect(() => {}, [followUpQuestions]);
+
+  const handleQuestionClick = (question) => {
+    setMessageText(question);
+    setIsSuggestions(false);
+  };
+
   const chat = async () => {
     sendQuestion();
-    await getAnswer();
+    const answer = await getAnswer();
+    await getFollowUpQuestions(answer);
   };
 
   const handleKeyDown = (e) => {
@@ -158,99 +214,110 @@ function ChatComponent({ user }) {
 
   return (
     <>
-      <div className="cwa_suggestion-container">
-        <div className="cwa_box-suggestion">
-          <div className="cwa_box-container">
-            <div className="cwa_box-suggestion-header">
-              <h3>🤓 Explain a complicated thing</h3>
+      <div className="cwa_chat-content-container">
+        <div className="cwa_suggestion-container">
+          <div className="cwa_box-suggestion">
+            <div className="cwa_box-container">
+              <div className="cwa_box-suggestion-header">
+                <h3>🤓 Explain a complicated thing</h3>
+              </div>
+              <div className="cwa_box-suggestion-content">
+                <p>
+                  Explain Artificial Intelligence so I can explain it for my six
+                  year old.
+                </p>
+              </div>
             </div>
-            <div className="cwa_box-suggestion-content">
-              <p>
-                Explain Artificial Intelligence so I can explain it for my six
-                year old.
-              </p>
+            <div className="cwa_box-suggestion-btn">
+              <ArrowButton />
             </div>
           </div>
-          <div className="cwa_box-suggestion-btn">
-            <ArrowButton />
+          <div className="cwa_box-suggestion">
+            <div className="cwa_box-container">
+              <div className="cwa_box-suggestion-header">
+                <h3>🧠 Get suggestions and generate new ideas</h3>
+              </div>
+              <div className="cwa_box-suggestion-content">
+                <p>Please give me the 10 best coding ideas in the world.</p>
+              </div>
+            </div>
+            <div className="cwa_box-suggestion-btn">
+              <ArrowButton />
+            </div>
+          </div>
+          <div className="cwa_box-suggestion">
+            <div className="cwa_box-container">
+              <div className="cwa_box-suggestion-header">
+                <h3>💭 Translate, summarize, correct grammar and more...</h3>
+              </div>
+              <div className="cwa_box-suggestion-content">
+                <p>Translate "I love you", into French.</p>
+              </div>
+            </div>
+            <div className="cwa_box-suggestion-btn">
+              <ArrowButton />
+            </div>
           </div>
         </div>
-        <div className="cwa_box-suggestion">
-          <div className="cwa_box-container">
-            <div className="cwa_box-suggestion-header">
-              <h3>🧠 Get suggestions and generate new ideas</h3>
-            </div>
-            <div className="cwa_box-suggestion-content">
-              <p>Please give me the 10 best coding ideas in the world.</p>
-            </div>
-          </div>
-          <div className="cwa_box-suggestion-btn">
-            <ArrowButton />
-          </div>
-        </div>
-        <div className="cwa_box-suggestion">
-          <div className="cwa_box-container">
-            <div className="cwa_box-suggestion-header">
-              <h3>💭 Translate, summarize, correct grammar and more...</h3>
-            </div>
-            <div className="cwa_box-suggestion-content">
-              <p>Translate "I love you", into French.</p>
-            </div>
-          </div>
-          <div className="cwa_box-suggestion-btn">
-            <ArrowButton />
-          </div>
-        </div>
-      </div>
-      <div className="cwa_messages-container">
-        <div className="cwa_messages">
-          {messages.length > 0 &&
-            messages.map((message, index) => {
-              if (message.type === "loading") {
-                return (
-                  <div
-                    key={index}
-                    className={`cwa_content-mess cwa_${message.type}`}
-                  >
-                    <img
-                      className="cwa_message-avatar user"
-                      src={message.avatar}
-                    />
-                    <div className={`cwa_message-content cwa_${message.type}`}>
-                      <p className={`cwa_${message.type} cwa_loading`}>
-                        {message.text}
-                      </p>
+        <div className="cwa_messages-container">
+          <div className="cwa_messages">
+            {messages.length > 0 &&
+              messages.map((message, index) => {
+                if (message.type === "loading") {
+                  return (
+                    <div
+                      key={index}
+                      className={`cwa_content-mess cwa_${message.type}`}
+                    >
+                      <img
+                        className="cwa_message-avatar user"
+                        src={message.avatar}
+                      />
+                      <div
+                        className={`cwa_message-content cwa_${message.type}`}
+                      >
+                        <p className={`cwa_${message.type} cwa_loading`}>
+                          {message.text}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                );
-              } else {
-                return (
-                  <div
-                    key={index}
-                    className={`cwa_content-mess cwa_${message.type}`}
-                  >
-                    <img
-                      className="cwa_message-avatar user"
-                      src={message.avatar}
-                    />
-                    <div className={`cwa_message-content cwa_${message.type}`}>
-                      <p className={`cwa_${message.type}`}>{message.text}</p>
+                  );
+                } else {
+                  return (
+                    <div
+                      key={index}
+                      className={`cwa_content-mess cwa_${message.type}`}
+                    >
+                      <img
+                        className="cwa_message-avatar user"
+                        src={message.avatar}
+                      />
+                      <div
+                        className={`cwa_message-content cwa_${message.type}`}
+                      >
+                        <p className={`cwa_${message.type}`}>{message.text}</p>
+                      </div>
                     </div>
-                  </div>
-                );
-              }
-            })}
-          <div ref={endOfMessagesRef} />
+                  );
+                }
+              })}
+            <div ref={endOfMessagesRef} />
+          </div>
         </div>
       </div>
-      <div className="cwa_tip">
-        <div className="cwa_scissors-icon">
-          <ScissorsIcon />
+      {isSuggestions && (
+        <div className="cwa_suggestion-question-container">
+          {followUpQuestions.map((question, index) => (
+            <button
+              key={index}
+              onClick={() => handleQuestionClick(question)}
+              className="cwa_suggestion-question-button"
+            >
+              {question}
+            </button>
+          ))}
         </div>
-        <div className="cwa_upload-image-icon">
-          <UploadImageIcon />
-        </div>
-      </div>
+      )}
       <div className="cwa_input-area">
         <input
           type="text"
@@ -268,7 +335,13 @@ function ChatComponent({ user }) {
           }`}
           onClick={chat}
         >
-          {isDisable ? <LoadingIcon /> : <SendIcon />}
+          {isDisable ? (
+            <LoadingIcon />
+          ) : (
+            <SendIcon
+              fill={messageText.trim() !== "" && !isDisable ? "#FFF" : "#000"}
+            />
+          )}
         </button>
       </div>
     </>
