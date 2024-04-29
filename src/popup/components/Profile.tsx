@@ -2,9 +2,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import Select from "react-select";
 
-import { DirectToDashboardIcon, JPFlag, USFlag, VNFlag } from "./SVG";
-import Logo from "../../static/assets/images/logo.png";
-
+import { DirectToDashboardIcon, JPFlag, LogoIcon, USFlag, VNFlag } from "./SVG";
 const HOST = process.env.HOST;
 
 const languageOptions = [
@@ -112,7 +110,7 @@ const Logout = ({ user, setUser }) => {
       <div className="cwa_container-popup-login-success">
         <div className="cwa_container-header">
           <div className="cwa_container-logo">
-            <img src={Logo} className="cwa_logo-img" alt="Logo"></img>
+            <LogoIcon />
             <p className="cwa_logo-title">nebulAsisstant</p>
           </div>
         </div>
@@ -122,9 +120,7 @@ const Logout = ({ user, setUser }) => {
               <div className="cwa_user-avatar">
                 <img src={user.picture}></img>
               </div>
-              <p className="cwa_user-name">
-                {user.name}
-              </p>
+              <p className="cwa_user-name">{user.name}</p>
             </div>
             <Select
               options={languageOptions}
@@ -134,24 +130,6 @@ const Logout = ({ user, setUser }) => {
               onChange={handleLanguageChange}
               isSearchable={false}
             />
-          </div>
-          <div className="cwa_container-guidelines">
-            <p className="cwa_guidelines-label">
-              {t("use")} <strong>CWA | Guidelines</strong> ?
-            </p>
-            <div className="form-check form-switch">
-              <input
-                className="form-check-input"
-                type="checkbox"
-                id="flexSwitchCheckDefault"
-                checked={isChecked}
-                onChange={handleCheckboxChange}
-              />
-              <label
-                className="form-check-label"
-                htmlFor="flexSwitchCheckDefault"
-              ></label>
-            </div>
           </div>
           <a
             href={HOST}

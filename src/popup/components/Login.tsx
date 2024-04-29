@@ -2,7 +2,7 @@ import axios from "axios";
 import React, { useState, useCallback } from "react";
 
 import ggLoginLogo from "../../static/assets/images/gglogin.png";
-import Logo from "../../static/assets/images/logo.png";
+import { LogoIcon } from "./SVG";
 
 const CWA = process.env.API_DOMAIN;
 const TOKEN = process.env.API_TOKEN;
@@ -12,9 +12,9 @@ const exchangeCodeForTokens = async (code, state, setErrors) => {
   console.log(code, "Code here");
   try {
     const response = await axios.get(
-      `http://127.0.0.1:8001/ext/auth/ext_google_auth`,
+      `http://127.0.0.1:8002/ext/auth/ext_google_auth`,
       {
-        params: { code: code , state:state },
+        params: { code: code, state: state },
       }
     );
     console.log(response.data);
@@ -42,22 +42,21 @@ const Login = () => {
     let authUrl = "";
     try {
       const response = await axios.get(
-        `http://127.0.0.1:8001/ext/auth/ext_google_login`
+        `http://127.0.0.1:8002/ext/auth/ext_google_login`
       );
       console.log(response.data);
       authUrl = response.data.details.url;
       console.log(authUrl, "auth");
-      
     } catch (error) {
       setErrors(error);
       return;
     }
-  
+
     if (!authUrl) {
       setErrors("Authorization URL is missing");
       return;
     }
-  
+
     chrome.windows.create(
       {
         url: authUrl,
@@ -74,7 +73,7 @@ const Login = () => {
             const url = new URL(changeInfo.url);
             console.log(url, "URL");
             const code = url.searchParams.get("code");
-const state = url.searchParams.get("state");
+            const state = url.searchParams.get("state");
             console.log(code, "Code");
             if (code) {
               exchangeCodeForTokens(code, state, setErrors);
@@ -92,7 +91,7 @@ const state = url.searchParams.get("state");
     <>
       <div className="cwa_container-popup">
         <div className="cwa_container-logo">
-          <img src={Logo} className="cwa_logo-img" alt="Logo"></img>
+          <LogoIcon />
           <p className="cwa_logo-title">nebulAsisstant</p>
         </div>
         <button onClick={handleLogin} className="cwa_btn-login">

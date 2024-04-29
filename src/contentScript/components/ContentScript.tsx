@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from "react";
 
-import { CloseCWA } from "./SVG";
+import { CloseCWA, LogoIcon } from "./SVG";
 import ChatBox from "./ChatBox";
-
-const logo = chrome.runtime.getURL("assets/images/logo.png");
 
 const ContentScript = () => {
   const [user, setUser] = useState({
@@ -79,7 +77,7 @@ const ContentScript = () => {
                 tooltip-data="CO-WELL Assistant"
               >
                 <div className="cwa_view-icon-item">
-                  <img src={logo} className="cwa_custom-img" alt="Logo"></img>
+                  <LogoIcon />
                 </div>
               </div>
             </div>

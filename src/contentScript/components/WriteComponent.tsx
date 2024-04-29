@@ -69,6 +69,8 @@ function WriteComponent({ user }) {
   const [selectedLanguage, setSelectedLanguage] = useState("");
   const [response, setResponse] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isAnswer, setIsAnswer] = useState(false);
+  const [originText, setOriginText] = useState("");
 
   const handleTextareaChange = (event) => {
     setTextareaContent(event.target.value);
@@ -102,14 +104,19 @@ function WriteComponent({ user }) {
   };
 
   const handleSend = () => {
-    const formattedContext = `Hãy giúp tôi viết 1 đoạn composer với chủ đề ${context.subject} với loại văn bản ${context.type} với tone giọng ${context.tone} với độ dài ${context.length} bằng ngôn ngữ ${context.language}`;
-    return formattedContext;
+    if (activeTab === "Composer") {
+      const formattedContext = `Hãy giúp tôi viết 1 đoạn composer với chủ đề ${context.subject} với loại văn bản ${context.type} với tone giọng ${context.tone} với độ dài ${context.length} bằng ngôn ngữ ${context.language}`;
+      return formattedContext;
+    } else {
+      const formattedContext = `Hãy giúp tôi viết 1 đoạn answer để trả lời đoạn văn bản ${originText} với chủ đề ${context.subject} với loại văn bản ${context.type}, tone giọng ${context.tone}, độ dài ${context.length} và bằng ngôn ngữ ${context.language}`;
+      return formattedContext;
+    }
   };
 
   const getContextAnswer = async (formattedContext) => {
     setIsLoading(true);
     const eventSource = new EventSourcePolyfill(
-      `http://127.0.0.1:8001/ext/chat?query=${encodeURIComponent(
+      `http://127.0.0.1:8002/ext/chat?query=${encodeURIComponent(
         formattedContext
       )}&user_email=${encodeURIComponent(user.email)}`
     );
@@ -121,6 +128,7 @@ function WriteComponent({ user }) {
       for (let char of data.text) {
         answer += char;
         setResponse(answer);
+        setIsAnswer(true);
         setIsLoading(false);
       }
     });
@@ -189,11 +197,53 @@ function WriteComponent({ user }) {
           />
         </div>
       )}
-      {activeTab === "Answer" && <div className="cwa_composer-answer"></div>}
+      {activeTab === "Answer" && (
+        <div className="cwa_answer-content">
+          <textarea
+            className="cwa_answer-textarea"
+            placeholder="The original text you want to reply to..."
+            onChange={(e) => setOriginText(e.target.value)}
+            value={originText}
+          ></textarea>
+          <textarea
+            className="cwa_composer-textarea"
+            placeholder="Subject that you want to write about..."
+            value={textareaContent}
+            onChange={handleTextareaChange}
+            onBlur={handleTextareaBlur}
+          ></textarea>
+          <TypeComposerTypeItem
+            title="Type"
+            icon={<IconType />}
+            items={typeItems}
+            onSelect={handleTypeSelect}
+          />
+          <ToneComposerTypeItem
+            title="Tone"
+            icon={<IconTone />}
+            items={toneItems}
+            onSelect={handleToneSelect}
+          />
+          <LengthComposerTypeItem
+            title="Length"
+            icon={<IconLength />}
+            items={lengthItems}
+            onSelect={handleLengthSelect}
+          />
+          <ComposerLanguage
+            icon={<IconLanguage />}
+            options={languageOptions}
+            onSelect={handleLanguageSelect}
+          />
+        </div>
+      )}
       <button className="cwa_composer-send-btn" onClick={sendContextAndAnswer}>
         Send
       </button>
-      <div className="cwa_write-answer">
+      <div
+        className="cwa_write-answer"
+        style={{ display: isLoading || isAnswer ? "block" : "none" }}
+      >
         {isLoading ? "Thinking..." : response}
       </div>
     </div>
@@ -218,7 +268,9 @@ function ToneComposerTypeItem({ title, icon, items, onSelect }) {
         {items.map((item, index) => (
           <div
             key={index}
-            className={`cwa_composer-tone-item ${item.text === activeItem ? "active" : ""}`}
+            className={`cwa_composer-tone-item ${
+              item.text === activeItem ? "active" : ""
+            }`}
             onClick={() => handleSelect(item.text)}
           >
             {typeof item === "string" ? item : item.icon} {item.text}
@@ -246,7 +298,9 @@ function LengthComposerTypeItem({ title, icon, items, onSelect }) {
         {items.map((item, index) => (
           <div
             key={index}
-            className={`cwa_composer-length-item ${item.text === activeItem ? "active" : ""}`}
+            className={`cwa_composer-length-item ${
+              item.text === activeItem ? "active" : ""
+            }`}
             onClick={() => handleSelect(item.text)}
           >
             {typeof item === "string" ? item : item.icon} {item.text}
@@ -274,7 +328,9 @@ function TypeComposerTypeItem({ title, icon, items, onSelect }) {
         {items.map((item, index) => (
           <div
             key={index}
-            className={`cwa_composer-type-item ${item.text === activeItem ? "active" : ""}`}
+            className={`cwa_composer-type-item ${
+              item.text === activeItem ? "active" : ""
+            }`}
             onClick={() => handleSelect(item.text)}
           >
             {typeof item === "string" ? item : item.icon} {item.text}
