@@ -34,7 +34,6 @@
     {
       "resources": [
         "assets/images/icon.png",
-        "assets/images/logo.png",
         "locales/en/translation.json",
         "locales/vi/translation.json",
         "locales/jp/translation.json"

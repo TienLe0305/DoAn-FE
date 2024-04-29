@@ -23,9 +23,9 @@ body {
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  gap: 1rem;
-  height: 200px;
-  width: 400px;
+  gap: 0.9rem;
+  height: 180px;
+  width: 320px;
   transform: translate3d(0, 0, 0);
 }
 
@@ -34,10 +34,10 @@ body {
   flex-direction: column;
   justify-content: space-around;
   align-items: center;
-  height: 325px;
+  height: 220px;
   padding: 20px;
-  width: 400px;
-  gap: 25px;
+  width: 320px;
+  gap: 10px;
 }
 
 .cwa_btn-login,
@@ -62,7 +62,7 @@ body {
   padding: var(--padding-value-CWA);
   background-color: #ebebeb;
   width: 250px;
-  height: 45px;
+  height: 40px;
   border-radius: var(--border-radius-CWA);
   box-shadow: 0px 3px 3px 0px rgba(0, 0, 0, 0.2);
   font-size: 1rem;
@@ -78,12 +78,12 @@ body {
 
 .cwa_btn-logout {
   background-color: #fff1f1;
-  padding: var(--padding-value-CWA) 20px;
+  padding: var(--padding-value-CWA) 15px;
   border-radius: var(--border-radius-CWA);
   font-weight: bold;
   color: #ff4f4f;
-  font-size: 1.1rem;
-  height: 38px;
+  font-size: 0.9rem;
+  height: 30px;
   transition: all 0.5s;
   border: none;
   outline: none;
@@ -122,7 +122,7 @@ body {
 .wave5 {
   opacity: 0.6;
   position: absolute;
-  background: rgba(86, 187, 85, 0.4);
+  background: #378ba5;
   width: 200px;
   height: 200px;
   margin-left: -250px;
@@ -146,7 +146,7 @@ body {
 
 .wave2,
 .wave4 {
-  background: rgba(86, 187, 85, 0.5);
+  background: #378ba5;
 }
 
 .wave2 {
@@ -186,7 +186,7 @@ body {
 .wave5.-two {
   animation: drift 11000ms infinite linear;
   opacity: 0.1;
-  background: rgba(86, 187, 85, 0.7);
+  background: #378ba5;
   pointer-events: none;
 }
 
@@ -223,7 +223,7 @@ body {
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  gap: 10px;
+  gap: 5px;
   z-index: 9999;
 }
 
@@ -257,9 +257,9 @@ body {
 }
 
 .cwa_user-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: var(--border-radius-CWA);
+  width: 30px;
+  height: 30px;
+  border-radius: 5px;
   border: none;
   box-shadow: 0 3px 3px 0px rgba(0, 0, 0, 0.2);
   overflow: hidden;
@@ -274,7 +274,7 @@ body {
 
 .cwa_user-name {
   margin: 0 !important;
-  font-size: 1.15rem;
+  font-size: 1rem;
 }
 
 .cwa_container-guidelines,
@@ -285,8 +285,8 @@ body {
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  padding: 20px;
-  height: 45px;
+  padding: 15px;
+  height: 35px;
   border: none;
   outline: none;
   box-shadow: 0 3px 3px 0 rgba(0, 0, 0, 0.3);
@@ -307,7 +307,7 @@ body {
 }
 
 .cwa_container-visit-dashboard {
-  background: #203532;
+  background: #02212a;
   color: white;
   cursor: pointer;
   text-decoration: none;
@@ -316,7 +316,7 @@ body {
 .cwa_guidelines-label,
 .cwa_visit-dashboard-label {
   margin: 0 !important;
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: 500;
   line-height: 100%;
   margin-top: 4px !important;
@@ -352,8 +352,8 @@ body {
 }
 
 .cwa_container-loading {
-  width: 400px;
-  height: 200px;
+  width: 320px;
+  height: 220px;
 }
 
 .cwa_indicator-component {
@@ -367,7 +367,7 @@ body {
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  margin-bottom: 15px;
+  margin-bottom: 10px;
 }
 
 @keyframes forward {
