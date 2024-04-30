@@ -30,11 +30,17 @@ const ChatBox = ({ user, setIsOpen }) => {
     });
   }, []);
 
-  const handleKeyDownEsc = (event) => {
-    if (event.key === "Escape") {
-      setIsOpen(false);
-    }
-  };
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        setIsOpen(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
 
   const handleClose = () => {
     setIsOpen(false);
@@ -48,50 +54,68 @@ const ChatBox = ({ user, setIsOpen }) => {
 
   return (
     <div ref={chatBoxRef} id="CWA">
-      <div className={`cwa_box-chat-container ${selectedComponent === 'Write' ? 'writing' : ''}`}>
+      <div
+        className={`cwa_box-chat-container ${
+          selectedComponent === "Write" ? "writing" : ""
+        }`}
+      >
         <div className="cwa_header">
           <div className="cwa_title">
-            {/* <img src={urls.logo} alt="logo" /> */}
             <LogoIcon />
             <h3 className="cwa_h3">nebulAsisstant</h3>
           </div>
-          <div className="cwa_exit-icon" onClick={handleClose}>
-            <ExitIcon />
-          </div>
         </div>
         {selectedComponent === "Chat" && <ChatComponent user={user} />}
-        {selectedComponent === 'Write' && <WriteComponent user={user}/>}
+        {selectedComponent === "Write" && <WriteComponent user={user} />}
       </div>
       <div className="cwa_side-bar-container">
+        <div className="cwa_exit-icon" onClick={handleClose}>
+          <ExitIcon />
+        </div>
         <div
-          className="cwa_btn-chat-side-bar cwa-btn-side-bar"
+          className={`cwa_btn-chat-side-bar cwa-btn-side-bar ${
+            selectedComponent === "Chat" ? "selected" : ""
+          }`}
           onClick={() => handleIconClick("Chat")}
         >
           <ChatIconSideBar />
+          <span className="tooltip-text">Chat</span>
         </div>
         <div
-          className="cwa_btn-question-side-bar cwa-btn-side-bar"
+          className={`cwa_btn-chat-side-bar cwa-btn-side-bar ${
+            selectedComponent === "Question" ? "selected" : ""
+          }`}
           onClick={() => handleIconClick("Question")}
         >
           <QuestionIconSideBar />
+          <span className="tooltip-text">Question</span>
         </div>
         <div
-          className="cwa_btn-write-side-bar cwa-btn-side-bar"
+          className={`cwa_btn-chat-side-bar cwa-btn-side-bar ${
+            selectedComponent === "Write" ? "selected" : ""
+          }`}
           onClick={() => handleIconClick("Write")}
         >
           <WriteIconSideBar />
+          <span className="tooltip-text">Write</span>
         </div>
         <div
-          className="cwa_btn-image-side-bar cwa-btn-side-bar"
+          className={`cwa_btn-chat-side-bar cwa-btn-side-bar ${
+            selectedComponent === "Image" ? "selected" : ""
+          }`}
           onClick={() => handleIconClick("Image")}
         >
           <UploadImageIcon />
+          <span className="tooltip-text">Image</span>
         </div>
         <div
-          className="cwa_btn-chat-pdf-side-bar cwa-btn-side-bar"
+          className={`cwa_btn-chat-side-bar cwa-btn-side-bar ${
+            selectedComponent === "PDF" ? "selected" : ""
+          }`}
           onClick={() => handleIconClick("PDF")}
         >
           <PDFIconSideBar />
+          <span className="tooltip-text">PDF</span>
         </div>
       </div>
     </div>
