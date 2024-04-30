@@ -20,6 +20,9 @@ const urls = {
 const ChatBox = ({ user, setIsOpen }) => {
   const { t, i18n } = useTranslation();
 
+  const [selectedComponent, setSelectedComponent] = useState("Chat");
+  const [isPDF, setIsPDF] = useState(false);
+
   const chatBoxRef = useRef(null);
 
   useEffect(() => {
@@ -46,10 +49,18 @@ const ChatBox = ({ user, setIsOpen }) => {
     setIsOpen(false);
   };
 
-  const [selectedComponent, setSelectedComponent] = useState("Chat");
+  const handlePDFOpen = (newIsPDF) => {
+    console.log("PDF", newIsPDF);
+    setIsPDF(newIsPDF);
+  };
 
   const handleIconClick = (component) => {
     setSelectedComponent(component);
+    if (component === "PDF") {
+      setIsPDF(true);
+    } else {
+      setIsPDF(false);
+    }
   };
 
   return (
@@ -65,8 +76,13 @@ const ChatBox = ({ user, setIsOpen }) => {
             <h3 className="cwa_h3">nebulAsisstant</h3>
           </div>
         </div>
-        {selectedComponent === "Chat" && <ChatComponent user={user} />}
+        {selectedComponent === "Chat" && (
+          <ChatComponent user={user} isPDF={isPDF} onPDFOpen={handlePDFOpen} />
+        )}
         {selectedComponent === "Write" && <WriteComponent user={user} />}
+        {selectedComponent === "PDF" && (
+          <ChatComponent user={user} isPDF={isPDF} onPDFOpen={handlePDFOpen} />
+        )}
       </div>
       <div className="cwa_side-bar-container">
         <div className="cwa_exit-icon" onClick={handleClose}>
@@ -112,7 +128,12 @@ const ChatBox = ({ user, setIsOpen }) => {
           className={`cwa_btn-chat-side-bar cwa-btn-side-bar ${
             selectedComponent === "PDF" ? "selected" : ""
           }`}
-          onClick={() => handleIconClick("PDF")}
+          onClick={() => {
+            if (!isPDF) {
+              handleIconClick("PDF");
+            }
+          }}
+          style={{ pointerEvents: isPDF ? "none" : "auto" }}
         >
           <PDFIconSideBar />
           <span className="tooltip-text">PDF</span>

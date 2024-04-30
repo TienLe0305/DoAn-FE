@@ -116,7 +116,7 @@ function WriteComponent({ user }) {
   const getContextAnswer = async (formattedContext) => {
     setIsLoading(true);
     const eventSource = new EventSourcePolyfill(
-      `http://127.0.0.1:8002/ext/chat?query=${encodeURIComponent(
+      `http://127.0.0.1:8004/ext/chat?query=${encodeURIComponent(
         formattedContext
       )}&user_email=${encodeURIComponent(user.email)}`
     );

@@ -9,15 +9,16 @@ import {
   LoadingIcon,
   UploadImageIcon,
   ArrowButton,
+  UploadPDFIcon,
 } from "./SVG";
 
 const urls = {
   icon: chrome.runtime.getURL("assets/images/icon.png"),
 };
 
-function ChatComponent({ user }) {
+function ChatComponent({ user, isPDF, onPDFOpen }) {
   const { t, i18n } = useTranslation();
-
+  const [isOpenPDF, setIsOpenPDF] = useState(isPDF);
   const [messages, setMessages] = useState([
     {
       text: "",
@@ -47,6 +48,14 @@ function ChatComponent({ user }) {
   and so on...`;
 
   useEffect(() => {
+    onPDFOpen(isOpenPDF);
+  }, [isOpenPDF]);
+
+  useEffect(() => {
+    setIsOpenPDF(isPDF);
+  }, [isPDF]);
+
+  useEffect(() => {
     chrome.storage.local.get("language", function (result) {
       if (result.language !== undefined) {
         i18n.changeLanguage(result.language);
@@ -69,7 +78,7 @@ function ChatComponent({ user }) {
     if (authToken) {
       axios
         .get(
-          `http://127.0.0.1:8002/ext/chat_history?user_email=${encodeURIComponent(
+          `http://127.0.0.1:8004/ext/chat_history?user_email=${encodeURIComponent(
             user.email
           )}`
         )
@@ -110,7 +119,7 @@ function ChatComponent({ user }) {
     }
   };
 
-  const getAnswer = async () => {
+  const getAnswer = async (formData = null) => {
     let loadingMessage = {
       text: "Thinking...",
       avatar: urls.icon,
@@ -119,9 +128,10 @@ function ChatComponent({ user }) {
     setMessages((prevMessage) => [...prevMessage, loadingMessage]);
 
     const eventSource = new EventSourcePolyfill(
-      `http://127.0.0.1:8002/ext/chat?query=${encodeURIComponent(
+      `http://127.0.0.1:8004/ext/chat?query=${encodeURIComponent(
         messageText
-      )}&user_email=${encodeURIComponent(user.email)}`
+      )}&user_email=${encodeURIComponent(user.email)}`,
+      formData ? { body: formData } : {}
     );
 
     setIsDisable(true);
@@ -150,16 +160,14 @@ function ChatComponent({ user }) {
 
   const getFollowUpQuestions = async (answer) => {
     const eventSource = new EventSourcePolyfill(
-      `http://127.0.0.1:8002/ext/chat?query=${encodeURIComponent(
+      `http://127.0.0.1:8004/ext/chat?query=${encodeURIComponent(
         answer + followUpQuestionsPrompts
       )}&user_email=${encodeURIComponent(user.email)}`
     );
     let followUpQuestions = "";
 
     eventSource.addEventListener("response", (event) => {
-      console.log(event.data);
       const data = JSON.parse(event.data);
-      console.log(data, "data");
       for (let char of data.text) {
         followUpQuestions += char;
       }
@@ -185,7 +193,9 @@ function ChatComponent({ user }) {
     });
   };
 
-  useEffect(() => {}, [followUpQuestions]);
+  useEffect(() => {
+    setFollowUpQuestions(followUpQuestions);
+  }, [followUpQuestions]);
 
   const handleQuestionClick = (question) => {
     setMessageText(question);
@@ -212,9 +222,68 @@ function ChatComponent({ user }) {
     setMessageText(value);
   };
 
+  const pdfChatRef = useRef(null);
+
+  const hidePDFChat = () => {
+    setIsOpenPDF(false);
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (pdfChatRef.current && !pdfChatRef.current.contains(event.target)) {
+        hidePDFChat(); 
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []); 
+
+  const PDFChatComponent = () => {
+    const handlePdfUpload = async (e) => {
+      const file = e.target.files[0];
+      console.log(file);
+      const formData = new FormData();
+      formData.append("file", file);
+    };
+
+    return (
+      <div ref={pdfChatRef} className="cwa_pdf-uploader">
+        <input
+          type="file"
+          id="pdf-upload"
+          accept=".pdf"
+          onChange={handlePdfUpload}
+          style={{ display: "none" }}
+        />
+        <div className="cwa_upload-pdf-container">
+          <div className="cwa_upload-pdf-title">
+            <h2>
+              Tải lên PDF bằng tiếng Việt và chỉ cung cấp cho tôi bản dịch chính
+              xác!
+            </h2>
+          </div>
+          <div className="cwa_upload-pdf-content">
+            <p>
+              Tải lên một tệp PDF để dễ dàng nhận được bản tóm tắt thông minh và
+              câu trả lời cho tài liệu của bạn.
+            </p>
+          </div>
+          <label htmlFor="pdf-upload" className="cwa_upload-pdf-footer">
+            <UploadPDFIcon />
+            <p>Loại tệp được hỗ trợ là PDF</p>
+            <p>Kéo PDF của bạn vào đây hoặc nhấp vào để tải lên</p>
+          </label>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <>
       <div className="cwa_chat-content-container">
+        {isOpenPDF && <PDFChatComponent />}
         <div className="cwa_suggestion-container">
           <div className="cwa_box-suggestion">
             <div className="cwa_box-container">

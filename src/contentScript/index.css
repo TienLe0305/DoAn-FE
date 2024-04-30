@@ -331,7 +331,7 @@
 }
 
 #CWA .cwa_exit-icon {
-  box-shadow:inset 0 1px 5px 2px rgba(0,0,0,0.3);
+  box-shadow: inset 0 1px 5px 2px rgba(0, 0, 0, 0.3);
   height: 40px;
   display: flex;
   cursor: pointer;
@@ -483,7 +483,7 @@
   display: flex;
   flex-direction: column;
   padding: var(--padding-value-CWA);
-  height: 37vh;
+  height: 35vh;
   width: 100%;
 }
 
@@ -554,7 +554,7 @@
 #CWA .cwa_message-avatar {
   width: 30px;
   height: 30px;
-  border-radius: 3px;
+  border-radius: 50%;
   object-fit: cover;
   margin: calc(var(--margin-value-CWA) / 2);
 }
@@ -962,6 +962,58 @@
 #CWA .cwa-btn-side-bar:hover .tooltip-text {
   visibility: visible;
   opacity: 1;
+}
+
+#CWA .cwa_pdf-uploader {
+  color: black;
+  box-shadow: 0 5px 50px 1px rgba(0, 0, 0, 0.4);
+  background: white;
+  width: 26vw;
+  position: absolute;
+  margin: auto;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 15px;
+  padding: 20px;
+  text-align: center;
+}
+
+#CWA .cwa_upload-pdf-container {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+  height: 100%;
+  gap: 1rem;
+}
+
+#CWA .cwa_upload-pdf-footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 10px;
+  border: 2px dotted black;
+  padding: 15px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+#CWA .cwa_upload-pdf-footer p:last-child {
+  color: rgba(0, 0, 0, 0.5);
+}
+
+#CWA .cwa_upload-pdf-title {
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+}
+
+#CWA .cwa_upload-pdf-content {
+  color: rgba(0, 0, 0, 0.5);
+}
+
+#CWA .cwa_upload-pdf-footer:hover {
+  opacity: 0.7;
 }
 
 @keyframes spin {
