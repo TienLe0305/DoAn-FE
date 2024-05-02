@@ -10,6 +10,7 @@ import {
   UploadImageIcon,
   ArrowButton,
   UploadPDFIcon,
+  UploadPDFIconInMessage,
 } from "./SVG";
 
 const urls = {
@@ -74,6 +75,39 @@ function ChatComponent({ user, isPDF, onPDFOpen }) {
     endOfMessagesRef.current?.scrollIntoView({ behavior: "instant" });
   }, [messages]);
 
+  // const getChatHistory = () => {
+  //   if (authToken) {
+  //     axios
+  //       .get(
+  //         `http://127.0.0.1:8004/ext/chat_history?user_email=${encodeURIComponent(
+  //           user.email
+  //         )}`
+  //       )
+  //       .then((res) => {
+  //         const formattedMessages = res.data
+  //           .map((message) => {
+  //             return [
+  //               {
+  //                 text: message.user_ask,
+  //                 avatar: user.picture,
+  //                 type: "question",
+  //               },
+  //               {
+  //                 text: message.assistant_answer,
+  //                 avatar: urls.icon,
+  //                 type: "answer",
+  //               },
+  //             ];
+  //           })
+  //           .flat();
+  //         setMessages(formattedMessages);
+  //       })
+  //       .catch((error) => {
+  //         setError(error);
+  //       });
+  //   }
+  // };
+
   const getChatHistory = () => {
     if (authToken) {
       axios
@@ -85,11 +119,18 @@ function ChatComponent({ user, isPDF, onPDFOpen }) {
         .then((res) => {
           const formattedMessages = res.data
             .map((message) => {
+              const isPdfMessage =
+                message.user_ask.includes("<pdf>") &&
+                message.user_ask.includes("</pdf>");
+              const userAsk = isPdfMessage
+                ? message.user_ask.replace(/<\/?pdf>/g, "")
+                : message.user_ask;
+
               return [
                 {
-                  text: message.user_ask,
+                  text: userAsk,
                   avatar: user.picture,
-                  type: "question",
+                  type: isPdfMessage ? "pdf" : "question",
                 },
                 {
                   text: message.assistant_answer,
@@ -107,19 +148,20 @@ function ChatComponent({ user, isPDF, onPDFOpen }) {
     }
   };
 
-  const sendQuestion = async () => {
-    if (messageText.trim() !== "" && !isDisable) {
+  const sendQuestion = async (text) => {
+    if (text.trim() !== "" && !isDisable) {
+      const isPdfMessage = text.includes("<pdf>") && text.includes("</pdf>");
       let newQuestion = {
-        text: messageText,
+        text: isPdfMessage ? text.replace(/<\/?pdf>/g, "") : text,
         avatar: user.picture,
-        type: "question",
+        type: isPdfMessage ? "pdf" : "question",
       };
       setMessages((prevMessage) => [...prevMessage, newQuestion]);
       setMessageText("");
     }
   };
 
-  const getAnswer = async (formData = null) => {
+  const getAnswer = async (text, pdf_name = null) => {
     let loadingMessage = {
       text: "Thinking...",
       avatar: urls.icon,
@@ -129,9 +171,10 @@ function ChatComponent({ user, isPDF, onPDFOpen }) {
 
     const eventSource = new EventSourcePolyfill(
       `http://127.0.0.1:8004/ext/chat?query=${encodeURIComponent(
-        messageText
-      )}&user_email=${encodeURIComponent(user.email)}`,
-      formData ? { body: formData } : {}
+        text
+      )}&user_email=${encodeURIComponent(user.email)}${
+        pdf_name ? `&pdf_name=${encodeURIComponent(pdf_name)}` : ""
+      }`
     );
 
     setIsDisable(true);
@@ -203,9 +246,10 @@ function ChatComponent({ user, isPDF, onPDFOpen }) {
   };
 
   const chat = async () => {
-    sendQuestion();
-    const answer = await getAnswer();
-    await getFollowUpQuestions(answer);
+    sendQuestion(messageText);
+    await getAnswer(messageText);
+    // const answer = await getAnswer();
+    // await getFollowUpQuestions(answer);
   };
 
   const handleKeyDown = (e) => {
@@ -231,21 +275,39 @@ function ChatComponent({ user, isPDF, onPDFOpen }) {
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (pdfChatRef.current && !pdfChatRef.current.contains(event.target)) {
-        hidePDFChat(); 
+        hidePDFChat();
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, []); 
+  }, []);
 
   const PDFChatComponent = () => {
     const handlePdfUpload = async (e) => {
       const file = e.target.files[0];
-      console.log(file);
       const formData = new FormData();
       formData.append("file", file);
+      sendQuestion(`<pdf>${file.name}</pdf>`);
+
+      try {
+        const response = await fetch("http://127.0.0.1:8004/ext/upload_pdf", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          const pdfText = data.pdf_text;
+          const pdfName = file.name;
+          await getAnswer(`What is this ?${pdfText}`, pdfName);
+        } else {
+          console.error("Đã xảy ra lỗi khi gửi file PDF lên BE.");
+        }
+      } catch (error) {
+        console.error("Lỗi khi gửi file PDF lên BE:", error);
+      }
     };
 
     return (
@@ -348,6 +410,29 @@ function ChatComponent({ user, isPDF, onPDFOpen }) {
                         <p className={`cwa_${message.type} cwa_loading`}>
                           {message.text}
                         </p>
+                      </div>
+                    </div>
+                  );
+                } else if (message.type === "pdf") {
+                  return (
+                    <div
+                      key={index}
+                      className={`cwa_content-mess cwa_${message.type}`}
+                    >
+                      <img
+                        className="cwa_message-avatar user"
+                        src={message.avatar}
+                      />
+                      <div
+                        className={`cwa_message-content cwa_${message.type}`}
+                      >
+                        <UploadPDFIconInMessage />
+                        <div className="cwa_pdf-info">
+                          <p>File</p>
+                          <div className={`cwa_${message.type}`}>
+                            {message.text}
+                          </div>
+                        </div>
                       </div>
                     </div>
                   );

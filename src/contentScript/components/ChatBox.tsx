@@ -50,7 +50,6 @@ const ChatBox = ({ user, setIsOpen }) => {
   };
 
   const handlePDFOpen = (newIsPDF) => {
-    console.log("PDF", newIsPDF);
     setIsPDF(newIsPDF);
   };
 
