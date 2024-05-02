@@ -483,8 +483,20 @@
   display: flex;
   flex-direction: column;
   padding: var(--padding-value-CWA);
-  height: 35vh;
+
   width: 100%;
+}
+
+@media screen and (max-width: 1920px) {
+  #CWA .cwa_messages-container {
+    height: 35vh;
+  }
+}
+
+@media screen and ((min-width: 1675px)) {
+  #CWA .cwa_messages-container {
+    height: 50vh;
+  }
 }
 
 #CWA .cwa_suggestion-question-container {
@@ -523,13 +535,23 @@
   background-color: #e7ece6;
 }
 
+#CWA .cwa_message-content.cwa_pdf {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+#CWA .cwa_pdf-info .cwa_pdf {
+  font-weight: 500;
+}
+
 #CWA .cwa_message-content {
   background: white;
   padding: var(--padding-value-CWA);
   border-radius: var(--border-radius-CWA);
   box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
   flex-grow: 1;
-  max-width: 100%;
+  max-width: 90%;
   min-height: 20px;
   overflow-wrap: break-word;
   font-size: 15px;
@@ -968,7 +990,7 @@
   color: black;
   box-shadow: 0 5px 50px 1px rgba(0, 0, 0, 0.4);
   background: white;
-  width: 26vw;
+  width: 90%;
   position: absolute;
   margin: auto;
   top: 50%;
