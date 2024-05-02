@@ -31,7 +31,6 @@ const Popup = () => {
   const getAuthToken = () => {
     chrome.storage.local.get(["auth_token"], function (result) {
       if (result.auth_token) {
-        console.log("auth_token", result.auth_token);
         setAuthToken(result.auth_token);
       } else {
         setAuthToken("");
@@ -49,7 +48,6 @@ const Popup = () => {
   };
 
   const getUser = () => {
-    console.log("authToken", authToken);
     if (authToken) {
       axios
         .get(`http://127.0.0.1:8004/ext/who_am_i`, {
@@ -58,7 +56,6 @@ const Popup = () => {
           },
         })
         .then((res) => {
-          console.log(res.data);
           setUser(res.data.details);
           chrome.storage.local.set({ user: res.data.details });
         })

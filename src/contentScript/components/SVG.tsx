@@ -32,30 +32,6 @@ const SendIcon = ({ fill = "#000" }) => (
   </svg>
 );
 
-const ScissorsIcon = () => (
-  <svg
-    width="20"
-    height="20"
-    viewBox="0 0 15 14"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <g
-      clip-path="url(#a)"
-      stroke="#000001"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-    >
-      <path d="m2.71 4.93 11.31 6.52M3.27 5a2.25 2.25 0 1 0 0-4.5 2.25 2.25 0 0 0 0 4.5m-.56 4.07 11.31-6.52M3.27 13.5a2.25 2.25 0 1 0 0-4.5 2.25 2.25 0 0 0 0 4.5" />
-    </g>
-    <defs>
-      <clipPath id="a">
-        <path fill="#fff" d="M.52 0h14v14h-14z" />
-      </clipPath>
-    </defs>
-  </svg>
-);
-
 const ExitIcon = () => (
   <svg
     aria-hidden="true"
@@ -758,7 +734,6 @@ const UploadPDFIconInMessage = () => (
 
 export {
   SendIcon,
-  ScissorsIcon,
   ExitIcon,
   RemoveIcon,
   CloseCWA,

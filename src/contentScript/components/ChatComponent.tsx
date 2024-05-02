@@ -5,9 +5,7 @@ import { EventSourcePolyfill } from "event-source-polyfill";
 import { useTranslation } from "react-i18next";
 import {
   SendIcon,
-  ScissorsIcon,
   LoadingIcon,
-  UploadImageIcon,
   ArrowButton,
   UploadPDFIcon,
   UploadPDFIconInMessage,
@@ -37,7 +35,8 @@ function ChatComponent({ user, isPDF, onPDFOpen }) {
   const inputRef = useRef(null);
   const endOfMessagesRef = useRef(null);
 
-  let followUpQuestionsPrompts = `- Finally, please suggest me 2-3 follow-up questions.
+  let followUpQuestionsPrompts = `
+  - Finally, please suggest me 2-3 follow-up questions.
   - Follow-up questions can be related to our conversation.
   - Follow-up questions should help the user understand the content better.
   - Follow-up questions should be short and concise.
@@ -75,38 +74,23 @@ function ChatComponent({ user, isPDF, onPDFOpen }) {
     endOfMessagesRef.current?.scrollIntoView({ behavior: "instant" });
   }, [messages]);
 
-  // const getChatHistory = () => {
-  //   if (authToken) {
-  //     axios
-  //       .get(
-  //         `http://127.0.0.1:8004/ext/chat_history?user_email=${encodeURIComponent(
-  //           user.email
-  //         )}`
-  //       )
-  //       .then((res) => {
-  //         const formattedMessages = res.data
-  //           .map((message) => {
-  //             return [
-  //               {
-  //                 text: message.user_ask,
-  //                 avatar: user.picture,
-  //                 type: "question",
-  //               },
-  //               {
-  //                 text: message.assistant_answer,
-  //                 avatar: urls.icon,
-  //                 type: "answer",
-  //               },
-  //             ];
-  //           })
-  //           .flat();
-  //         setMessages(formattedMessages);
-  //       })
-  //       .catch((error) => {
-  //         setError(error);
-  //       });
-  //   }
-  // };
+  useEffect(() => {
+    setFollowUpQuestions(followUpQuestions);
+  }, [followUpQuestions]);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (pdfChatRef.current && !pdfChatRef.current.contains(event.target)) {
+        hidePDFChat();
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const pdfChatRef = useRef(null);
 
   const getChatHistory = () => {
     if (authToken) {
@@ -145,19 +129,6 @@ function ChatComponent({ user, isPDF, onPDFOpen }) {
         .catch((error) => {
           setError(error);
         });
-    }
-  };
-
-  const sendQuestion = async (text) => {
-    if (text.trim() !== "" && !isDisable) {
-      const isPdfMessage = text.includes("<pdf>") && text.includes("</pdf>");
-      let newQuestion = {
-        text: isPdfMessage ? text.replace(/<\/?pdf>/g, "") : text,
-        avatar: user.picture,
-        type: isPdfMessage ? "pdf" : "question",
-      };
-      setMessages((prevMessage) => [...prevMessage, newQuestion]);
-      setMessageText("");
     }
   };
 
@@ -236,13 +207,22 @@ function ChatComponent({ user, isPDF, onPDFOpen }) {
     });
   };
 
-  useEffect(() => {
-    setFollowUpQuestions(followUpQuestions);
-  }, [followUpQuestions]);
-
   const handleQuestionClick = (question) => {
     setMessageText(question);
     setIsSuggestions(false);
+  };
+
+  const sendQuestion = async (text) => {
+    if (text.trim() !== "" && !isDisable) {
+      const isPdfMessage = text.includes("<pdf>") && text.includes("</pdf>");
+      let newQuestion = {
+        text: isPdfMessage ? text.replace(/<\/?pdf>/g, "") : text,
+        avatar: user.picture,
+        type: isPdfMessage ? "pdf" : "question",
+      };
+      setMessages((prevMessage) => [...prevMessage, newQuestion]);
+      setMessageText("");
+    }
   };
 
   const chat = async () => {
@@ -266,23 +246,9 @@ function ChatComponent({ user, isPDF, onPDFOpen }) {
     setMessageText(value);
   };
 
-  const pdfChatRef = useRef(null);
-
   const hidePDFChat = () => {
     setIsOpenPDF(false);
   };
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (pdfChatRef.current && !pdfChatRef.current.contains(event.target)) {
-        hidePDFChat();
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
 
   const PDFChatComponent = () => {
     const handlePdfUpload = async (e) => {

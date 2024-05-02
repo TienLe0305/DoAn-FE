@@ -9,7 +9,6 @@ const TOKEN = process.env.API_TOKEN;
 const LOGIN = process.env.API_LOGIN;
 
 const exchangeCodeForTokens = async (code, state, setErrors) => {
-  console.log(code, "Code here");
   try {
     const response = await axios.get(
       `http://127.0.0.1:8004/ext/auth/ext_google_auth`,
@@ -17,13 +16,9 @@ const exchangeCodeForTokens = async (code, state, setErrors) => {
         params: { code: code, state: state },
       }
     );
-    console.log(response.data);
     if (response.data.access_token && response.data.auth_token) {
       chrome.storage.local.set({ access_token: response.data.access_token });
       chrome.storage.local.set({ auth_token: response.data.auth_token });
-      console.log("Login success");
-      console.log("Access Token: ", response.data.access_token);
-      console.log("Auth Token: ", response.data.auth_token);
       chrome.runtime.sendMessage({ isLogin: true }, () => {
         window.location.reload();
       });
@@ -44,9 +39,7 @@ const Login = () => {
       const response = await axios.get(
         `http://127.0.0.1:8004/ext/auth/ext_google_login`
       );
-      console.log(response.data);
       authUrl = response.data.details.url;
-      console.log(authUrl, "auth");
     } catch (error) {
       setErrors(error);
       return;
@@ -71,10 +64,8 @@ const Login = () => {
         const tabUpdateListener = (tabId, changeInfo, tab) => {
           if (tab.windowId === newWindow.id && changeInfo.url) {
             const url = new URL(changeInfo.url);
-            console.log(url, "URL");
             const code = url.searchParams.get("code");
             const state = url.searchParams.get("state");
-            console.log(code, "Code");
             if (code) {
               exchangeCodeForTokens(code, state, setErrors);
               chrome.tabs.remove(tabId);
