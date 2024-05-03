@@ -155,13 +155,13 @@ body {
 }
 
 .wave3 {
-  top: -45%;
+  top: -55%;
   left: 40%;
 }
 
 .wave4 {
-  top: 50%;
-  right: -25%;
+  top: 45%;
+  right: -35%;
   border-radius: 35%;
 }
 
@@ -259,7 +259,7 @@ body {
 .cwa_user-avatar {
   width: 30px;
   height: 30px;
-  border-radius: 5px;
+  border-radius: 10px;
   border: none;
   box-shadow: 0 3px 3px 0px rgba(0, 0, 0, 0.2);
   overflow: hidden;

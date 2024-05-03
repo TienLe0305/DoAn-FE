@@ -17,6 +17,7 @@ import {
   IconTone,
   IconLength,
   IconLanguage,
+  LoadingMessageIcon,
 } from "./SVG";
 import { EventSourcePolyfill } from "event-source-polyfill";
 
@@ -116,7 +117,7 @@ function WriteComponent({ user }) {
   const getContextAnswer = async (formattedContext) => {
     setIsLoading(true);
     const eventSource = new EventSourcePolyfill(
-      `http://127.0.0.1:8004/ext/chat?query=${encodeURIComponent(
+      `http://127.0.0.1:8002/ext/chat?query=${encodeURIComponent(
         formattedContext
       )}&user_email=${encodeURIComponent(user.email)}`
     );
@@ -244,7 +245,7 @@ function WriteComponent({ user }) {
         className="cwa_write-answer"
         style={{ display: isLoading || isAnswer ? "block" : "none" }}
       >
-        {isLoading ? "Thinking..." : response}
+        {isLoading ? <LoadingMessageIcon/> : response}
       </div>
     </div>
   );

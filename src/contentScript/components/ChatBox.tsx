@@ -114,7 +114,7 @@ const ChatBox = ({ user, setIsOpen }) => {
           <WriteIconSideBar />
           <span className="tooltip-text">Write</span>
         </div>
-        <div
+        {/* <div
           className={`cwa_btn-chat-side-bar cwa-btn-side-bar ${
             selectedComponent === "Image" ? "selected" : ""
           }`}
@@ -122,7 +122,7 @@ const ChatBox = ({ user, setIsOpen }) => {
         >
           <UploadImageIcon />
           <span className="tooltip-text">Image</span>
-        </div>
+        </div> */}
         <div
           className={`cwa_btn-chat-side-bar cwa-btn-side-bar ${
             selectedComponent === "PDF" ? "selected" : ""

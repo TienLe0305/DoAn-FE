@@ -9,6 +9,7 @@ import {
   ArrowButton,
   UploadPDFIcon,
   UploadPDFIconInMessage,
+  LoadingMessageIcon,
 } from "./SVG";
 
 const urls = {
@@ -96,7 +97,7 @@ function ChatComponent({ user, isPDF, onPDFOpen }) {
     if (authToken) {
       axios
         .get(
-          `http://127.0.0.1:8004/ext/chat_history?user_email=${encodeURIComponent(
+          `http://127.0.0.1:8002/ext/chat_history?user_email=${encodeURIComponent(
             user.email
           )}`
         )
@@ -141,7 +142,7 @@ function ChatComponent({ user, isPDF, onPDFOpen }) {
     setMessages((prevMessage) => [...prevMessage, loadingMessage]);
 
     const eventSource = new EventSourcePolyfill(
-      `http://127.0.0.1:8004/ext/chat?query=${encodeURIComponent(
+      `http://127.0.0.1:8002/ext/chat?query=${encodeURIComponent(
         text
       )}&user_email=${encodeURIComponent(user.email)}${
         pdf_name ? `&pdf_name=${encodeURIComponent(pdf_name)}` : ""
@@ -174,7 +175,7 @@ function ChatComponent({ user, isPDF, onPDFOpen }) {
 
   const getFollowUpQuestions = async (answer) => {
     const eventSource = new EventSourcePolyfill(
-      `http://127.0.0.1:8004/ext/chat?query=${encodeURIComponent(
+      `http://127.0.0.1:8002/ext/chat?query=${encodeURIComponent(
         answer + followUpQuestionsPrompts
       )}&user_email=${encodeURIComponent(user.email)}`
     );
@@ -258,16 +259,22 @@ function ChatComponent({ user, isPDF, onPDFOpen }) {
       sendQuestion(`<pdf>${file.name}</pdf>`);
 
       try {
-        const response = await fetch("http://127.0.0.1:8004/ext/upload_pdf", {
+        const response = await fetch("http://127.0.0.1:8002/ext/upload_pdf", {
           method: "POST",
           body: formData,
         });
 
         if (response.ok) {
+          setIsOpenPDF(false);
           const data = await response.json();
           const pdfText = data.pdf_text;
           const pdfName = file.name;
-          await getAnswer(`What is this ?${pdfText}`, pdfName);
+          await getAnswer(
+            `
+            Please provide information related to the content of this PDF file: 
+             ${pdfText}`,
+            pdfName
+          );
         } else {
           console.error("Đã xảy ra lỗi khi gửi file PDF lên BE.");
         }
@@ -373,9 +380,7 @@ function ChatComponent({ user, isPDF, onPDFOpen }) {
                       <div
                         className={`cwa_message-content cwa_${message.type}`}
                       >
-                        <p className={`cwa_${message.type} cwa_loading`}>
-                          {message.text}
-                        </p>
+                        <LoadingMessageIcon />
                       </div>
                     </div>
                   );
