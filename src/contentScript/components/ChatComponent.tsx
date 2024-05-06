@@ -97,7 +97,7 @@ function ChatComponent({ user, isPDF, onPDFOpen }) {
     if (authToken) {
       axios
         .get(
-          `http://127.0.0.1:8002/ext/chat_history?user_email=${encodeURIComponent(
+          `http://127.0.0.1:8003/ext/chat_history?user_email=${encodeURIComponent(
             user.email
           )}`
         )
@@ -142,7 +142,7 @@ function ChatComponent({ user, isPDF, onPDFOpen }) {
     setMessages((prevMessage) => [...prevMessage, loadingMessage]);
 
     const eventSource = new EventSourcePolyfill(
-      `http://127.0.0.1:8002/ext/chat?query=${encodeURIComponent(
+      `http://127.0.0.1:8003/ext/chat?query=${encodeURIComponent(
         text
       )}&user_email=${encodeURIComponent(user.email)}${
         pdf_name ? `&pdf_name=${encodeURIComponent(pdf_name)}` : ""
@@ -175,7 +175,7 @@ function ChatComponent({ user, isPDF, onPDFOpen }) {
 
   const getFollowUpQuestions = async (answer) => {
     const eventSource = new EventSourcePolyfill(
-      `http://127.0.0.1:8002/ext/chat?query=${encodeURIComponent(
+      `http://127.0.0.1:8003/ext/chat?query=${encodeURIComponent(
         answer + followUpQuestionsPrompts
       )}&user_email=${encodeURIComponent(user.email)}`
     );
@@ -259,7 +259,7 @@ function ChatComponent({ user, isPDF, onPDFOpen }) {
       sendQuestion(`<pdf>${file.name}</pdf>`);
 
       try {
-        const response = await fetch("http://127.0.0.1:8002/ext/upload_pdf", {
+        const response = await fetch("http://127.0.0.1:8003/ext/upload_pdf", {
           method: "POST",
           body: formData,
         });

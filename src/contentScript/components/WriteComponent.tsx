@@ -52,6 +52,13 @@ const lengthItems = [
 const languageOptions = [
   { value: "en", label: "English" },
   { value: "vi", label: "Vietnamese" },
+  { value: "es", label: "Spanish" },
+  { value: "fr", label: "French" },
+  { value: "de", label: "German" },
+  { value: "it", label: "Italian" },
+  { value: "ru", label: "Russian" },
+  { value: "jp", label: "Japanese" },
+  { value: "cn", label: "Chinese" },
 ];
 
 function WriteComponent({ user }) {
@@ -106,10 +113,10 @@ function WriteComponent({ user }) {
 
   const handleSend = () => {
     if (activeTab === "Composer") {
-      const formattedContext = `Hãy giúp tôi viết 1 đoạn composer với chủ đề ${context.subject} với loại văn bản ${context.type} với tone giọng ${context.tone} với độ dài ${context.length} bằng ngôn ngữ ${context.language}`;
+      const formattedContext = `Tôi muốn viết một đoạn văn với chủ đề ${context.subject}, loại văn bản ${context.type}, tone giọng ${context.tone}, độ dài ${context.length}, và bằng ngôn ngữ ${context.language}. Bạn có thể giúp tôi không?`;
       return formattedContext;
     } else {
-      const formattedContext = `Hãy giúp tôi viết 1 đoạn answer để trả lời đoạn văn bản ${originText} với chủ đề ${context.subject} với loại văn bản ${context.type}, tone giọng ${context.tone}, độ dài ${context.length} và bằng ngôn ngữ ${context.language}`;
+      const formattedContext = `Tôi muốn trả lời đoạn văn bản ${originText} với chủ đề ${context.subject}, loại văn bản ${context.type}, tone giọng ${context.tone}, độ dài ${context.length}, và bằng ngôn ngữ ${context.language}. Bạn có thể giúp tôi không?`;
       return formattedContext;
     }
   };
@@ -117,7 +124,7 @@ function WriteComponent({ user }) {
   const getContextAnswer = async (formattedContext) => {
     setIsLoading(true);
     const eventSource = new EventSourcePolyfill(
-      `http://127.0.0.1:8002/ext/chat?query=${encodeURIComponent(
+      `http://127.0.0.1:8003/ext/chat?query=${encodeURIComponent(
         formattedContext
       )}&user_email=${encodeURIComponent(user.email)}`
     );
@@ -245,7 +252,7 @@ function WriteComponent({ user }) {
         className="cwa_write-answer"
         style={{ display: isLoading || isAnswer ? "block" : "none" }}
       >
-        {isLoading ? <LoadingMessageIcon/> : response}
+        {isLoading ? <LoadingMessageIcon /> : response}
       </div>
     </div>
   );
@@ -366,6 +373,7 @@ function ComposerLanguage({ icon, options, onSelect }) {
         <div className="cwa_composer-language-select">
           <Select
             className="cwa_composer-language-select"
+            defaultValue={options[0]}
             options={options}
             styles={selectStyles}
             onChange={(option: { value: string; label: string }) =>

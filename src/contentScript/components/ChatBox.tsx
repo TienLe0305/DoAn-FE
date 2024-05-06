@@ -12,6 +12,7 @@ import {
 } from "./SVG";
 import ChatComponent from "./ChatComponent";
 import WriteComponent from "./WriteComponent";
+import QuestionComponent from "./QuestionComponent";
 
 const urls = {
   icon: chrome.runtime.getURL("assets/images/icon.png"),
@@ -82,6 +83,7 @@ const ChatBox = ({ user, setIsOpen }) => {
         {selectedComponent === "PDF" && (
           <ChatComponent user={user} isPDF={isPDF} onPDFOpen={handlePDFOpen} />
         )}
+        {selectedComponent === "Question" && <QuestionComponent user={user} />}
       </div>
       <div className="cwa_side-bar-container">
         <div className="cwa_exit-icon" onClick={handleClose}>

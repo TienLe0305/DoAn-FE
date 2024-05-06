@@ -11,7 +11,7 @@ const LOGIN = process.env.API_LOGIN;
 const exchangeCodeForTokens = async (code, state, setErrors) => {
   try {
     const response = await axios.get(
-      `http://127.0.0.1:8002/ext/auth/ext_google_auth`,
+      `http://127.0.0.1:8003/ext/auth/ext_google_auth`,
       {
         params: { code: code, state: state },
       }
@@ -37,7 +37,7 @@ const Login = () => {
     let authUrl = "";
     try {
       const response = await axios.get(
-        `http://127.0.0.1:8002/ext/auth/ext_google_login`
+        `http://127.0.0.1:8003/ext/auth/ext_google_login`
       );
       authUrl = response.data.details.url;
     } catch (error) {
