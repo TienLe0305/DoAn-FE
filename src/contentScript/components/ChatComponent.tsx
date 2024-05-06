@@ -270,9 +270,7 @@ function ChatComponent({ user, isPDF, onPDFOpen }) {
           const pdfText = data.pdf_text;
           const pdfName = file.name;
           await getAnswer(
-            `
-            Please provide information related to the content of this PDF file: 
-             ${pdfText}`,
+            `Đây là nội dung tổng hợp của tệp PDF ${pdfName}: ${pdfText}`,
             pdfName
           );
         } else {

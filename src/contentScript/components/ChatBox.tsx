@@ -93,7 +93,7 @@ const ChatBox = ({ user, setIsOpen }) => {
           }`}
           onClick={() => handleIconClick("Chat")}
         >
-          <ChatIconSideBar />
+          <ChatIconSideBar isSelected={selectedComponent === "Chat"}/>
           <span className="tooltip-text">Chat</span>
         </div>
         <div
@@ -102,7 +102,7 @@ const ChatBox = ({ user, setIsOpen }) => {
           }`}
           onClick={() => handleIconClick("Question")}
         >
-          <QuestionIconSideBar />
+          <QuestionIconSideBar isSelected={selectedComponent === "Question"}/>
           <span className="tooltip-text">Question</span>
         </div>
         <div
@@ -111,7 +111,7 @@ const ChatBox = ({ user, setIsOpen }) => {
           }`}
           onClick={() => handleIconClick("Write")}
         >
-          <WriteIconSideBar />
+          <WriteIconSideBar isSelected={selectedComponent === "Write"}/>
           <span className="tooltip-text">Write</span>
         </div>
         {/* <div
@@ -134,7 +134,7 @@ const ChatBox = ({ user, setIsOpen }) => {
           }}
           style={{ pointerEvents: isPDF ? "none" : "auto" }}
         >
-          <PDFIconSideBar />
+          <PDFIconSideBar isSelected={selectedComponent === "PDF"}/>
           <span className="tooltip-text">PDF</span>
         </div>
       </div>
