@@ -3,6 +3,9 @@ import Select from "react-select";
 import { EventSourcePolyfill } from "event-source-polyfill";
 import { LoadingMessageIcon } from "./SVG";
 
+const CHAT = process.env.API_CHAT;
+const CWA = process.env.API_DOMAIN;
+
 // Styles for Select components
 const selectStyles = {
   control: (provided, state) => ({
@@ -152,7 +155,7 @@ function QuestionComponent({ user }) {
       .replace("${lang}", lang);
 
     const eventSource = new EventSourcePolyfill(
-      `http://127.0.0.1:8002/ext/chat?query=${encodeURIComponent(
+      `${CWA}/${CHAT}?query=${encodeURIComponent(
         prompt
       )}&user_email=${encodeURIComponent(user.email)}`
     );

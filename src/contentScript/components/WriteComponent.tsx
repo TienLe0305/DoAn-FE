@@ -21,6 +21,9 @@ import {
 } from "./SVG";
 import { EventSourcePolyfill } from "event-source-polyfill";
 
+const CWA = process.env.API_DOMAIN;
+const CHAT = process.env.API_CHAT;
+
 const typeItems = [
   { icon: <IconEssay />, text: "Essay" },
   { icon: <IconBlogFacebook />, text: "Blog Facebook" },
@@ -124,7 +127,7 @@ function WriteComponent({ user }) {
   const getContextAnswer = async (formattedContext) => {
     setIsLoading(true);
     const eventSource = new EventSourcePolyfill(
-      `http://127.0.0.1:8002/ext/chat?query=${encodeURIComponent(
+      `${CWA}/${CHAT}?query=${encodeURIComponent(
         formattedContext
       )}&user_email=${encodeURIComponent(user.email)}`
     );

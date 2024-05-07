@@ -12,6 +12,11 @@ import {
   LoadingMessageIcon,
 } from "./SVG";
 
+const CHAT = process.env.API_CHAT;
+const CWA = process.env.API_DOMAIN;
+const HISTORY = process.env.API_HISTORY;
+const UPLOADPDF = process.env.API_UPLOAD_PDF;
+
 const urls = {
   icon: chrome.runtime.getURL("assets/images/icon.png"),
 };
@@ -97,7 +102,7 @@ function ChatComponent({ user, isPDF, onPDFOpen }) {
     if (authToken) {
       axios
         .get(
-          `http://127.0.0.1:8002/ext/chat_history?user_email=${encodeURIComponent(
+          `${CWA}/${HISTORY}?user_email=${encodeURIComponent(
             user.email
           )}`
         )
@@ -142,7 +147,7 @@ function ChatComponent({ user, isPDF, onPDFOpen }) {
     setMessages((prevMessage) => [...prevMessage, loadingMessage]);
 
     const eventSource = new EventSourcePolyfill(
-      `http://127.0.0.1:8002/ext/chat?query=${encodeURIComponent(
+      `${CWA}/${CHAT}?query=${encodeURIComponent(
         text + followUpQuestionsPrompts
       )}&user_email=${encodeURIComponent(user.email)}${
         pdf_name ? `&pdf_name=${encodeURIComponent(pdf_name)}` : ""
@@ -231,7 +236,7 @@ function ChatComponent({ user, isPDF, onPDFOpen }) {
       sendQuestion(`<pdf>${file.name}</pdf>`);
 
       try {
-        const response = await fetch("http://127.0.0.1:8002/ext/upload_pdf", {
+        const response = await fetch(`${CWA}/${UPLOADPDF}`, {
           method: "POST",
           body: formData,
         });
