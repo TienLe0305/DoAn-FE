@@ -152,7 +152,7 @@ function QuestionComponent({ user }) {
       .replace("${lang}", lang);
 
     const eventSource = new EventSourcePolyfill(
-      `http://127.0.0.1:8003/ext/chat?query=${encodeURIComponent(
+      `http://127.0.0.1:8002/ext/chat?query=${encodeURIComponent(
         prompt
       )}&user_email=${encodeURIComponent(user.email)}`
     );

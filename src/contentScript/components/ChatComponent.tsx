@@ -97,7 +97,7 @@ function ChatComponent({ user, isPDF, onPDFOpen }) {
     if (authToken) {
       axios
         .get(
-          `http://127.0.0.1:8003/ext/chat_history?user_email=${encodeURIComponent(
+          `http://127.0.0.1:8002/ext/chat_history?user_email=${encodeURIComponent(
             user.email
           )}`
         )
@@ -142,8 +142,8 @@ function ChatComponent({ user, isPDF, onPDFOpen }) {
     setMessages((prevMessage) => [...prevMessage, loadingMessage]);
 
     const eventSource = new EventSourcePolyfill(
-      `http://127.0.0.1:8003/ext/chat?query=${encodeURIComponent(
-        text
+      `http://127.0.0.1:8002/ext/chat?query=${encodeURIComponent(
+        text + followUpQuestionsPrompts
       )}&user_email=${encodeURIComponent(user.email)}${
         pdf_name ? `&pdf_name=${encodeURIComponent(pdf_name)}` : ""
       }`
@@ -155,8 +155,9 @@ function ChatComponent({ user, isPDF, onPDFOpen }) {
       const data = JSON.parse(event.data);
       for (let char of data.text) {
         answer += char;
+        let splitAnswer = answer.split("Follow-up questions:")[0].trim();
         let getmess = {
-          text: answer,
+          text: splitAnswer,
           avatar: urls.icon,
           type: "answer",
         };
@@ -166,6 +167,13 @@ function ChatComponent({ user, isPDF, onPDFOpen }) {
 
     return new Promise((resolve) => {
       eventSource.addEventListener("done", (event) => {
+        let splitSuggestionQuestion = answer.split("Follow-up questions:");
+        let followUpQuestions = splitSuggestionQuestion[1]
+          .split("\n")
+          .filter((question) => question.startsWith("- "))
+          .map((question) => question.substring(2));
+        setFollowUpQuestions(followUpQuestions);
+        setIsSuggestions(true);
         setIsDisable(false);
         eventSource.close();
         resolve(answer);
@@ -173,44 +181,9 @@ function ChatComponent({ user, isPDF, onPDFOpen }) {
     });
   };
 
-  const getFollowUpQuestions = async (answer) => {
-    const eventSource = new EventSourcePolyfill(
-      `http://127.0.0.1:8003/ext/chat?query=${encodeURIComponent(
-        answer + followUpQuestionsPrompts
-      )}&user_email=${encodeURIComponent(user.email)}`
-    );
-    let followUpQuestions = "";
-
-    eventSource.addEventListener("response", (event) => {
-      const data = JSON.parse(event.data);
-      for (let char of data.text) {
-        followUpQuestions += char;
-      }
-    });
-
-    eventSource.addEventListener("done", (event) => {
-      const lines = followUpQuestions.split("\n");
-      const followUpQuestionsIndex = lines.findIndex((line) =>
-        line.includes("Follow-up questions:")
-      );
-      if (followUpQuestionsIndex !== -1) {
-        const questions = lines
-          .slice(followUpQuestionsIndex + 1)
-          .filter((line) => line.trim().startsWith("-"))
-          .map((line) => line.trim().substring(2));
-        setFollowUpQuestions(questions);
-        setIsSuggestions(true);
-      } else {
-        setFollowUpQuestions([]);
-      }
-
-      eventSource.close();
-    });
-  };
-
-  const handleQuestionClick = (question) => {
-    setMessageText(question);
-    setIsSuggestions(false);
+  const chat = async () => {
+    sendQuestion(messageText);
+    await getAnswer(messageText);
   };
 
   const sendQuestion = async (text) => {
@@ -226,11 +199,10 @@ function ChatComponent({ user, isPDF, onPDFOpen }) {
     }
   };
 
-  const chat = async () => {
-    sendQuestion(messageText);
-    await getAnswer(messageText);
-    // const answer = await getAnswer();
-    // await getFollowUpQuestions(answer);
+  const handleQuestionClick = (question) => {
+    sendQuestion(question);
+    getAnswer(question);
+    setIsSuggestions(false);
   };
 
   const handleKeyDown = (e) => {
@@ -259,7 +231,7 @@ function ChatComponent({ user, isPDF, onPDFOpen }) {
       sendQuestion(`<pdf>${file.name}</pdf>`);
 
       try {
-        const response = await fetch("http://127.0.0.1:8003/ext/upload_pdf", {
+        const response = await fetch("http://127.0.0.1:8002/ext/upload_pdf", {
           method: "POST",
           body: formData,
         });
@@ -267,10 +239,10 @@ function ChatComponent({ user, isPDF, onPDFOpen }) {
         if (response.ok) {
           setIsOpenPDF(false);
           const data = await response.json();
-          const pdfText = data.pdf_text;
+          const pdfText = data.pdf_text.replace(/\s+/g, ' ');
           const pdfName = file.name;
           await getAnswer(
-            `Đây là nội dung tổng hợp của tệp PDF ${pdfName}: ${pdfText}`,
+            `Summarize these documents: ${pdfText}`,
             pdfName
           );
         } else {

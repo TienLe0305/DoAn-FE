@@ -50,7 +50,7 @@ const Popup = () => {
   const getUser = () => {
     if (authToken) {
       axios
-        .get(`http://127.0.0.1:8003/ext/who_am_i`, {
+        .get(`http://127.0.0.1:8002/ext/who_am_i`, {
           headers: {
             Authorization: `Bearer ${authToken}`,
           },
