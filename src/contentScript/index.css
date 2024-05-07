@@ -515,8 +515,6 @@
   padding: 10px;
   flex-direction: column;
   gap: 5px;
-  position: absolute;
-  bottom: 10vh;
   width: 100%;
 }
 
@@ -567,7 +565,6 @@
 }
 
 #CWA .cwa_message-content p {
-  margin-bottom: var(--margin-value-CWA);
   letter-spacing: 0.03em;
   line-height: 1.5em;
   white-space: pre-line;

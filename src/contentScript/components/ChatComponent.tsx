@@ -78,7 +78,7 @@ function ChatComponent({ user, isPDF, onPDFOpen }) {
 
   useEffect(() => {
     endOfMessagesRef.current?.scrollIntoView({ behavior: "instant" });
-  }, [messages]);
+  }, [messages, followUpQuestions]);
 
   useEffect(() => {
     setFollowUpQuestions(followUpQuestions);
@@ -101,11 +101,7 @@ function ChatComponent({ user, isPDF, onPDFOpen }) {
   const getChatHistory = () => {
     if (authToken) {
       axios
-        .get(
-          `${CWA}/${HISTORY}?user_email=${encodeURIComponent(
-            user.email
-          )}`
-        )
+        .get(`${CWA}/${HISTORY}?user_email=${encodeURIComponent(user.email)}`)
         .then((res) => {
           const formattedMessages = res.data
             .map((message) => {
@@ -160,7 +156,11 @@ function ChatComponent({ user, isPDF, onPDFOpen }) {
       const data = JSON.parse(event.data);
       for (let char of data.text) {
         answer += char;
-        let splitAnswer = answer.split("Follow-up questions:")[0].trim();
+        let splitAnswer = answer.split("Follow-up questions:")[0].trimEnd();
+        console.log(splitAnswer);
+        if (splitAnswer === "") {
+          splitAnswer = "How can I help you today?";
+        }
         let getmess = {
           text: splitAnswer,
           avatar: urls.icon,
@@ -244,12 +244,9 @@ function ChatComponent({ user, isPDF, onPDFOpen }) {
         if (response.ok) {
           setIsOpenPDF(false);
           const data = await response.json();
-          const pdfText = data.pdf_text.replace(/\s+/g, ' ');
+          const pdfText = data.pdf_text.replace(/\s+/g, " ");
           const pdfName = file.name;
-          await getAnswer(
-            `Summarize these documents: ${pdfText}`,
-            pdfName
-          );
+          await getAnswer(`Please summarize this text: ${pdfText}`, pdfName);
         } else {
           console.error("Đã xảy ra lỗi khi gửi file PDF lên BE.");
         }
@@ -401,23 +398,24 @@ function ChatComponent({ user, isPDF, onPDFOpen }) {
                   );
                 }
               })}
-            <div ref={endOfMessagesRef} />
+            {isSuggestions && (
+              <div className="cwa_suggestion-question-container">
+                {followUpQuestions.map((question, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handleQuestionClick(question)}
+                    className="cwa_suggestion-question-button"
+                  >
+                    {question}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
+          <div ref={endOfMessagesRef}></div>
         </div>
       </div>
-      {isSuggestions && (
-        <div className="cwa_suggestion-question-container">
-          {followUpQuestions.map((question, index) => (
-            <button
-              key={index}
-              onClick={() => handleQuestionClick(question)}
-              className="cwa_suggestion-question-button"
-            >
-              {question}
-            </button>
-          ))}
-        </div>
-      )}
+
       <div className="cwa_input-area">
         <input
           type="text"
