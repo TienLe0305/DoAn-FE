@@ -28,7 +28,7 @@ const selectStyles = {
 const optionStyles = {
   control: (provided, state) => ({
     ...selectStyles.control(provided, state),
-    width: "300px",
+    width: "280px",
   }),
   option: (provided, state) => ({
     ...provided,
@@ -151,13 +151,14 @@ function QuestionComponent({ user }) {
     const selection = inputText;
     const lang = selectedLanguage.value;
     const prompt = promptText
-      .replace("${selection}", selection)
       .replace("${lang}", lang);
 
     const eventSource = new EventSourcePolyfill(
       `${CWA}/${CHAT}?query=${encodeURIComponent(
-        prompt
-      )}&user_email=${encodeURIComponent(user.email)}`
+        `\`\`\`${selection}\`\`\``
+      )}&user_email=${encodeURIComponent(
+        user.email
+      )}&prompt=${encodeURIComponent(prompt)}`
     );
 
     let answer = "";
@@ -186,7 +187,7 @@ function QuestionComponent({ user }) {
         ...optionStyles,
         control: (provided, state) => ({
           ...provided,
-          width: "420px",
+          width: "400px",
           padding: "10px !important",
         }),
       };
@@ -233,7 +234,7 @@ function QuestionComponent({ user }) {
         className="cwa_question-component-result"
         style={{ display: isLoading || outputText ? "block" : "none" }}
       >
-        {isLoading ? <LoadingMessageIcon /> : outputText}
+        {isLoading && outputText || outputText ? outputText : <LoadingMessageIcon />}
       </div>
     </div>
   );

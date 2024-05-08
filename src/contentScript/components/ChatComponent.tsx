@@ -147,7 +147,7 @@ function ChatComponent({ user, isPDF, onPDFOpen }) {
         text + followUpQuestionsPrompts
       )}&user_email=${encodeURIComponent(user.email)}${
         pdf_name ? `&pdf_name=${encodeURIComponent(pdf_name)}` : ""
-      }`
+      }prompt=${encodeURIComponent("")}`
     );
 
     setIsDisable(true);
@@ -234,19 +234,15 @@ function ChatComponent({ user, isPDF, onPDFOpen }) {
       const formData = new FormData();
       formData.append("file", file);
       sendQuestion(`<pdf>${file.name}</pdf>`);
-
       try {
         const response = await fetch(`${CWA}/${UPLOADPDF}`, {
           method: "POST",
           body: formData,
         });
-
+        setIsOpenPDF(false);
         if (response.ok) {
-          setIsOpenPDF(false);
-          const data = await response.json();
-          const pdfText = data.pdf_text.replace(/\s+/g, " ");
           const pdfName = file.name;
-          await getAnswer(`Please summarize this text: ${pdfText}`, pdfName);
+          getAnswer(`What is the main topic of the document?`, pdfName);
         } else {
           console.error("Đã xảy ra lỗi khi gửi file PDF lên BE.");
         }

@@ -524,6 +524,7 @@
   outline: none;
   border-radius: 5px;
   padding: 10px;
+  color: white;
 }
 
 #CWA .cwa_messages {
@@ -912,7 +913,11 @@
   margin-top: 0.7rem;
 }
 
-#CWA .cwa_box-chat-container.writing {
+#CWA .cwa_box-chat-container.writing-component {
+  overflow: scroll;
+}
+
+#CWA .cwa_box-chat-container.question-component {
   overflow: scroll;
 }
 
@@ -927,6 +932,12 @@
 #CWA .cwa_composer-length-item.active {
   background-color: #b0d6df;
   box-shadow: none;
+}
+
+#CWA .cwa_composer-type-item:hover,
+#CWA .cwa_composer-tone-item:hover,
+#CWA .cwa_composer-length-item:hover {
+  background-color: #b0d6df;
 }
 
 #CWA .cwa_write-answer {
@@ -1081,6 +1092,7 @@
 }
 
 #CWA .cwa_question-component-submit button {
+  color: white;
   cursor: pointer;
   border: none;
   background: transparent;

@@ -67,7 +67,7 @@ const ChatBox = ({ user, setIsOpen }) => {
     <div ref={chatBoxRef} id="CWA">
       <div
         className={`cwa_box-chat-container ${
-          selectedComponent === "Write" ? "writing" : ""
+          selectedComponent === "Write" ? "writing-component" : selectedComponent === "Question" ? "question-component" : ""
         }`}
       >
         <div className="cwa_header">
