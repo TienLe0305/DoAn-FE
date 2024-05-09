@@ -1,19 +1,27 @@
 import React from "react";
 
 const LoadingIcon = () => (
-  <svg
-    className="cwa_loading-icon"
-    width="48"
-    height="48"
-    viewBox="0 0 48 48"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-  >
+  <svg className="snurra" width="48" height="48" viewBox="0 0 200 200">
+    <defs>
+      <linearGradient id="linjärGradient">
+        <stop className="stopp1" offset="0" />
+        <stop className="stopp2" offset="1" />
+      </linearGradient>
+      <linearGradient
+        y2="160"
+        x2="160"
+        y1="40"
+        x1="40"
+        gradientUnits="userSpaceOnUse"
+        id="gradient"
+        xlinkHref="#linjärGradient"
+      />
+    </defs>
     <path
-      d="M45 24a21.001 21.001 0 0 1-42 0m11 0a10 10 0 0 1 20 0"
-      stroke="#000"
-      strokeWidth="3"
+      className="halvan"
+      d="m 164,100 c 0,-35.346224 -28.65378,-64 -64,-64 -35.346224,0 -64,28.653776 -64,64 0,35.34622 28.653776,64 64,64 35.34622,0 64,-26.21502 64,-64 0,-37.784981 -26.92058,-64 -64,-64 -37.079421,0 -65.267479,26.922736 -64,64 1.267479,37.07726 26.703171,65.05317 64,64 37.29683,-1.05317 64,-64 64,-64"
     />
+    <circle className="strecken" cx="100" cy="100" r="64" />
   </svg>
 );
 
@@ -725,36 +733,129 @@ const UploadPDFIconInMessage = () => (
     height="35px"
     width="35px"
   >
-    <path
-      d="M64 464h32v48H64c-35.3 0-64-28.7-64-64V64C0 28.7 28.7 0 64 0h165.5c17 0 33.3 6.7 45.3 18.7l90.5 90.5c12 12 18.7 28.3 18.7 45.3V288h-48V160h-80c-17.7 0-32-14.3-32-32V48H64c-8.8 0-16 7.2-16 16v384c0 8.8 7.2 16 16 16m112-112h32c30.9 0 56 25.1 56 56s-25.1 56-56 56h-16v32c0 8.8-7.2 16-16 16s-16-7.2-16-16V368c0-8.8 7.2-16 16-16m32 80c13.3 0 24-10.7 24-24s-10.7-24-24-24h-16v48zm96-80h32c26.5 0 48 21.5 48 48v64c0 26.5-21.5 48-48 48h-32c-8.8 0-16-7.2-16-16V368c0-8.8 7.2-16 16-16m32 128c8.8 0 16-7.2 16-16v-64c0-8.8-7.2-16-16-16h-16v96zm80-112c0-8.8 7.2-16 16-16h48c8.8 0 16 7.2 16 16s-7.2 16-16 16h-32v32h32c8.8 0 16 7.2 16 16s-7.2 16-16 16h-32v48c0 8.8-7.2 16-16 16s-16-7.2-16-16z"
-    ></path>
+    <path d="M64 464h32v48H64c-35.3 0-64-28.7-64-64V64C0 28.7 28.7 0 64 0h165.5c17 0 33.3 6.7 45.3 18.7l90.5 90.5c12 12 18.7 28.3 18.7 45.3V288h-48V160h-80c-17.7 0-32-14.3-32-32V48H64c-8.8 0-16 7.2-16 16v384c0 8.8 7.2 16 16 16m112-112h32c30.9 0 56 25.1 56 56s-25.1 56-56 56h-16v32c0 8.8-7.2 16-16 16s-16-7.2-16-16V368c0-8.8 7.2-16 16-16m32 80c13.3 0 24-10.7 24-24s-10.7-24-24-24h-16v48zm96-80h32c26.5 0 48 21.5 48 48v64c0 26.5-21.5 48-48 48h-32c-8.8 0-16-7.2-16-16V368c0-8.8 7.2-16 16-16m32 128c8.8 0 16-7.2 16-16v-64c0-8.8-7.2-16-16-16h-16v96zm80-112c0-8.8 7.2-16 16-16h48c8.8 0 16 7.2 16 16s-7.2 16-16 16h-32v32h32c8.8 0 16 7.2 16 16s-7.2 16-16 16h-32v48c0 8.8-7.2 16-16 16s-16-7.2-16-16z"></path>
   </svg>
 );
 
 const LoadingMessageIcon = () => (
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid" width="40" height="30">
-  <circle fill="#f1eef6" r="10" cy="50" cx="84">
-    <animate begin="0s" keySplines="0 0.5 0.5 1" values="10;0" keyTimes="0;1" calcMode="spline" dur="0.25s" repeatCount="indefinite" attributeName="r"/>
-    <animate begin="0s" values="#f1eef6;#2b8cbe;#74a9cf;#bdc9e1;#f1eef6" keyTimes="0;0.25;0.5;0.75;1" calcMode="discrete" dur="1s" repeatCount="indefinite" attributeName="fill"/>
-  </circle>
-  <circle fill="#f1eef6" r="10" cy="50" cx="16">
-    <animate begin="0s" keySplines="0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1" values="0;0;10;10;10" keyTimes="0;0.25;0.5;0.75;1" calcMode="spline" dur="1s" repeatCount="indefinite" attributeName="r"/>
-    <animate begin="0s" keySplines="0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1" values="16;16;16;50;84" keyTimes="0;0.25;0.5;0.75;1" calcMode="spline" dur="1s" repeatCount="indefinite" attributeName="cx"/>
-  </circle>
-  <circle fill="#bdc9e1" r="10" cy="50" cx="50">
-    <animate begin="-0.25s" keySplines="0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1" values="0;0;10;10;10" keyTimes="0;0.25;0.5;0.75;1" calcMode="spline" dur="1s" repeatCount="indefinite" attributeName="r"/>
-    <animate begin="-0.25s" keySplines="0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1" values="16;16;16;50;84" keyTimes="0;0.25;0.5;0.75;1" calcMode="spline" dur="1s" repeatCount="indefinite" attributeName="cx"/>
-  </circle>
-  <circle fill="#74a9cf" r="10" cy="50" cx="84">
-    <animate begin="-0.5s" keySplines="0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1" values="0;0;10;10;10" keyTimes="0;0.25;0.5;0.75;1" calcMode="spline" dur="1s" repeatCount="indefinite" attributeName="r"/>
-    <animate begin="-0.5s" keySplines="0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1" values="16;16;16;50;84" keyTimes="0;0.25;0.5;0.75;1" calcMode="spline" dur="1s" repeatCount="indefinite" attributeName="cx"/>
-  </circle>
-  <circle fill="#2b8cbe" r="10" cy="50" cx="16">
-    <animate begin="-0.75s" keySplines="0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1" values="0;0;10;10;10" keyTimes="0;0.25;0.5;0.75;1" calcMode="spline" dur="1s" repeatCount="indefinite" attributeName="r"/>
-    <animate begin="-0.75s" keySplines="0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1" values="16;16;16;50;84" keyTimes="0;0.25;0.5;0.75;1" calcMode="spline" dur="1s" repeatCount="indefinite" attributeName="cx"/>
-  </circle>
-  <g/>
-</svg>
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 100 100"
+    preserveAspectRatio="xMidYMid"
+    width="40"
+    height="30"
+  >
+    <circle fill="#f1eef6" r="10" cy="50" cx="84">
+      <animate
+        begin="0s"
+        keySplines="0 0.5 0.5 1"
+        values="10;0"
+        keyTimes="0;1"
+        calcMode="spline"
+        dur="0.25s"
+        repeatCount="indefinite"
+        attributeName="r"
+      />
+      <animate
+        begin="0s"
+        values="#f1eef6;#2b8cbe;#74a9cf;#bdc9e1;#f1eef6"
+        keyTimes="0;0.25;0.5;0.75;1"
+        calcMode="discrete"
+        dur="1s"
+        repeatCount="indefinite"
+        attributeName="fill"
+      />
+    </circle>
+    <circle fill="#f1eef6" r="10" cy="50" cx="16">
+      <animate
+        begin="0s"
+        keySplines="0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1"
+        values="0;0;10;10;10"
+        keyTimes="0;0.25;0.5;0.75;1"
+        calcMode="spline"
+        dur="1s"
+        repeatCount="indefinite"
+        attributeName="r"
+      />
+      <animate
+        begin="0s"
+        keySplines="0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1"
+        values="16;16;16;50;84"
+        keyTimes="0;0.25;0.5;0.75;1"
+        calcMode="spline"
+        dur="1s"
+        repeatCount="indefinite"
+        attributeName="cx"
+      />
+    </circle>
+    <circle fill="#bdc9e1" r="10" cy="50" cx="50">
+      <animate
+        begin="-0.25s"
+        keySplines="0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1"
+        values="0;0;10;10;10"
+        keyTimes="0;0.25;0.5;0.75;1"
+        calcMode="spline"
+        dur="1s"
+        repeatCount="indefinite"
+        attributeName="r"
+      />
+      <animate
+        begin="-0.25s"
+        keySplines="0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1"
+        values="16;16;16;50;84"
+        keyTimes="0;0.25;0.5;0.75;1"
+        calcMode="spline"
+        dur="1s"
+        repeatCount="indefinite"
+        attributeName="cx"
+      />
+    </circle>
+    <circle fill="#74a9cf" r="10" cy="50" cx="84">
+      <animate
+        begin="-0.5s"
+        keySplines="0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1"
+        values="0;0;10;10;10"
+        keyTimes="0;0.25;0.5;0.75;1"
+        calcMode="spline"
+        dur="1s"
+        repeatCount="indefinite"
+        attributeName="r"
+      />
+      <animate
+        begin="-0.5s"
+        keySplines="0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1"
+        values="16;16;16;50;84"
+        keyTimes="0;0.25;0.5;0.75;1"
+        calcMode="spline"
+        dur="1s"
+        repeatCount="indefinite"
+        attributeName="cx"
+      />
+    </circle>
+    <circle fill="#2b8cbe" r="10" cy="50" cx="16">
+      <animate
+        begin="-0.75s"
+        keySplines="0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1"
+        values="0;0;10;10;10"
+        keyTimes="0;0.25;0.5;0.75;1"
+        calcMode="spline"
+        dur="1s"
+        repeatCount="indefinite"
+        attributeName="r"
+      />
+      <animate
+        begin="-0.75s"
+        keySplines="0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1"
+        values="16;16;16;50;84"
+        keyTimes="0;0.25;0.5;0.75;1"
+        calcMode="spline"
+        dur="1s"
+        repeatCount="indefinite"
+        attributeName="cx"
+      />
+    </circle>
+    <g />
+  </svg>
 );
 
 export {

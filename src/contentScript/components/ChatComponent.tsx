@@ -31,6 +31,7 @@ function ChatComponent({ user, isPDF, onPDFOpen }) {
       type: "",
     },
   ]);
+  const [isGetPdfFile, setIsGetPdfFile] = useState(false);
   const [followUpQuestions, setFollowUpQuestions] = useState([]);
   const [isSuggestions, setIsSuggestions] = useState(false);
   const [isDisable, setIsDisable] = useState(false);
@@ -147,7 +148,7 @@ function ChatComponent({ user, isPDF, onPDFOpen }) {
         text + followUpQuestionsPrompts
       )}&user_email=${encodeURIComponent(user.email)}${
         pdf_name ? `&pdf_name=${encodeURIComponent(pdf_name)}` : ""
-      }prompt=${encodeURIComponent("")}`
+      }`
     );
 
     setIsDisable(true);
@@ -227,21 +228,22 @@ function ChatComponent({ user, isPDF, onPDFOpen }) {
   const hidePDFChat = () => {
     setIsOpenPDF(false);
   };
-
   const PDFChatComponent = () => {
     const handlePdfUpload = async (e) => {
       const file = e.target.files[0];
       const formData = new FormData();
       formData.append("file", file);
       sendQuestion(`<pdf>${file.name}</pdf>`);
+      setIsGetPdfFile(true);
+      setIsOpenPDF(false);
       try {
         const response = await fetch(`${CWA}/${UPLOADPDF}`, {
           method: "POST",
           body: formData,
         });
-        setIsOpenPDF(false);
         if (response.ok) {
           const pdfName = file.name;
+          setIsGetPdfFile(false);
           getAnswer(`What is the main topic of the document?`, pdfName);
         } else {
           console.error("Đã xảy ra lỗi khi gửi file PDF lên BE.");
@@ -405,6 +407,16 @@ function ChatComponent({ user, isPDF, onPDFOpen }) {
                     {question}
                   </button>
                 ))}
+              </div>
+            )}
+            {isGetPdfFile && (
+              <div className="cwa_wrapper-container-loading-pdf">
+                <div className="loader">
+                  <div className="inner one"></div>
+                  <div className="inner two"></div>
+                  <div className="inner three"></div>
+                </div>
+                <h1>Đang đọc file, xin vui lòng đợi trong giây lát ...</h1>
               </div>
             )}
           </div>

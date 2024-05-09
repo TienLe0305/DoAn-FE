@@ -18,6 +18,18 @@ body {
   position: relative;
 }
 
+.cwa_container-img {
+  height: 100vh;
+  width: 100vw;
+  position: absolute;
+}
+
+.cwa_container-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 .cwa_container-popup {
   display: flex;
   justify-content: center;
@@ -34,8 +46,8 @@ body {
   flex-direction: column;
   justify-content: space-around;
   align-items: center;
-  height: 220px;
-  padding: 20px;
+  height: 240px;
+  padding: 15px;
   width: 320px;
   gap: 10px;
 }
@@ -78,7 +90,7 @@ body {
 
 .cwa_btn-logout {
   background-color: #fff1f1;
-  padding: var(--padding-value-CWA) 15px;
+  padding: 5px 15px;
   border-radius: var(--border-radius-CWA);
   font-weight: bold;
   color: #ff4f4f;
@@ -155,7 +167,7 @@ body {
 }
 
 .wave3 {
-  top: -55%;
+  top: -65%;
   left: 40%;
 }
 
@@ -225,6 +237,10 @@ body {
   flex-direction: column;
   gap: 5px;
   z-index: 9999;
+  backdrop-filter: blur(10px);
+  background-color: rgb(255 255 255 / 30%);
+  padding: 20px;
+  border-radius: 10px;
 }
 
 .cwa_container-loading {
@@ -243,7 +259,7 @@ body {
   display: table-cell;
   vertical-align: middle;
   font-size: 1.3rem;
-  color: #000;
+  color: #fff;
   font-weight: 600;
   margin: 0 !important;
 }
@@ -275,6 +291,7 @@ body {
 .cwa_user-name {
   margin: 0 !important;
   font-size: 1rem;
+  color: #fff;
 }
 
 .cwa_container-guidelines,
@@ -307,7 +324,7 @@ body {
 }
 
 .cwa_container-visit-dashboard {
-  background: #02212a;
+  background: #0f4454;
   color: white;
   cursor: pointer;
   text-decoration: none;
@@ -353,7 +370,7 @@ body {
 
 .cwa_container-loading {
   width: 320px;
-  height: 220px;
+  height: 240px;
 }
 
 .cwa_indicator-component {

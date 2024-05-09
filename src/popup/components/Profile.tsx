@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import Select from "react-select";
 
 import { DirectToDashboardIcon, JPFlag, LogoIcon, USFlag, VNFlag } from "./SVG";
+import imgBackround from "../../static/assets/images/test.png";
 const HOST = process.env.HOST;
 
 const languageOptions = [
@@ -108,6 +109,9 @@ const Logout = ({ user, setUser }) => {
   return (
     <>
       <div className="cwa_container-popup-login-success">
+        <div className=".cwa_container-img">
+          <img src={imgBackround}></img>
+        </div>
         <div className="cwa_container-header">
           <div className="cwa_container-logo">
             <LogoIcon />
@@ -138,7 +142,7 @@ const Logout = ({ user, setUser }) => {
           >
             <div className="cwa_visit-dashboard-div">
               <p className="cwa_visit-dashboard-label">
-                {t("visit")} CWA Dashboard
+                {t("visit")} Dashboard
               </p>
               <div className="cwa_visit-dashboard-icon">
                 <DirectToDashboardIcon />
@@ -151,12 +155,12 @@ const Logout = ({ user, setUser }) => {
             <p>{t("logout")}</p>
           </button>
         </div>
-        <div className="wave3 -one"></div>
+        {/* <div className="wave3 -one"></div>
         <div className="wave3 -two"></div>
         <div className="wave3 -three"></div>
         <div className="wave4 -one"></div>
         <div className="wave4 -two"></div>
-        <div className="wave4 -three"></div>
+        <div className="wave4 -three"></div> */}
       </div>
     </>
   );
