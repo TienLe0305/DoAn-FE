@@ -149,9 +149,10 @@ function QuestionComponent({ user }) {
     setOutputText("");
 
     const selection = inputText;
-    const lang = selectedLanguage.value;
+    const lang = selectedLanguage.label;
     const prompt = promptText
-      .replace("${lang}", lang);
+      .replace("${lang}", lang)
+      .replace('"""${selection}"""', selection);
 
     const eventSource = new EventSourcePolyfill(
       `${CWA}/${CHAT}?query=${encodeURIComponent(

@@ -14,7 +14,7 @@
     "Noto Color Emoji";
   --font-family-monospace: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
     "Liberation Mono", "Courier New", monospace;
-  --light-color: #25EAD5;
+  --light-color: #25ead5;
   --mid-color: #007d89;
   --dark-color: #114556;
 }
@@ -501,7 +501,7 @@
 
 @media screen and (max-width: 1920px) {
   #CWA .cwa_messages-container {
-    height: 35vh;
+    height: 37vh;
   }
 }
 
@@ -983,7 +983,7 @@
   color: white;
   text-align: center;
   border-radius: 6px;
-  padding: 2px 10px;
+  padding: 4px 10px;
   position: absolute;
   z-index: 1;
   bottom: 50%;
@@ -991,6 +991,7 @@
   opacity: 0;
   transition: opacity 0.3s;
   transform: translateY(50%);
+  text-wrap: nowrap
 }
 
 #CWA .cwa-btn-side-bar:hover .tooltip-text {
@@ -998,7 +999,8 @@
   opacity: 1;
 }
 
-#CWA .cwa_pdf-uploader {
+#CWA .cwa_pdf-uploader,
+#CWA .cwa_get-current-url {
   color: black;
   box-shadow: 0 5px 50px 1px rgba(0, 0, 0, 0.4);
   background: white;
@@ -1019,6 +1021,20 @@
   flex-direction: column;
   height: 100%;
   gap: 1rem;
+}
+
+#CWA .cwa_get-current-url p {
+  font-size: 1.1rem;
+}
+
+#CWA .cwa_get-url-button {
+  margin-top: 2rem;
+  padding: 5px 10px;
+  border-radius: 5px;
+  border: none;
+  outline: none;
+  background-color: #1E282C;
+  color: white !important;
 }
 
 #CWA .cwa_upload-pdf-footer {
@@ -1221,7 +1237,7 @@
   box-sizing: border-box;
   width: 100%;
   height: 100%;
-  border-radius: 50%;  
+  border-radius: 50%;
 }
 
 .inner.one {
@@ -1235,14 +1251,14 @@
   right: 0%;
   top: 0%;
   animation: rotate-two 1s linear infinite;
-  border-right: 3px solid var(--mid-color);;
+  border-right: 3px solid var(--mid-color);
 }
 
 .inner.three {
   right: 0%;
   bottom: 0%;
   animation: rotate-three 1s linear infinite;
-  border-top: 3px solid var(--dark-color);;
+  border-top: 3px solid var(--dark-color);
 }
 
 @keyframes rotate-one {
@@ -1273,6 +1289,15 @@
 }
 
 .cwa_wrapper-container-loading-pdf {
+  /* padding: 100vh 0 !important; */
+  height: 90vh;
+  width: 100%;
+  transform: translate(-50%, -50%);
+  left: 50%;
+  top: 50%;
+  position: absolute;
+  backdrop-filter: blur(2px);
+  background-color: rgb(255 255 255 / 2%);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -1281,7 +1306,9 @@
 }
 
 .cwa_wrapper-container-loading-pdf h1 {
-  color: #000;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: black;
 }
 
 .cwa_container-loading-pdf {

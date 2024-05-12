@@ -21,9 +21,10 @@ const urls = {
   icon: chrome.runtime.getURL("assets/images/icon.png"),
 };
 
-function ChatComponent({ user, isPDF, onPDFOpen }) {
+function ChatComponent({ user, isPDF, isUrl, onPDFOpen, onURLOpen }) {
   const { t, i18n } = useTranslation();
   const [isOpenPDF, setIsOpenPDF] = useState(isPDF);
+  const [isOpenUrl, setIsOpenUrl] = useState(isUrl);
   const [messages, setMessages] = useState([
     {
       text: "",
@@ -32,6 +33,7 @@ function ChatComponent({ user, isPDF, onPDFOpen }) {
     },
   ]);
   const [isGetPdfFile, setIsGetPdfFile] = useState(false);
+  const [isGetUrl, setIsGetUrl] = useState(false);
   const [followUpQuestions, setFollowUpQuestions] = useState([]);
   const [isSuggestions, setIsSuggestions] = useState(false);
   const [isDisable, setIsDisable] = useState(false);
@@ -59,8 +61,16 @@ function ChatComponent({ user, isPDF, onPDFOpen }) {
   }, [isOpenPDF]);
 
   useEffect(() => {
+    onURLOpen(isOpenUrl);
+  }, [isOpenUrl]);
+
+  useEffect(() => {
     setIsOpenPDF(isPDF);
   }, [isPDF]);
+
+  useEffect(() => {
+    setIsOpenUrl(isUrl);
+  }, [isUrl]);
 
   useEffect(() => {
     chrome.storage.local.get("language", function (result) {
@@ -90,6 +100,9 @@ function ChatComponent({ user, isPDF, onPDFOpen }) {
       if (pdfChatRef.current && !pdfChatRef.current.contains(event.target)) {
         hidePDFChat();
       }
+      if (urlChatRef.current && !urlChatRef.current.contains(event.target)) {
+        hideUrlChat();
+      }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
@@ -98,6 +111,7 @@ function ChatComponent({ user, isPDF, onPDFOpen }) {
   }, []);
 
   const pdfChatRef = useRef(null);
+  const urlChatRef = useRef(null);
 
   const getChatHistory = () => {
     if (authToken) {
@@ -158,7 +172,6 @@ function ChatComponent({ user, isPDF, onPDFOpen }) {
       for (let char of data.text) {
         answer += char;
         let splitAnswer = answer.split("Follow-up questions:")[0].trimEnd();
-        console.log(splitAnswer);
         if (splitAnswer === "") {
           splitAnswer = "How can I help you today?";
         }
@@ -187,11 +200,6 @@ function ChatComponent({ user, isPDF, onPDFOpen }) {
     });
   };
 
-  const chat = async () => {
-    sendQuestion(messageText);
-    await getAnswer(messageText);
-  };
-
   const sendQuestion = async (text) => {
     if (text.trim() !== "" && !isDisable) {
       const isPdfMessage = text.includes("<pdf>") && text.includes("</pdf>");
@@ -203,6 +211,11 @@ function ChatComponent({ user, isPDF, onPDFOpen }) {
       setMessages((prevMessage) => [...prevMessage, newQuestion]);
       setMessageText("");
     }
+  };
+
+  const chat = async () => {
+    sendQuestion(messageText);
+    await getAnswer(messageText);
   };
 
   const handleQuestionClick = (question) => {
@@ -228,6 +241,67 @@ function ChatComponent({ user, isPDF, onPDFOpen }) {
   const hidePDFChat = () => {
     setIsOpenPDF(false);
   };
+
+  const hideUrlChat = () => {
+    setIsOpenUrl(false);
+  };
+
+  const SummarizeComponent = () => {
+    const [currentURL, setCurrentURL] = useState("");
+    const getCurrentURL = async () => {
+      chrome.runtime.sendMessage({ action: "getCurrentURL" }, (response) => {
+        if (response && response.currentURL) {
+          setCurrentURL(response.currentURL);
+          sendQuestion(`Summarize this website!!!`);
+          setIsGetUrl(true);
+          setIsOpenUrl(false);
+          sendURLToBackend(response.currentURL);
+        } else {
+          console.error("Failed to get current URL");
+        }
+      });
+    };
+
+    const sendURLToBackend = async (url) => {
+      try {
+        const response = await axios.post(
+          "http://127.0.0.1:8003/ext/extract_from_url",
+          { url },
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        if (response.status === 200) {
+          setIsGetUrl(false);
+          getAnswer("Summarize this website!!!");
+        } else {
+          console.error("Đã xảy ra lỗi khi gửi url lên BE.");
+        }
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    };
+
+    const getInformation = async () => {
+      await getCurrentURL();
+    };
+
+    return (
+      <div ref={urlChatRef} className="cwa_get-current-url">
+        <p>Click here to get main content from current website and you can question about it!!!</p>
+        <button className="cwa_get-url-button"
+          onClick={() => {
+            getInformation();
+          }}
+        >
+          Get Information
+        </button>
+      </div>
+    );
+  };
+
   const PDFChatComponent = () => {
     const handlePdfUpload = async (e) => {
       const file = e.target.files[0];
@@ -265,8 +339,7 @@ function ChatComponent({ user, isPDF, onPDFOpen }) {
         <div className="cwa_upload-pdf-container">
           <div className="cwa_upload-pdf-title">
             <h2>
-              Tải lên PDF bằng tiếng Việt và chỉ cung cấp cho tôi bản dịch chính
-              xác!
+              Tải lên tệp PDF để nhận bản tóm tắt thông minh và câu trả lời!
             </h2>
           </div>
           <div className="cwa_upload-pdf-content">
@@ -289,6 +362,7 @@ function ChatComponent({ user, isPDF, onPDFOpen }) {
     <>
       <div className="cwa_chat-content-container">
         {isOpenPDF && <PDFChatComponent />}
+        {isOpenUrl && <SummarizeComponent />}
         <div className="cwa_suggestion-container">
           <div className="cwa_box-suggestion">
             <div className="cwa_box-container">
@@ -419,11 +493,20 @@ function ChatComponent({ user, isPDF, onPDFOpen }) {
                 <h1>Đang đọc file, xin vui lòng đợi trong giây lát ...</h1>
               </div>
             )}
+            {isGetUrl && (
+              <div className="cwa_wrapper-container-loading-pdf">
+                <div className="loader">
+                  <div className="inner one"></div>
+                  <div className="inner two"></div>
+                  <div className="inner three"></div>
+                </div>
+                <h1>Đang xử lí thông tin trang web, xin vui lòng đợi trong giây lát ...</h1>
+              </div>
+            )}
           </div>
           <div ref={endOfMessagesRef}></div>
         </div>
       </div>
-
       <div className="cwa_input-area">
         <input
           type="text"

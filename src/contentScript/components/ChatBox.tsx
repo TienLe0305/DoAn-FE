@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 
 import { useTranslation } from "react-i18next";
+import axios from "axios";
+
 import {
   ExitIcon,
   UploadImageIcon,
@@ -9,6 +11,7 @@ import {
   WriteIconSideBar,
   PDFIconSideBar,
   LogoIcon,
+  UrlIconSideBar,
 } from "./SVG";
 import ChatComponent from "./ChatComponent";
 import WriteComponent from "./WriteComponent";
@@ -23,8 +26,17 @@ const ChatBox = ({ user, setIsOpen }) => {
 
   const [selectedComponent, setSelectedComponent] = useState("Chat");
   const [isPDF, setIsPDF] = useState(false);
+  const [isURL, setIsURL] = useState(false);
 
   const chatBoxRef = useRef(null);
+
+  const sideBarButtons = [
+    { component: "Chat", Icon: ChatIconSideBar },
+    { component: "Question", Icon: QuestionIconSideBar },
+    { component: "Write", Icon: WriteIconSideBar },
+    { component: "PDF", Icon: PDFIconSideBar, condition: !isPDF },
+    { component: "Current Website Information", Icon: UrlIconSideBar, condition: !isURL },
+  ];
 
   useEffect(() => {
     chrome.storage.local.get("language", function (result) {
@@ -54,20 +66,25 @@ const ChatBox = ({ user, setIsOpen }) => {
     setIsPDF(newIsPDF);
   };
 
+  const handleUrlOpen = (newIsUrl) => {
+    setIsURL(newIsUrl);
+  };
+
   const handleIconClick = (component) => {
     setSelectedComponent(component);
-    if (component === "PDF") {
-      setIsPDF(true);
-    } else {
-      setIsPDF(false);
-    }
+    setIsPDF(component === "PDF");
+    setIsURL(component === "Current Website Information");
   };
 
   return (
     <div ref={chatBoxRef} id="CWA">
       <div
         className={`cwa_box-chat-container ${
-          selectedComponent === "Write" ? "writing-component" : selectedComponent === "Question" ? "question-component" : ""
+          selectedComponent === "Write"
+            ? "writing-component"
+            : selectedComponent === "Question"
+            ? "question-component"
+            : ""
         }`}
       >
         <div className="cwa_header">
@@ -77,11 +94,32 @@ const ChatBox = ({ user, setIsOpen }) => {
           </div>
         </div>
         {selectedComponent === "Chat" && (
-          <ChatComponent user={user} isPDF={isPDF} onPDFOpen={handlePDFOpen} />
+          <ChatComponent
+            user={user}
+            isPDF={isPDF}
+            isUrl={isURL}
+            onPDFOpen={handlePDFOpen}
+            onURLOpen={handleUrlOpen}
+          />
         )}
         {selectedComponent === "Write" && <WriteComponent user={user} />}
         {selectedComponent === "PDF" && (
-          <ChatComponent user={user} isPDF={isPDF} onPDFOpen={handlePDFOpen} />
+          <ChatComponent
+            user={user}
+            isPDF={isPDF}
+            isUrl={isURL}
+            onPDFOpen={handlePDFOpen}
+            onURLOpen={handleUrlOpen}
+          />
+        )}
+        {selectedComponent === "Current Website Information" && (
+          <ChatComponent
+            user={user}
+            isPDF={isPDF}
+            isUrl={isURL}
+            onPDFOpen={handlePDFOpen}
+            onURLOpen={handleUrlOpen}
+          />
         )}
         {selectedComponent === "Question" && <QuestionComponent user={user} />}
       </div>
@@ -89,56 +127,22 @@ const ChatBox = ({ user, setIsOpen }) => {
         <div className="cwa_exit-icon" onClick={handleClose}>
           <ExitIcon />
         </div>
-        <div
-          className={`cwa_btn-chat-side-bar cwa-btn-side-bar ${
-            selectedComponent === "Chat" ? "selected" : ""
-          }`}
-          onClick={() => handleIconClick("Chat")}
-        >
-          <ChatIconSideBar isSelected={selectedComponent === "Chat"}/>
-          <span className="tooltip-text">Chat</span>
-        </div>
-        <div
-          className={`cwa_btn-chat-side-bar cwa-btn-side-bar ${
-            selectedComponent === "Question" ? "selected" : ""
-          }`}
-          onClick={() => handleIconClick("Question")}
-        >
-          <QuestionIconSideBar isSelected={selectedComponent === "Question"}/>
-          <span className="tooltip-text">Question</span>
-        </div>
-        <div
-          className={`cwa_btn-chat-side-bar cwa-btn-side-bar ${
-            selectedComponent === "Write" ? "selected" : ""
-          }`}
-          onClick={() => handleIconClick("Write")}
-        >
-          <WriteIconSideBar isSelected={selectedComponent === "Write"}/>
-          <span className="tooltip-text">Write</span>
-        </div>
-        {/* <div
-          className={`cwa_btn-chat-side-bar cwa-btn-side-bar ${
-            selectedComponent === "Image" ? "selected" : ""
-          }`}
-          onClick={() => handleIconClick("Image")}
-        >
-          <UploadImageIcon />
-          <span className="tooltip-text">Image</span>
-        </div> */}
-        <div
-          className={`cwa_btn-chat-side-bar cwa-btn-side-bar ${
-            selectedComponent === "PDF" ? "selected" : ""
-          }`}
-          onClick={() => {
-            if (!isPDF) {
-              handleIconClick("PDF");
-            }
-          }}
-          style={{ pointerEvents: isPDF ? "none" : "auto" }}
-        >
-          <PDFIconSideBar isSelected={selectedComponent === "PDF"}/>
-          <span className="tooltip-text">PDF</span>
-        </div>
+        {sideBarButtons.map(({ component, Icon, condition }) => (
+          <div
+            className={`cwa_btn-chat-side-bar cwa-btn-side-bar ${
+              selectedComponent === component ? "selected" : ""
+            }`}
+            onClick={() => {
+              if (condition === undefined || condition) {
+                handleIconClick(component);
+              }
+            }}
+            style={{ pointerEvents: condition === false ? "none" : "auto" }}
+          >
+            {Icon && <Icon isSelected={selectedComponent === component} />}
+            <span className="tooltip-text">{component}</span>
+          </div>
+        ))}
       </div>
     </div>
   );

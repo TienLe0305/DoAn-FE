@@ -109,7 +109,7 @@ const Logout = ({ user, setUser }) => {
   return (
     <>
       <div className="cwa_container-popup-login-success">
-        <div className=".cwa_container-img">
+        <div className="cwa_container-img">
           <img src={imgBackround}></img>
         </div>
         <div className="cwa_container-header">
