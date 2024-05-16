@@ -10,7 +10,12 @@ import {
   UploadPDFIcon,
   UploadPDFIconInMessage,
   LoadingMessageIcon,
+  PDFIconSideBar,
+  UrlIconSideBar,
+  AddNewChatIcon,
+  OpenListConversationsIcon,
 } from "./SVG";
+import ChatHistoryList from "./ChatHistoryList";
 
 const CHAT = process.env.API_CHAT;
 const CWA = process.env.API_DOMAIN;
@@ -21,15 +26,15 @@ const urls = {
   icon: chrome.runtime.getURL("assets/images/icon.png"),
 };
 
-function ChatComponent({ user, isPDF, isUrl, onPDFOpen, onURLOpen }) {
+function ChatComponent({ user }) {
   const { t, i18n } = useTranslation();
-  const [isOpenPDF, setIsOpenPDF] = useState(isPDF);
-  const [isOpenUrl, setIsOpenUrl] = useState(isUrl);
+  const [isOpenPDF, setIsOpenPDF] = useState(false);
+  const [isOpenUrl, setIsOpenUrl] = useState(false);
   const [messages, setMessages] = useState([
     {
-      text: "",
-      avatar: "",
-      type: "",
+      text: "How can I assist you today?",
+      avatar: urls.icon,
+      type: "answer",
     },
   ]);
   const [isGetPdfFile, setIsGetPdfFile] = useState(false);
@@ -40,9 +45,14 @@ function ChatComponent({ user, isPDF, isUrl, onPDFOpen, onURLOpen }) {
   const [messageText, setMessageText] = useState("");
   const [error, setError] = useState(null);
   const [authToken, setAuthToken] = useState(null);
+  const [chatHistories, setChatHistories] = useState([]);
+  const [isShowChatHistory, setIsShowChatHistory] = useState(false);
+  const [chatHistoryId, setChatHistoryId] = useState(null);
 
   const inputRef = useRef(null);
   const endOfMessagesRef = useRef(null);
+  const pdfChatRef = useRef(null);
+  const urlChatRef = useRef(null);
 
   let followUpQuestionsPrompts = `
   - Finally, please suggest me 2-3 follow-up questions.
@@ -56,21 +66,13 @@ function ChatComponent({ user, isPDF, isUrl, onPDFOpen, onURLOpen }) {
   - <question 2>
   and so on...`;
 
-  useEffect(() => {
-    onPDFOpen(isOpenPDF);
-  }, [isOpenPDF]);
+  const handleOpenUploadPDF = () => {
+    setIsOpenPDF((prev) => !prev);
+  };
 
-  useEffect(() => {
-    onURLOpen(isOpenUrl);
-  }, [isOpenUrl]);
-
-  useEffect(() => {
-    setIsOpenPDF(isPDF);
-  }, [isPDF]);
-
-  useEffect(() => {
-    setIsOpenUrl(isUrl);
-  }, [isUrl]);
+  const handleOpenGetSummarizeUrl = () => {
+    setIsOpenUrl((prev) => !prev);
+  };
 
   useEffect(() => {
     chrome.storage.local.get("language", function (result) {
@@ -83,9 +85,9 @@ function ChatComponent({ user, isPDF, isUrl, onPDFOpen, onURLOpen }) {
     });
   }, []);
 
-  useEffect(() => {
-    getChatHistory();
-  }, [authToken]);
+  // useEffect(() => {
+  //   getChatHistory();
+  // }, [authToken]);
 
   useEffect(() => {
     endOfMessagesRef.current?.scrollIntoView({ behavior: "instant" });
@@ -110,44 +112,41 @@ function ChatComponent({ user, isPDF, isUrl, onPDFOpen, onURLOpen }) {
     };
   }, []);
 
-  const pdfChatRef = useRef(null);
-  const urlChatRef = useRef(null);
+  // const getChatHistory = () => {
+  //   if (authToken) {
+  //     axios
+  //       .get(`${CWA}/${HISTORY}?user_email=${encodeURIComponent(user.email)}`)
+  //       .then((res) => {
+  //         const formattedMessages = res.data
+  //           .map((message) => {
+  //             const isPdfMessage =
+  //               message.user_ask.includes("<pdf>") &&
+  //               message.user_ask.includes("</pdf>");
+  //             const userAsk = isPdfMessage
+  //               ? message.user_ask.replace(/<\/?pdf>/g, "")
+  //               : message.user_ask;
 
-  const getChatHistory = () => {
-    if (authToken) {
-      axios
-        .get(`${CWA}/${HISTORY}?user_email=${encodeURIComponent(user.email)}`)
-        .then((res) => {
-          const formattedMessages = res.data
-            .map((message) => {
-              const isPdfMessage =
-                message.user_ask.includes("<pdf>") &&
-                message.user_ask.includes("</pdf>");
-              const userAsk = isPdfMessage
-                ? message.user_ask.replace(/<\/?pdf>/g, "")
-                : message.user_ask;
-
-              return [
-                {
-                  text: userAsk,
-                  avatar: user.picture,
-                  type: isPdfMessage ? "pdf" : "question",
-                },
-                {
-                  text: message.assistant_answer,
-                  avatar: urls.icon,
-                  type: "answer",
-                },
-              ];
-            })
-            .flat();
-          setMessages(formattedMessages);
-        })
-        .catch((error) => {
-          setError(error);
-        });
-    }
-  };
+  //             return [
+  //               {
+  //                 text: userAsk,
+  //                 avatar: user.picture,
+  //                 type: isPdfMessage ? "pdf" : "question",
+  //               },
+  //               {
+  //                 text: message.assistant_answer,
+  //                 avatar: urls.icon,
+  //                 type: "answer",
+  //               },
+  //             ];
+  //           })
+  //           .flat();
+  //         setMessages(formattedMessages);
+  //       })
+  //       .catch((error) => {
+  //         setError(error);
+  //       });
+  //   }
+  // };
 
   const getAnswer = async (text, pdf_name = null) => {
     let loadingMessage = {
@@ -186,12 +185,14 @@ function ChatComponent({ user, isPDF, isUrl, onPDFOpen, onURLOpen }) {
 
     return new Promise((resolve) => {
       eventSource.addEventListener("done", (event) => {
-        let splitSuggestionQuestion = answer.split("Follow-up questions:");
-        let followUpQuestions = splitSuggestionQuestion[1]
-          .split("\n")
-          .filter((question) => question.startsWith("- "))
-          .map((question) => question.substring(2));
-        setFollowUpQuestions(followUpQuestions);
+        if (answer.includes("Follow-up questions:")) {
+          let splitSuggestionQuestion = answer.split("Follow-up questions:");
+          let followUpQuestions = splitSuggestionQuestion[1]
+            .split("\n")
+            .filter((question) => question.startsWith("- "))
+            .map((question) => question.substring(2));
+          setFollowUpQuestions(followUpQuestions);
+        }
         setIsSuggestions(true);
         setIsDisable(false);
         eventSource.close();
@@ -246,6 +247,145 @@ function ChatComponent({ user, isPDF, isUrl, onPDFOpen, onURLOpen }) {
     setIsOpenUrl(false);
   };
 
+  const hideChatHistoryList = () => {
+    setIsShowChatHistory(false);
+  };
+
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      saveChatMessagesToStorage();
+    };
+  
+    window.addEventListener("beforeunload", handleBeforeUnload);
+  
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [messages]);
+
+  const saveChatMessagesToStorage = () => {
+    try {
+      const timestamp = Date.now();
+      const date = new Date();
+      const formattedDate = `${date.getHours()}:${date.getMinutes()} ${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+      const newChatHistory = {
+        messages,
+        createdAt: formattedDate,
+        key: timestamp,
+      };
+      let chatHistories = JSON.parse(localStorage.getItem("chatHistories")) || [];
+      const existingChatHistoryIndex = chatHistories.findIndex(
+        (chatHistory) => chatHistory.key === chatHistoryId
+      );
+      if (existingChatHistoryIndex !== -1) {
+        chatHistories[existingChatHistoryIndex] = newChatHistory;
+      } else {
+        chatHistories.push(newChatHistory);
+        setChatHistoryId(timestamp);
+      }
+      localStorage.setItem("chatHistories", JSON.stringify(chatHistories));
+    } catch (error) {
+      console.error("Error saving chat messages to storage:", error);
+    }
+  };
+
+  // const handleNewChat = async () => {
+  //   setFollowUpQuestions([]);
+  //   setMessages([
+  //     {
+  //       text: "How can I assist you today?",
+  //       avatar: urls.icon,
+  //       type: "answer",
+  //     },
+  //   ]);
+  //   try {
+  //     const timestamp = Date.now();
+  //     if (messages.length > 0) {
+  //       const date = new Date();
+  //       const formattedDate = `${date.getHours()}:${date.getMinutes()} ${date.getDate()}/${
+  //         date.getMonth() + 1
+  //       }/${date.getFullYear()}`;
+  //       const newChatHistory = {
+  //         messages,
+  //         createdAt: formattedDate,
+  //         key: timestamp,
+  //       };
+  //       let chatHistories =
+  //         JSON.parse(localStorage.getItem("chatHistories")) || [];
+  //       const existingChatHistoryIndex = chatHistories.findIndex(
+  //         (chatHistory) => chatHistory.key === chatHistoryId
+  //       );
+
+  //       if (existingChatHistoryIndex !== -1) {
+  //         chatHistories[existingChatHistoryIndex] = newChatHistory;
+  //       } else {
+  //         chatHistories.push(newChatHistory);
+  //         setChatHistoryId(timestamp);
+  //       }
+
+  //       localStorage.setItem("chatHistories", JSON.stringify(chatHistories));
+  //     }
+  //     setMessages([]);
+  //   } catch (error) {
+  //     console.error("Error creating new chat history:", error);
+  //   }
+  // };
+
+  const handleNewChat = async () => {
+    setFollowUpQuestions([]);
+  
+    try {
+      const chatHistories = JSON.parse(localStorage.getItem("chatHistories")) || [];
+      const lastChatHistory = chatHistories[chatHistories.length - 1];
+      if (lastChatHistory) {
+        setMessages(lastChatHistory.messages);
+        setChatHistoryId(lastChatHistory.key);
+      } else {
+        setMessages([
+          {
+            text: "How can I assist you today?",
+            avatar: urls.icon,
+            type: "answer",
+          },
+        ]);
+      }
+    } catch (error) {
+      console.error("Error retrieving chat messages from storage:", error);
+      setMessages([
+        {
+          text: "How can I assist you today?",
+          avatar: urls.icon,
+          type: "answer",
+        },
+      ]);
+    }
+  };
+
+  const handleOpenListConversations = async () => {
+    await getChatHistories();
+    setIsShowChatHistory(true);
+  };
+
+  const getChatHistories = async () => {
+    try {
+      const chatHistories =
+        JSON.parse(localStorage.getItem("chatHistories")) || [];
+      setChatHistories(chatHistories);
+    } catch (error) {
+      console.error("Error getting chat histories:", error);
+    }
+  };
+
+  const handleViewChatHistory = (chatHistory) => {
+    setMessages(chatHistory.messages);
+    setIsShowChatHistory(false);
+    setChatHistoryId(chatHistory.key);
+  };
+
+  useEffect(() => {
+    handleNewChat();
+  }, []);
+
   const SummarizeComponent = () => {
     const [currentURL, setCurrentURL] = useState("");
     const getCurrentURL = async () => {
@@ -290,8 +430,12 @@ function ChatComponent({ user, isPDF, isUrl, onPDFOpen, onURLOpen }) {
 
     return (
       <div ref={urlChatRef} className="cwa_get-current-url">
-        <p>Click here to get main content from current website and you can question about it!!!</p>
-        <button className="cwa_get-url-button"
+        <p>
+          Click here to get main content from current website and you can
+          question about it!!!
+        </p>
+        <button
+          className="cwa_get-url-button"
           onClick={() => {
             getInformation();
           }}
@@ -363,6 +507,13 @@ function ChatComponent({ user, isPDF, isUrl, onPDFOpen, onURLOpen }) {
       <div className="cwa_chat-content-container">
         {isOpenPDF && <PDFChatComponent />}
         {isOpenUrl && <SummarizeComponent />}
+        <ChatHistoryList
+          chatHistories={chatHistories}
+          getChatHistories={getChatHistories}
+          handleViewChatHistory={handleViewChatHistory}
+          hideChatHistoryList={hideChatHistoryList}
+          isShowChatHistory={isShowChatHistory}
+        />
         <div className="cwa_suggestion-container">
           <div className="cwa_box-suggestion">
             <div className="cwa_box-container">
@@ -500,11 +651,45 @@ function ChatComponent({ user, isPDF, isUrl, onPDFOpen, onURLOpen }) {
                   <div className="inner two"></div>
                   <div className="inner three"></div>
                 </div>
-                <h1>Đang xử lí thông tin trang web, xin vui lòng đợi trong giây lát ...</h1>
+                <h1>
+                  Đang xử lí thông tin trang web, xin vui lòng đợi trong giây
+                  lát ...
+                </h1>
               </div>
             )}
           </div>
           <div ref={endOfMessagesRef}></div>
+        </div>
+      </div>
+      <div className="cwa_group-btn">
+        <div className="cwa_new-chat-btn" onClick={handleNewChat}>
+          <AddNewChatIcon isSelected={false} />
+          <span className="tooltip-text-group-btn">New Chat</span>
+        </div>
+        <div
+          className="cwa_open-list-conversations-btn"
+          onClick={handleOpenListConversations}
+        >
+          <OpenListConversationsIcon isSelected={false} />
+          <span className="tooltip-text-group-btn">List Conversations</span>
+        </div>
+        <div
+          className="cwa_upload-pdf-btn"
+          onClick={() => {
+            handleOpenUploadPDF();
+          }}
+        >
+          <PDFIconSideBar isSelected={false} />
+          <span className="tooltip-text-group-btn">PDF</span>
+        </div>
+        <div
+          className="cwa_get-url-btn"
+          onClick={() => {
+            handleOpenGetSummarizeUrl();
+          }}
+        >
+          <UrlIconSideBar isSelected={false} />
+          <span className="tooltip-text-group-btn">Current website</span>
         </div>
       </div>
       <div className="cwa_input-area">
