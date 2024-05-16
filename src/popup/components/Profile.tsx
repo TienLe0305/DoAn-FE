@@ -37,8 +37,6 @@ const formatOptionLabel = ({ value, label, image }) => (
 
 const clearLocalStorage = (setUser) => {
   chrome.storage.local.remove("auth_token");
-  chrome.storage.local.remove("language");
-  chrome.storage.local.remove("checked");
   chrome.storage.local.remove("user", function () {
     if (chrome.runtime.lastError) {
       console.error(chrome.runtime.lastError);

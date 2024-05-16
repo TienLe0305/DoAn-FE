@@ -25,8 +25,6 @@ const ChatBox = ({ user, setIsOpen }) => {
   const { t, i18n } = useTranslation();
 
   const [selectedComponent, setSelectedComponent] = useState("Chat");
-  const [isPDF, setIsPDF] = useState(false);
-  const [isURL, setIsURL] = useState(false);
 
   const chatBoxRef = useRef(null);
 
@@ -34,8 +32,6 @@ const ChatBox = ({ user, setIsOpen }) => {
     { component: "Chat", Icon: ChatIconSideBar },
     { component: "Question", Icon: QuestionIconSideBar },
     { component: "Write", Icon: WriteIconSideBar },
-    { component: "PDF", Icon: PDFIconSideBar, condition: !isPDF },
-    { component: "Current Website Information", Icon: UrlIconSideBar, condition: !isURL },
   ];
 
   useEffect(() => {
@@ -62,18 +58,8 @@ const ChatBox = ({ user, setIsOpen }) => {
     setIsOpen(false);
   };
 
-  const handlePDFOpen = (newIsPDF) => {
-    setIsPDF(newIsPDF);
-  };
-
-  const handleUrlOpen = (newIsUrl) => {
-    setIsURL(newIsUrl);
-  };
-
   const handleIconClick = (component) => {
     setSelectedComponent(component);
-    setIsPDF(component === "PDF");
-    setIsURL(component === "Current Website Information");
   };
 
   return (
@@ -96,48 +82,23 @@ const ChatBox = ({ user, setIsOpen }) => {
         {selectedComponent === "Chat" && (
           <ChatComponent
             user={user}
-            isPDF={isPDF}
-            isUrl={isURL}
-            onPDFOpen={handlePDFOpen}
-            onURLOpen={handleUrlOpen}
           />
         )}
         {selectedComponent === "Write" && <WriteComponent user={user} />}
-        {selectedComponent === "PDF" && (
-          <ChatComponent
-            user={user}
-            isPDF={isPDF}
-            isUrl={isURL}
-            onPDFOpen={handlePDFOpen}
-            onURLOpen={handleUrlOpen}
-          />
-        )}
-        {selectedComponent === "Current Website Information" && (
-          <ChatComponent
-            user={user}
-            isPDF={isPDF}
-            isUrl={isURL}
-            onPDFOpen={handlePDFOpen}
-            onURLOpen={handleUrlOpen}
-          />
-        )}
         {selectedComponent === "Question" && <QuestionComponent user={user} />}
       </div>
       <div className="cwa_side-bar-container">
         <div className="cwa_exit-icon" onClick={handleClose}>
           <ExitIcon />
         </div>
-        {sideBarButtons.map(({ component, Icon, condition }) => (
+        {sideBarButtons.map(({ component, Icon }) => (
           <div
             className={`cwa_btn-chat-side-bar cwa-btn-side-bar ${
               selectedComponent === component ? "selected" : ""
             }`}
             onClick={() => {
-              if (condition === undefined || condition) {
-                handleIconClick(component);
-              }
+              handleIconClick(component);
             }}
-            style={{ pointerEvents: condition === false ? "none" : "auto" }}
           >
             {Icon && <Icon isSelected={selectedComponent === component} />}
             <span className="tooltip-text">{component}</span>
