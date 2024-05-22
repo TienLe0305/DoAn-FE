@@ -83,7 +83,7 @@ const Login = () => {
       <div className="cwa_container-popup">
         <div className="cwa_container-logo">
           <LogoIcon />
-          <p className="cwa_logo-title">nebulAsisstant</p>
+          <p className="cwa_logo-title login">nebulAsisstant</p>
         </div>
         <button onClick={handleLogin} className="cwa_btn-login">
           <img

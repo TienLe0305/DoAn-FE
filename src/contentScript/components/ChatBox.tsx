@@ -1,17 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
-
 import { useTranslation } from "react-i18next";
-import axios from "axios";
 
 import {
   ExitIcon,
-  UploadImageIcon,
   ChatIconSideBar,
   QuestionIconSideBar,
   WriteIconSideBar,
-  PDFIconSideBar,
   LogoIcon,
-  UrlIconSideBar,
 } from "./SVG";
 import ChatComponent from "./ChatComponent";
 import WriteComponent from "./WriteComponent";

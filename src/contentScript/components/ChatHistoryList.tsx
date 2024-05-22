@@ -9,7 +9,6 @@ const ChatHistoryList = ({
   isShowChatHistory
 }) => {
   const [hoveredIndex, setHoveredIndex] = useState(null);
-  console.log("isShowChatHistory", isShowChatHistory);
   const handleDelete = (index) => {
     const updatedChatHistories = [...chatHistories];
     updatedChatHistories.splice(index, 1);

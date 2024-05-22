@@ -250,18 +250,21 @@ const WriteIconSideBar = ({ isSelected }) => (
   </svg>
 );
 
-const PDFIconSideBar = ({ isSelected }) => (
+const FileIconSideBar = ({ isSelected }) => (
   <svg
     width="20"
     height="20"
-    viewBox="0 0 15 15"
+    viewBox="0 0 24 24"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
   >
     <path
-      d="M2.5 6.5V6H2v.5zm4 0V6H6v.5zm0 4H6v.5h.5zm7-7h.5v-.207l-.146-.147zm-3-3 .354-.354L10.707 0H10.5zM2.5 7h1V6h-1zm.5 4V8.5H2V11zm0-2.5v-2H2v2zm.5-.5h-1v1h1zm.5-.5a.5.5 0 0 1-.5.5v1A1.5 1.5 0 0 0 5 7.5zM3.5 7a.5.5 0 0 1 .5.5h1A1.5 1.5 0 0 0 3.5 6zM6 6.5v4h1v-4zm.5 4.5h1v-1h-1zM9 9.5v-2H8v2zM7.5 6h-1v1h1zM9 7.5A1.5 1.5 0 0 0 7.5 6v1a.5.5 0 0 1 .5.5zM7.5 11A1.5 1.5 0 0 0 9 9.5H8a.5.5 0 0 1-.5.5zM10 6v5h1V6zm.5 1H13V6h-2.5zm0 2H12V8h-1.5zM2 5V1.5H1V5zm11-1.5V5h1V3.5zM2.5 1h8V0h-8zm7.646-.146 3 3 .708-.708-3-3zM2 1.5a.5.5 0 0 1 .5-.5V0A1.5 1.5 0 0 0 1 1.5zM1 12v1.5h1V12zm1.5 3h10v-1h-10zM14 13.5V12h-1v1.5zM12.5 15a1.5 1.5 0 0 0 1.5-1.5h-1a.5.5 0 0 1-.5.5zM1 13.5A1.5 1.5 0 0 0 2.5 15v-1a.5.5 0 0 1-.5-.5z"
-      fill={isSelected ? "#fff" : "#000001"}
+      d="M4 4v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8.342a2 2 0 0 0-.602-1.43l-4.44-4.342A2 2 0 0 0 13.56 2H6a2 2 0 0 0-2 2m5 9h6m-6 4h3"
+      stroke="#000"
+      stroke-linecap="round"
+      stroke-linejoin="round"
     />
+    <path d="M14 2v4a2 2 0 0 0 2 2h4" stroke="#000" stroke-linejoin="round" />
   </svg>
 );
 
@@ -717,41 +720,41 @@ const LogoIcon = () => (
   </svg>
 );
 
-const UploadPDFIcon = () => (
+const UploadFileIcon = () => (
   <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 309.267 309.267"
-    xmlSpace="preserve"
     width="80"
+    viewBox="0 0 48 48"
+    version="1"
+    xmlns="http://www.w3.org/2000/svg"
   >
-    <path
-      style={{ fill: "#e2574c" }}
-      d="M38.658 0h164.23l87.049 86.711v203.227c0 10.679-8.659 19.329-19.329 19.329H38.658c-10.67 0-19.329-8.65-19.329-19.329V19.329C19.329 8.65 27.989 0 38.658 0"
-    />
-    <path
-      style={{ fill: "#b53629" }}
-      d="M289.658 86.981h-67.372c-10.67 0-19.329-8.659-19.329-19.329V.193z"
-    />
-    <path
-      style={{ fill: "#fff" }}
-      d="M217.434 146.544c3.238 0 4.823-2.822 4.823-5.557 0-2.832-1.653-5.567-4.823-5.567h-18.44c-3.605 0-5.615 2.986-5.615 6.282v45.317c0 4.04 2.3 6.282 5.412 6.282 3.093 0 5.403-2.242 5.403-6.282v-12.438h11.153c3.46 0 5.19-2.832 5.19-5.644 0-2.754-1.73-5.49-5.19-5.49h-11.153v-16.903zm-62.327-11.124h-13.492c-3.663 0-6.263 2.513-6.263 6.243v45.395c0 4.629 3.74 6.079 6.417 6.079h14.159c16.758 0 27.824-11.027 27.824-28.047-.009-17.995-10.427-29.67-28.645-29.67m.648 46.526h-8.225v-35.334h7.413c11.221 0 16.101 7.529 16.101 17.918 0 9.723-4.794 17.416-15.289 17.416M106.33 135.42H92.964c-3.779 0-5.886 2.493-5.886 6.282v45.317c0 4.04 2.416 6.282 5.663 6.282s5.663-2.242 5.663-6.282v-13.231h8.379c10.341 0 18.875-7.326 18.875-19.107.001-11.529-8.233-19.261-19.328-19.261m-.222 27.738h-7.703v-17.097h7.703c4.755 0 7.78 3.711 7.78 8.553-.01 4.833-3.025 8.544-7.78 8.544"
-    />
+    <path fill="#90CAF9" d="M40 45H8V3h22l10 10z" />
+    <path fill="#E1F5FE" d="M38.5 14H29V4.5z" />
   </svg>
 );
 
-const UploadPDFIconInMessage = () => (
+const UploadFileIconInMessage = () => (
   <svg
-    className="fa-file-pdf"
-    aria-hidden="true"
-    data-prefix="far"
-    data-icon="file-pdf"
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 512 512"
-    fill="#f40f02"
     height="35px"
     width="35px"
+    viewBox="0 0 24 24"
+    data-name="Flat Line"
+    xmlns="http://www.w3.org/2000/svg"
+    className="icon flat-line"
   >
-    <path d="M64 464h32v48H64c-35.3 0-64-28.7-64-64V64C0 28.7 28.7 0 64 0h165.5c17 0 33.3 6.7 45.3 18.7l90.5 90.5c12 12 18.7 28.3 18.7 45.3V288h-48V160h-80c-17.7 0-32-14.3-32-32V48H64c-8.8 0-16 7.2-16 16v384c0 8.8 7.2 16 16 16m112-112h32c30.9 0 56 25.1 56 56s-25.1 56-56 56h-16v32c0 8.8-7.2 16-16 16s-16-7.2-16-16V368c0-8.8 7.2-16 16-16m32 80c13.3 0 24-10.7 24-24s-10.7-24-24-24h-16v48zm96-80h32c26.5 0 48 21.5 48 48v64c0 26.5-21.5 48-48 48h-32c-8.8 0-16-7.2-16-16V368c0-8.8 7.2-16 16-16m32 128c8.8 0 16-7.2 16-16v-64c0-8.8-7.2-16-16-16h-16v96zm80-112c0-8.8 7.2-16 16-16h48c8.8 0 16 7.2 16 16s-7.2 16-16 16h-32v32h32c8.8 0 16 7.2 16 16s-7.2 16-16 16h-32v48c0 8.8-7.2 16-16 16s-16-7.2-16-16z"></path>
+    <path
+      d="M19 8.41V20a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h7.59a1 1 0 0 1 .7.29l4.42 4.42a1 1 0 0 1 .29.7"
+      style={{ fill: "#fff", strokeWidth: 1 }}
+    />
+    <path
+      d="M19 8.41V20a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h7.59a1 1 0 0 1 .7.29l4.42 4.42a1 1 0 0 1 .29.7"
+      style={{
+        fill: "none",
+        stroke: "#378ba5",
+        strokeLinecap: "round",
+        strokeLinejoin: "round",
+        strokeWidth: 1,
+      }}
+    />
   </svg>
 );
 
@@ -936,7 +939,7 @@ export {
   ChatIconSideBar,
   QuestionIconSideBar,
   WriteIconSideBar,
-  PDFIconSideBar,
+  FileIconSideBar,
   IconEssay,
   IconTwitter,
   IconMessage,
@@ -955,11 +958,11 @@ export {
   VNFlag,
   JPFlag,
   LogoIcon,
-  UploadPDFIcon,
-  UploadPDFIconInMessage,
+  UploadFileIcon,
+  UploadFileIconInMessage,
   LoadingMessageIcon,
   UrlIconSideBar,
   AddNewChatIcon,
   OpenListConversationsIcon,
-  HideListConversationsIcon
+  HideListConversationsIcon,
 };

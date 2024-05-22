@@ -507,7 +507,7 @@
 
 @media screen and ((min-width: 1675px)) {
   #CWA .cwa_messages-container {
-    height: 48vh;
+    height: 46vh;
   }
 }
 
@@ -546,13 +546,13 @@
   background-color: #e7ece6;
 }
 
-#CWA .cwa_message-content.cwa_pdf {
+#CWA .cwa_message-content.cwa_file {
   display: flex;
   align-items: center;
   gap: 1rem;
 }
 
-#CWA .cwa_pdf-info .cwa_pdf {
+#CWA .cwa_pdf-info .cwa_file {
   font-weight: 500;
 }
 
@@ -1048,7 +1048,6 @@
 
 #CWA .cwa_get-current-url p {
   font-size: 1.1rem;
-  text-align: center;
 }
 
 #CWA .cwa_get-url-button {
@@ -1333,6 +1332,7 @@
   font-size: 1.2rem;
   font-weight: 600;
   color: black;
+  text-align: center;
 }
 
 .cwa_container-loading-pdf {
@@ -1395,6 +1395,10 @@
   justify-content: start;
   gap: 1rem;
   align-items: center;
+  background: white;
+  position: absolute;
+  width: 100%;
+  bottom: 70px;
 }
 
 .cwa_upload-pdf-btn,
@@ -1429,6 +1433,7 @@
   background-color: black;
   color: white;
   transition: transform 0.5s ease-in-out;
+  overflow-y: auto;
 }
 
 .cwa_chat-history-container button {

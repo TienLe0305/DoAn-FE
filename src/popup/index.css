@@ -264,6 +264,10 @@ body {
   margin: 0 !important;
 }
 
+.cwa_logo-title.login {
+  color: #000;
+}
+
 .cwa_user-container {
   display: flex;
   justify-content: center;

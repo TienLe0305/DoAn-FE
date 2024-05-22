@@ -7,10 +7,10 @@ import {
   SendIcon,
   LoadingIcon,
   ArrowButton,
-  UploadPDFIcon,
-  UploadPDFIconInMessage,
+  UploadFileIcon,
+  UploadFileIconInMessage,
   LoadingMessageIcon,
-  PDFIconSideBar,
+  FileIconSideBar,
   UrlIconSideBar,
   AddNewChatIcon,
   OpenListConversationsIcon,
@@ -19,8 +19,8 @@ import ChatHistoryList from "./ChatHistoryList";
 
 const CHAT = process.env.API_CHAT;
 const CWA = process.env.API_DOMAIN;
-const HISTORY = process.env.API_HISTORY;
-const UPLOADPDF = process.env.API_UPLOAD_PDF;
+const UPLOADFILE = process.env.API_UPLOAD_FILE;
+const EXTRACTFROMURL = process.env.API_EXTRACT_FROM_URL;
 
 const urls = {
   icon: chrome.runtime.getURL("assets/images/icon.png"),
@@ -28,7 +28,7 @@ const urls = {
 
 function ChatComponent({ user }) {
   const { t, i18n } = useTranslation();
-  const [isOpenPDF, setIsOpenPDF] = useState(false);
+  const [isOpenFile, setIsOpenFile] = useState(false);
   const [isOpenUrl, setIsOpenUrl] = useState(false);
   const [messages, setMessages] = useState([
     {
@@ -37,7 +37,7 @@ function ChatComponent({ user }) {
       type: "answer",
     },
   ]);
-  const [isGetPdfFile, setIsGetPdfFile] = useState(false);
+  const [isGetFile, setIsGetFile] = useState(false);
   const [isGetUrl, setIsGetUrl] = useState(false);
   const [followUpQuestions, setFollowUpQuestions] = useState([]);
   const [isSuggestions, setIsSuggestions] = useState(false);
@@ -51,7 +51,7 @@ function ChatComponent({ user }) {
 
   const inputRef = useRef(null);
   const endOfMessagesRef = useRef(null);
-  const pdfChatRef = useRef(null);
+  const fileChatRef = useRef(null);
   const urlChatRef = useRef(null);
 
   let followUpQuestionsPrompts = `
@@ -66,8 +66,8 @@ function ChatComponent({ user }) {
   - <question 2>
   and so on...`;
 
-  const handleOpenUploadPDF = () => {
-    setIsOpenPDF((prev) => !prev);
+  const handleOpenUploadFile = () => {
+    setIsOpenFile((prev) => !prev);
   };
 
   const handleOpenGetSummarizeUrl = () => {
@@ -85,10 +85,6 @@ function ChatComponent({ user }) {
     });
   }, []);
 
-  // useEffect(() => {
-  //   getChatHistory();
-  // }, [authToken]);
-
   useEffect(() => {
     endOfMessagesRef.current?.scrollIntoView({ behavior: "instant" });
   }, [messages, followUpQuestions]);
@@ -99,8 +95,8 @@ function ChatComponent({ user }) {
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (pdfChatRef.current && !pdfChatRef.current.contains(event.target)) {
-        hidePDFChat();
+      if (fileChatRef.current && !fileChatRef.current.contains(event.target)) {
+        hideFileChat();
       }
       if (urlChatRef.current && !urlChatRef.current.contains(event.target)) {
         hideUrlChat();
@@ -112,43 +108,7 @@ function ChatComponent({ user }) {
     };
   }, []);
 
-  // const getChatHistory = () => {
-  //   if (authToken) {
-  //     axios
-  //       .get(`${CWA}/${HISTORY}?user_email=${encodeURIComponent(user.email)}`)
-  //       .then((res) => {
-  //         const formattedMessages = res.data
-  //           .map((message) => {
-  //             const isPdfMessage =
-  //               message.user_ask.includes("<pdf>") &&
-  //               message.user_ask.includes("</pdf>");
-  //             const userAsk = isPdfMessage
-  //               ? message.user_ask.replace(/<\/?pdf>/g, "")
-  //               : message.user_ask;
-
-  //             return [
-  //               {
-  //                 text: userAsk,
-  //                 avatar: user.picture,
-  //                 type: isPdfMessage ? "pdf" : "question",
-  //               },
-  //               {
-  //                 text: message.assistant_answer,
-  //                 avatar: urls.icon,
-  //                 type: "answer",
-  //               },
-  //             ];
-  //           })
-  //           .flat();
-  //         setMessages(formattedMessages);
-  //       })
-  //       .catch((error) => {
-  //         setError(error);
-  //       });
-  //   }
-  // };
-
-  const getAnswer = async (text, pdf_name = null) => {
+  const getAnswer = async (text, fileName = null) => {
     let loadingMessage = {
       text: "Thinking...",
       avatar: urls.icon,
@@ -160,7 +120,7 @@ function ChatComponent({ user }) {
       `${CWA}/${CHAT}?query=${encodeURIComponent(
         text + followUpQuestionsPrompts
       )}&user_email=${encodeURIComponent(user.email)}${
-        pdf_name ? `&pdf_name=${encodeURIComponent(pdf_name)}` : ""
+        fileName ? `&file_name=${encodeURIComponent(fileName)}` : ""
       }`
     );
 
@@ -203,11 +163,11 @@ function ChatComponent({ user }) {
 
   const sendQuestion = async (text) => {
     if (text.trim() !== "" && !isDisable) {
-      const isPdfMessage = text.includes("<pdf>") && text.includes("</pdf>");
+      const isFileMessage = text.includes("<file>") && text.includes("</file>");
       let newQuestion = {
-        text: isPdfMessage ? text.replace(/<\/?pdf>/g, "") : text,
+        text: isFileMessage ? text.replace(/<\/?file>/g, "") : text,
         avatar: user.picture,
-        type: isPdfMessage ? "pdf" : "question",
+        type: isFileMessage ? "file" : "question",
       };
       setMessages((prevMessage) => [...prevMessage, newQuestion]);
       setMessageText("");
@@ -228,7 +188,8 @@ function ChatComponent({ user }) {
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
       e.preventDefault();
-      if (!isDisable) {
+      const trimmedText = messageText.trim();
+      if (trimmedText !== "" && !isDisable) {
         chat();
       }
     }
@@ -239,8 +200,8 @@ function ChatComponent({ user }) {
     setMessageText(value);
   };
 
-  const hidePDFChat = () => {
-    setIsOpenPDF(false);
+  const hideFileChat = () => {
+    setIsOpenFile(false);
   };
 
   const hideUrlChat = () => {
@@ -255,9 +216,9 @@ function ChatComponent({ user }) {
     const handleBeforeUnload = () => {
       saveChatMessagesToStorage();
     };
-  
+
     window.addEventListener("beforeunload", handleBeforeUnload);
-  
+
     return () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
     };
@@ -267,13 +228,16 @@ function ChatComponent({ user }) {
     try {
       const timestamp = Date.now();
       const date = new Date();
-      const formattedDate = `${date.getHours()}:${date.getMinutes()} ${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+      const formattedDate = `${date.getHours()}:${date.getMinutes()} ${date.getDate()}/${
+        date.getMonth() + 1
+      }/${date.getFullYear()}`;
       const newChatHistory = {
         messages,
         createdAt: formattedDate,
         key: timestamp,
       };
-      let chatHistories = JSON.parse(localStorage.getItem("chatHistories")) || [];
+      let chatHistories =
+        JSON.parse(localStorage.getItem("chatHistories")) || [];
       const existingChatHistoryIndex = chatHistories.findIndex(
         (chatHistory) => chatHistory.key === chatHistoryId
       );
@@ -289,68 +253,35 @@ function ChatComponent({ user }) {
     }
   };
 
-  // const handleNewChat = async () => {
-  //   setFollowUpQuestions([]);
-  //   setMessages([
-  //     {
-  //       text: "How can I assist you today?",
-  //       avatar: urls.icon,
-  //       type: "answer",
-  //     },
-  //   ]);
-  //   try {
-  //     const timestamp = Date.now();
-  //     if (messages.length > 0) {
-  //       const date = new Date();
-  //       const formattedDate = `${date.getHours()}:${date.getMinutes()} ${date.getDate()}/${
-  //         date.getMonth() + 1
-  //       }/${date.getFullYear()}`;
-  //       const newChatHistory = {
-  //         messages,
-  //         createdAt: formattedDate,
-  //         key: timestamp,
-  //       };
-  //       let chatHistories =
-  //         JSON.parse(localStorage.getItem("chatHistories")) || [];
-  //       const existingChatHistoryIndex = chatHistories.findIndex(
-  //         (chatHistory) => chatHistory.key === chatHistoryId
-  //       );
-
-  //       if (existingChatHistoryIndex !== -1) {
-  //         chatHistories[existingChatHistoryIndex] = newChatHistory;
-  //       } else {
-  //         chatHistories.push(newChatHistory);
-  //         setChatHistoryId(timestamp);
-  //       }
-
-  //       localStorage.setItem("chatHistories", JSON.stringify(chatHistories));
-  //     }
-  //     setMessages([]);
-  //   } catch (error) {
-  //     console.error("Error creating new chat history:", error);
-  //   }
-  // };
-
   const handleNewChat = async () => {
     setFollowUpQuestions([]);
-  
     try {
-      const chatHistories = JSON.parse(localStorage.getItem("chatHistories")) || [];
-      const lastChatHistory = chatHistories[chatHistories.length - 1];
-      if (lastChatHistory) {
-        setMessages(lastChatHistory.messages);
-        setChatHistoryId(lastChatHistory.key);
-      } else {
-        setMessages([
-          {
-            text: "How can I assist you today?",
-            avatar: urls.icon,
-            type: "answer",
-          },
-        ]);
+      const timestamp = Date.now();
+      if (messages.length > 0) {
+        const date = new Date();
+        const formattedDate = `${date.getHours()}:${date.getMinutes()} ${date.getDate()}/${
+          date.getMonth() + 1
+        }/${date.getFullYear()}`;
+        const newChatHistory = {
+          messages,
+          createdAt: formattedDate,
+          key: timestamp,
+        };
+        let chatHistories =
+          JSON.parse(localStorage.getItem("chatHistories")) || [];
+        const existingChatHistoryIndex = chatHistories.findIndex(
+          (chatHistory) => chatHistory.key === chatHistoryId
+        );
+
+        if (existingChatHistoryIndex !== -1) {
+          chatHistories[existingChatHistoryIndex] = newChatHistory;
+        } else {
+          chatHistories.push(newChatHistory);
+          setChatHistoryId(timestamp);
+        }
+
+        localStorage.setItem("chatHistories", JSON.stringify(chatHistories));
       }
-    } catch (error) {
-      console.error("Error retrieving chat messages from storage:", error);
       setMessages([
         {
           text: "How can I assist you today?",
@@ -358,6 +289,8 @@ function ChatComponent({ user }) {
           type: "answer",
         },
       ]);
+    } catch (error) {
+      console.error("Error creating new chat history:", error);
     }
   };
 
@@ -382,10 +315,6 @@ function ChatComponent({ user }) {
     setChatHistoryId(chatHistory.key);
   };
 
-  useEffect(() => {
-    handleNewChat();
-  }, []);
-
   const SummarizeComponent = () => {
     const [currentURL, setCurrentURL] = useState("");
     const getCurrentURL = async () => {
@@ -405,7 +334,7 @@ function ChatComponent({ user }) {
     const sendURLToBackend = async (url) => {
       try {
         const response = await axios.post(
-          "http://127.0.0.1:8003/ext/extract_from_url",
+          `${CWA}/${EXTRACTFROMURL}`,
           { url },
           {
             headers: {
@@ -446,56 +375,57 @@ function ChatComponent({ user }) {
     );
   };
 
-  const PDFChatComponent = () => {
-    const handlePdfUpload = async (e) => {
+  const FileChatComponent = () => {
+    const handleFileUpload = async (e) => {
       const file = e.target.files[0];
       const formData = new FormData();
       formData.append("file", file);
-      sendQuestion(`<pdf>${file.name}</pdf>`);
-      setIsGetPdfFile(true);
-      setIsOpenPDF(false);
+      sendQuestion(`<file>${file.name}</file>`);
+      setIsGetFile(true);
+      setIsOpenFile(false);
       try {
-        const response = await fetch(`${CWA}/${UPLOADPDF}`, {
+        const response = await fetch(`${CWA}/${UPLOADFILE}`, {
           method: "POST",
           body: formData,
         });
         if (response.ok) {
-          const pdfName = file.name;
-          setIsGetPdfFile(false);
-          getAnswer(`What is the main topic of the document?`, pdfName);
+          const fileName = file.name;
+          setIsGetFile(false);
+          getAnswer(`What is the main topic of the document?`, fileName);
         } else {
-          console.error("Đã xảy ra lỗi khi gửi file PDF lên BE.");
+          console.error("Đã xảy ra lỗi khi gửi file lên BE.");
         }
       } catch (error) {
-        console.error("Lỗi khi gửi file PDF lên BE:", error);
+        console.error("Lỗi khi gửi file lên BE:", error);
       }
     };
 
     return (
-      <div ref={pdfChatRef} className="cwa_pdf-uploader">
+      <div ref={fileChatRef} className="cwa_pdf-uploader">
         <input
           type="file"
           id="pdf-upload"
-          accept=".pdf"
-          onChange={handlePdfUpload}
+          accept=".pdf,.docx"
+          onChange={handleFileUpload}
           style={{ display: "none" }}
         />
         <div className="cwa_upload-pdf-container">
           <div className="cwa_upload-pdf-title">
             <h2>
-              Tải lên tệp PDF để nhận bản tóm tắt thông minh và câu trả lời!
+              Tải lên tệp PDF hoặc WORD để nhận bản tóm tắt thông minh và câu
+              trả lời!
             </h2>
           </div>
           <div className="cwa_upload-pdf-content">
             <p>
-              Tải lên một tệp PDF để dễ dàng nhận được bản tóm tắt thông minh và
-              câu trả lời cho tài liệu của bạn.
+              Tải lên một tệp PDF hoặc WORD để dễ dàng nhận được bản tóm tắt
+              thông minh và câu trả lời cho tài liệu của bạn.
             </p>
           </div>
           <label htmlFor="pdf-upload" className="cwa_upload-pdf-footer">
-            <UploadPDFIcon />
-            <p>Loại tệp được hỗ trợ là PDF</p>
-            <p>Kéo PDF của bạn vào đây hoặc nhấp vào để tải lên</p>
+            <UploadFileIcon />
+            <p>Loại tệp được hỗ trợ là PDF và WORD</p>
+            <p>Kéo file của bạn vào đây hoặc nhấp vào để tải lên</p>
           </label>
         </div>
       </div>
@@ -505,7 +435,7 @@ function ChatComponent({ user }) {
   return (
     <>
       <div className="cwa_chat-content-container">
-        {isOpenPDF && <PDFChatComponent />}
+        {isOpenFile && <FileChatComponent />}
         {isOpenUrl && <SummarizeComponent />}
         <ChatHistoryList
           chatHistories={chatHistories}
@@ -579,7 +509,7 @@ function ChatComponent({ user }) {
                       </div>
                     </div>
                   );
-                } else if (message.type === "pdf") {
+                } else if (message.type === "file") {
                   return (
                     <div
                       key={index}
@@ -592,7 +522,7 @@ function ChatComponent({ user }) {
                       <div
                         className={`cwa_message-content cwa_${message.type}`}
                       >
-                        <UploadPDFIconInMessage />
+                        <UploadFileIconInMessage />
                         <div className="cwa_pdf-info">
                           <p>File</p>
                           <div className={`cwa_${message.type}`}>
@@ -634,7 +564,7 @@ function ChatComponent({ user }) {
                 ))}
               </div>
             )}
-            {isGetPdfFile && (
+            {isGetFile && (
               <div className="cwa_wrapper-container-loading-pdf">
                 <div className="loader">
                   <div className="inner one"></div>
@@ -676,11 +606,11 @@ function ChatComponent({ user }) {
         <div
           className="cwa_upload-pdf-btn"
           onClick={() => {
-            handleOpenUploadPDF();
+            handleOpenUploadFile();
           }}
         >
-          <PDFIconSideBar isSelected={false} />
-          <span className="tooltip-text-group-btn">PDF</span>
+          <FileIconSideBar isSelected={false} />
+          <span className="tooltip-text-group-btn">Upload File</span>
         </div>
         <div
           className="cwa_get-url-btn"
@@ -702,12 +632,14 @@ function ChatComponent({ user }) {
           onKeyDown={handleKeyDown}
           placeholder="Nhập câu hỏi của bạn..."
           style={{ overflow: "hidden" }}
+          disabled={isDisable}
         />
         <button
           className={`cwa_send-button ${
             messageText.trim() !== "" && !isDisable ? "active" : ""
           }`}
           onClick={chat}
+          disabled={messageText.trim() === "" || isDisable}
         >
           {isDisable ? (
             <LoadingIcon />

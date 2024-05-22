@@ -2,11 +2,11 @@ import React, { useState } from "react";
 import Select from "react-select";
 import { EventSourcePolyfill } from "event-source-polyfill";
 import { LoadingMessageIcon } from "./SVG";
+import ReactMarkdown from "react-markdown";
 
 const CHAT = process.env.API_CHAT;
 const CWA = process.env.API_DOMAIN;
 
-// Styles for Select components
 const selectStyles = {
   control: (provided, state) => ({
     ...provided,
@@ -53,7 +53,6 @@ const languageOptionStyles = {
   }),
 };
 
-// Options for Select components
 const taskOptions = [
   { value: "answer", label: "Trả lời câu hỏi này" },
   { value: "explain", label: "Giải thích điều này" },
@@ -112,12 +111,12 @@ function QuestionComponent({ user }) {
         break;
       case "summarize":
         setPromptText(
-          'As a proficient AI, specialized in language comprehension and writing enhancement, your task is to review the text within the triple quotes and improve it while maintaining its original essence. Strive to keep the original meaning, structure, character length and format intact to ensure coherence and readability. Provide only the improved version of the text without wrapping responses in quotes or changing the language of the text. """"""${selection}"""""""'
+          'As an AI trained in concise writing, your task is to condense the text within the triple quotes. Make sure the revised text is no more than half the length of the original while retaining its meaning. Present only the output without any additional information or wrapping it in quotes. Your response should be in the same language variety or dialect as that of the given text."""${selection}"""'
         );
         break;
       case "improve":
         setPromptText(
-          'As an AI trained in concise writing, your task is to condense the text within the triple quotes. Make sure the revised text is no more than half the length of the original while retaining its meaning. Present only the output without any additional information or wrapping it in quotes. Your response should be in the same language variety or dialect as that of the given text."""${selection}"""'
+          'As a proficient AI, specialized in language comprehension and writing enhancement, your task is to review the text within the triple quotes and improve it while maintaining its original essence. Strive to keep the original meaning, structure, character length and format intact to ensure coherence and readability. Provide only the improved version of the text without wrapping responses in quotes or changing the language of the text. """"""${selection}"""""""'
         );
         break;
       case "correct":
@@ -235,7 +234,11 @@ function QuestionComponent({ user }) {
         className="cwa_question-component-result"
         style={{ display: isLoading || outputText ? "block" : "none" }}
       >
-        {isLoading && outputText || outputText ? outputText : <LoadingMessageIcon />}
+        {(isLoading && outputText) || outputText ? (
+          <ReactMarkdown>{outputText}</ReactMarkdown>
+        ) : (
+          <LoadingMessageIcon />
+        )}
       </div>
     </div>
   );
