@@ -1490,6 +1490,35 @@
   transform: translateX(0%) translateY(-50%) !important;
 }
 
+#CWA .cwa_copy-message {
+  position: relative;
+  float: inline-end;
+  cursor: pointer;
+}
+
+#CWA .cwa_tooltip {
+  visibility: hidden;
+  background-color: #203532;
+  font-family: CohereText !important;
+  color: var(--primary-color);
+  text-align: center;
+  padding: 5px;
+  border-radius: 6px;
+  position: absolute;
+  z-index: 9999;
+  bottom: 90%;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 0.3s;
+  margin-bottom: 5px;
+}
+
+#CWA .cwa_copy-message:hover .cwa_tooltip {
+  visibility: visible;
+  opacity: 1;
+}
+
 @keyframes outer {
   0% {
     transform: rotate(0deg) scale(1);

@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useTranslation } from "react-i18next";
 
 import {
   ExitIcon,
@@ -17,8 +16,6 @@ const urls = {
 };
 
 const ChatBox = ({ user, setIsOpen }) => {
-  const { t, i18n } = useTranslation();
-
   const [selectedComponent, setSelectedComponent] = useState("Chat");
 
   const chatBoxRef = useRef(null);
@@ -28,14 +25,6 @@ const ChatBox = ({ user, setIsOpen }) => {
     { component: "Question", Icon: QuestionIconSideBar },
     { component: "Write", Icon: WriteIconSideBar },
   ];
-
-  useEffect(() => {
-    chrome.storage.local.get("language", function (result) {
-      if (result.language !== undefined) {
-        i18n.changeLanguage(result.language);
-      }
-    });
-  }, []);
 
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -75,9 +64,7 @@ const ChatBox = ({ user, setIsOpen }) => {
           </div>
         </div>
         {selectedComponent === "Chat" && (
-          <ChatComponent
-            user={user}
-          />
+          <ChatComponent user={user} />
         )}
         {selectedComponent === "Write" && <WriteComponent user={user} />}
         {selectedComponent === "Question" && <QuestionComponent user={user} />}
@@ -88,6 +75,7 @@ const ChatBox = ({ user, setIsOpen }) => {
         </div>
         {sideBarButtons.map(({ component, Icon }) => (
           <div
+            key={component}
             className={`cwa_btn-chat-side-bar cwa-btn-side-bar ${
               selectedComponent === component ? "selected" : ""
             }`}

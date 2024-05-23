@@ -79,10 +79,10 @@ const UploadImageIcon = () => (
     xmlns="http://www.w3.org/2000/svg"
   >
     <g
-      clip-path="url(#a)"
+      clipPath="url(#a)"
       stroke="#000001"
-      stroke-linecap="round"
-      stroke-linejoin="round"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     >
       <path d="M2.01 13.5h11a1 1 0 0 0 1-1v-11a1 1 0 0 0-1-1h-11a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1" />
       <path d="M9.75 6.5a1.75 1.75 0 1 0 0-3.5 1.75 1.75 0 0 0 0 3.5m.15 7a7.36 7.36 0 0 0-7.4-6 8 8 0 0 0-1.5.14" />
@@ -119,9 +119,9 @@ const CloseCWA = () => (
         width="23"
         height="23"
         filterUnits="userSpaceOnUse"
-        color-interpolation-filters="sRGB"
+        colorInterpolationFilters="sRGB"
       >
-        <feFlood flood-opacity="0" result="BackgroundImageFix" />
+        <feFlood floodOpacity="0" result="BackgroundImageFix" />
         <feColorMatrix
           in="SourceAlpha"
           type="matrix"
@@ -160,10 +160,10 @@ const ArrowButton = () => (
     xmlns="http://www.w3.org/2000/svg"
   >
     <g
-      clip-path="url(#a)"
+      clipPath="url(#a)"
       stroke="#000001"
-      stroke-linecap="round"
-      stroke-linejoin="round"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     >
       <path d="M1.25 7h13m-3.5 3.5 3.5-3.5-3.5-3.5" />
     </g>
@@ -184,10 +184,10 @@ const ChatIconSideBar = ({ isSelected }) => (
     xmlns="http://www.w3.org/2000/svg"
   >
     <g
-      clip-path="url(#a)"
+      clipPath="url(#a)"
       stroke={isSelected ? "#fff" : "#000001"}
-      stroke-linecap="round"
-      stroke-linejoin="round"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     >
       <path d="M4.75 7a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1M8 7a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1m3.25 0a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1" />
       <path d="m5 12.5-4 1 1-3v-9a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1z" />
@@ -209,10 +209,10 @@ const QuestionIconSideBar = ({ isSelected }) => (
     xmlns="http://www.w3.org/2000/svg"
   >
     <g
-      clip-path="url(#a)"
+      clipPath="url(#a)"
       stroke={isSelected ? "#fff" : "#000001"}
-      stroke-linecap="round"
-      stroke-linejoin="round"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     >
       <path d="M12.5.5h-11a1 1 0 0 0-1 1V10a1 1 0 0 0 1 1h2v2.5L6.62 11h5.88a1 1 0 0 0 1-1V1.5a1 1 0 0 0-1-1" />
       <path d="M5.5 4.5A1.5 1.5 0 1 1 7 6v.5M7 9a.25.25 0 0 1 0-.5M7 9a.25.25 0 0 0 0-.5" />
@@ -234,10 +234,10 @@ const WriteIconSideBar = ({ isSelected }) => (
     xmlns="http://www.w3.org/2000/svg"
   >
     <g
-      clip-path="url(#a)"
+      clipPath="url(#a)"
       stroke={isSelected ? "#fff" : "#000001"}
-      stroke-linecap="round"
-      stroke-linejoin="round"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     >
       <path d="m8.02 9-3 .54.5-3.04L11.25.79a1 1 0 0 1 1.42 0l1.06 1.06a1 1 0 0 1 0 1.42z" />
       <path d="M12.52 9.5v3a1 1 0 0 1-1 1h-9.5a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h3" />
@@ -261,10 +261,10 @@ const FileIconSideBar = ({ isSelected }) => (
     <path
       d="M4 4v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8.342a2 2 0 0 0-.602-1.43l-4.44-4.342A2 2 0 0 0 13.56 2H6a2 2 0 0 0-2 2m5 9h6m-6 4h3"
       stroke="#000"
-      stroke-linecap="round"
-      stroke-linejoin="round"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     />
-    <path d="M14 2v4a2 2 0 0 0 2 2h4" stroke="#000" stroke-linejoin="round" />
+    <path d="M14 2v4a2 2 0 0 0 2 2h4" stroke="#000" strokeLinejoin="round" />
   </svg>
 );
 
@@ -298,13 +298,13 @@ const IconEssay = () => (
       d="M1.45834 2.04167H4.66668C5.95535 2.04167 7.00001 3.08633 7.00001 4.37501V12.25C7.00001 11.2835 6.21651 10.5 5.25001 10.5H1.45834V2.04167Z"
       stroke="currentColor"
       stroke-width="1.2"
-      stroke-linejoin="round"
+      strokeLinejoin="round"
     ></path>
     <path
       d="M12.5417 2.04167H9.33333C8.04466 2.04167 7 3.08633 7 4.37501V12.25C7 11.2835 7.7835 10.5 8.75 10.5H12.5417V2.04167Z"
       stroke="currentColor"
       stroke-width="1.2"
-      stroke-linejoin="round"
+      strokeLinejoin="round"
     ></path>
   </svg>
 );
@@ -317,14 +317,14 @@ const IconBlogFacebook = () => (
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
   >
-    <g clip-path="url(#a)">
+    <g clipPath="url(#a)">
       <path d="M0 14h14V0H0z" fill="#fff" fill-opacity=".01" />
       <path
         d="M7 11.375H1.75m10.5-2.625H1.75m10.5-3.208H1.75m10.5-2.917H1.75"
         stroke="currentColor"
         stroke-width="1.2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </g>
     <defs>
@@ -379,14 +379,14 @@ const IconBlog = () => (
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
   >
-    <g clip-path="url(#a)">
+    <g clipPath="url(#a)">
       <path d="M14 0H0v14h14z" fill="#fff" fill-opacity=".01" />
       <path
         d="M7 2.625h5.25M7 5.542h5.25M1.75 8.458h10.5m-10.5 2.917h10.5M2.042 4.958h2.333m-2.625.584.292-.584zm2.917 0-.292-.584zm-2.625-.584 1.166-2.333 1.167 2.333z"
         stroke="currentColor"
         stroke-width="1.2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </g>
     <defs>
@@ -405,14 +405,14 @@ const IconOutline = () => (
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
   >
-    <g clip-path="url(#a)">
+    <g clipPath="url(#a)">
       <path d="M14 0H0v14h14z" fill="#fff" fill-opacity=".01" />
       <path
         d="M7.583 7h5.25m-8.75 0H5.25m0 4.083h7.583m-11.083 0h1.167M5.25 2.917h7.583m-11.083 0h1.167"
         stroke="currentColor"
         stroke-width="1.2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </g>
     <defs>
@@ -435,7 +435,7 @@ const IconMarketing = () => (
       d="M1.39999 2.79999V11.2C1.39999 11.9732 2.02679 12.6 2.79999 12.6H11.2C11.9732 12.6 12.6 11.9732 12.6 11.2V2.79999M1.39999 2.79999C1.39999 2.0268 2.0268 1.39999 2.79999 1.39999H11.2C11.9732 1.39999 12.6 2.0268 12.6 2.79999M1.39999 2.79999C1.39999 3.57319 2.0268 4.19999 2.79999 4.19999H11.2C11.9732 4.19999 12.6 3.57319 12.6 2.79999M3.84999 8.39999H6.64999M3.84999 10.5H5.59999"
       stroke="currentColor"
       stroke-width="1.2"
-      stroke-linecap="round"
+      strokeLinecap="round"
     ></path>
   </svg>
 );
@@ -473,8 +473,8 @@ const IconMessage = () => (
         d="M9.80019 7.05266V7.00002M7.00019 7.05266V7.00002M4.20019 7.05266V7.00002M1.40019 7.00002C1.40019 7.80504 1.57005 8.57038 1.87589 9.26216L1.39913 12.5995L4.25917 11.8845C5.06939 12.3401 6.00444 12.6 7.00019 12.6C10.093 12.6 12.6002 10.0928 12.6002 7.00002C12.6002 3.90723 10.093 1.40002 7.00019 1.40002C3.9074 1.40002 1.40019 3.90723 1.40019 7.00002Z"
         stroke="currentColor"
         stroke-width="1.2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       ></path>
     </g>
   </svg>
@@ -491,8 +491,8 @@ const IconTwitter = () => (
     xmlns="http://www.w3.org/2000/svg"
   >
     <path
-      fill-rule="evenodd"
-      clip-rule="evenodd"
+      fillRule="evenodd"
+      clipRule="evenodd"
       d="M7.233 4.696c0-1.727 1.4-3.127 3.127-3.127 1.014 0 1.823.479 2.365 1.175a5.3 5.3 0 0 0 1.626-.629 2.63 2.63 0 0 1-1.148 1.45l.002.003a5.3 5.3 0 0 0 1.5-.413l-.001.002c-.337.505-.76.95-1.248 1.313q.04.266.04.53c0 3.687-2.809 7.975-7.975 7.975a7.93 7.93 0 0 1-4.296-1.26.5.5 0 0 1-.108-.748.45.45 0 0 1 .438-.215c.916.108 1.83-.004 2.637-.356a3.1 3.1 0 0 1-1.69-1.876.45.45 0 0 1 .103-.448 3.07 3.07 0 0 1-1.045-2.31v-.034a.45.45 0 0 1 .365-.442 3.1 3.1 0 0 1-.344-1.416c0-.468.003-1.058.332-1.59a.45.45 0 0 1 .323-.208.5.5 0 0 1 .538.161 6.96 6.96 0 0 0 4.46 2.507zm-1.712 7.279a7 7 0 0 1-2.249-.373 5.3 5.3 0 0 0 2.39-1.042.45.45 0 0 0-.27-.804 2.17 2.17 0 0 1-1.714-.888q.285-.023.556-.096a.45.45 0 0 0-.028-.876 2.18 2.18 0 0 1-1.644-1.474q.301.073.623.084a.45.45 0 0 0 .265-.824 2.18 2.18 0 0 1-.97-1.812q-.001-.25.013-.453a7.95 7.95 0 0 0 5.282 2.376.5.5 0 0 0 .513-.61 2.127 2.127 0 0 1 2.071-2.614c1.234 0 2.136 1.143 2.136 2.432 0 3.256-2.476 6.974-6.975 6.974Z"
       fill="currentColor"
       stroke="none"
@@ -512,14 +512,14 @@ const IconType = () => (
       d="M11.375 1.75h-8.75a.875.875 0 0 0-.875.875v8.75c0 .483.392.875.875.875h8.75a.875.875 0 0 0 .875-.875v-8.75a.875.875 0 0 0-.875-.875Z"
       stroke="currentColor"
       stroke-width="1.2"
-      stroke-linejoin="round"
+      strokeLinejoin="round"
     />
     <path
       d="M7.583 7h-3.5m5.834-2.625H4.083m5.25 5.25h-5.25"
       stroke="currentColor"
       stroke-width="1.2"
-      stroke-linecap="round"
-      stroke-linejoin="round"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     />
   </svg>
 );
@@ -532,20 +532,20 @@ const IconTone = () => (
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
   >
-    <g clip-path="url(#a)">
+    <g clipPath="url(#a)">
       <path d="M14 0H0v14h14z" fill="#fff" fill-opacity=".01" />
       <path
         d="M7 12.833A5.833 5.833 0 1 0 7 1.167a5.833 5.833 0 0 0 0 11.666Z"
         stroke="currentColor"
         stroke-width="1.2"
-        stroke-linejoin="round"
+        strokeLinejoin="round"
       />
       <path
         d="M9.042 5.25v.292M4.958 5.25v.292m2.625 2.625H6.417a1.167 1.167 0 1 0 0 2.333h1.166a1.167 1.167 0 0 0 0-2.333"
         stroke="currentColor"
         stroke-width="1.2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </g>
     <defs>
@@ -564,14 +564,14 @@ const IconLength = () => (
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
   >
-    <g clip-path="url(#a)">
+    <g clipPath="url(#a)">
       <path d="M0 14h14V0H0z" fill="#fff" fill-opacity=".01" />
       <path
         d="M9 12H2m10-3H2m7-4H2m10-3H2"
         stroke="currentColor"
         stroke-width="1.2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </g>
     <defs>
@@ -590,21 +590,21 @@ const IconLanguage = () => (
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
   >
-    <g opacity=".65" clip-path="url(#a)">
+    <g opacity=".65" clipPath="url(#a)">
       <path d="M14 0H0v14h14z" fill="#fff" fill-opacity=".01" />
       <path
         d="M8.25 10.792h3.333m.667 1.458-.667-1.458zm-4.667 0 .667-1.458zm.667-1.458L9.917 7l1.666 3.792zM4.667 1.75l.291.875m-3.208.583h6.417m-5.25 1.459s.522 1.826 1.826 2.84c1.305 1.015 3.424 1.826 3.424 1.826"
         stroke="currentColor"
         stroke-width="1.2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
       <path
         d="M7 3.208s-.522 2.397-1.827 3.729C3.868 8.268 1.75 9.333 1.75 9.333"
         stroke="currentColor"
         stroke-width="1.2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </g>
     <defs>
@@ -649,8 +649,8 @@ const USFlag = () => (
       fill="#0052B4"
     />
     <path
-      fill-rule="evenodd"
-      clip-rule="evenodd"
+      fillRule="evenodd"
+      clipRule="evenodd"
       d="M109.506 46.0312C117.873 40.1825 126.606 34.8212 135.664 29.9885L136.621 32.9341H164.521L141.95 49.3329L150.571 75.8666L128 59.4679L105.429 75.8666L114.05 49.3329L109.506 46.0312ZM29.5876 136.419C35.4946 125.258 42.2026 114.586 49.6351 104.48L53.4214 116.133H81.3206L58.7497 132.532L67.371 159.066L44.8001 142.667L22.2291 159.066L29.5876 136.419ZM211.2 6.40039L219.821 32.9341H247.721L225.15 49.3329L233.771 75.8666L211.2 59.4679L188.629 75.8666L197.25 49.3329L174.68 32.9341H202.579L211.2 6.40039ZM128 89.5996L136.621 116.133H164.521L141.95 132.532L150.571 159.066L128 142.667L105.429 159.066L114.05 132.532L91.4794 116.133H119.379L128 89.5996ZM219.821 116.133L211.2 89.5996L202.579 116.133H174.68L197.25 132.532L188.629 159.066L211.2 142.667L233.771 159.066L225.15 132.532L247.721 116.133H219.821ZM44.8001 172.8L53.4214 199.334H81.3206L58.7497 215.732L67.371 242.266L44.8001 225.867L22.2291 242.266L30.8504 215.732L8.27948 199.334H36.1787L44.8001 172.8ZM136.621 199.334L128 172.8L119.379 199.334H91.4794L114.05 215.732L105.429 242.266L128 225.867L150.571 242.266L141.95 215.732L164.521 199.334H136.621ZM211.2 172.8L219.821 199.334H247.721L225.15 215.732L233.771 242.266L211.2 225.867L188.629 242.266L197.25 215.732L174.68 199.334H202.579L211.2 172.8Z"
       fill="#EEEEEE"
     />
@@ -879,6 +879,25 @@ const LoadingMessageIcon = () => (
   </svg>
 );
 
+const CopyIcon = () => (
+  <svg
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M9 3.25A5.75 5.75 0 0 0 3.25 9v7.107a.75.75 0 0 0 1.5 0V9A4.25 4.25 0 0 1 9 4.75h7.013a.75.75 0 0 0 0-1.5z"
+      fill="#6c757d"
+    />
+    <path
+      d="M18.403 6.793a44.4 44.4 0 0 0-9.806 0 2.01 2.01 0 0 0-1.774 1.76 42.6 42.6 0 0 0 0 9.894 2.01 2.01 0 0 0 1.774 1.76c3.241.362 6.565.362 9.806 0a2.01 2.01 0 0 0 1.774-1.76 42.6 42.6 0 0 0 0-9.894 2.01 2.01 0 0 0-1.774-1.76M8.764 8.284c3.13-.35 6.342-.35 9.472 0a.51.51 0 0 1 .45.444 41 41 0 0 1 0 9.544.51.51 0 0 1-.45.444c-3.13.35-6.342.35-9.472 0a.51.51 0 0 1-.45-.444 41 41 0 0 1 0-9.544.51.51 0 0 1 .45-.444"
+      fill="#6c757d"
+    />
+  </svg>
+);
+
 const AddNewChatIcon = ({ isSelected }) => (
   <svg
     width="20"
@@ -909,8 +928,8 @@ const OpenListConversationsIcon = ({ isSelected }) => (
     xmlns="http://www.w3.org/2000/svg"
   >
     <path
-      fill-rule="evenodd"
-      clip-rule="evenodd"
+      fillRule="evenodd"
+      clipRule="evenodd"
       d="M13.507 12.324a7 7 0 0 0 .065-8.56A7 7 0 0 0 2 4.393V2H1v3.5l.5.5H5V5H2.811a6.008 6.008 0 1 1-.135 5.77l-.887.462a7 7 0 0 0 11.718 1.092m-3.361-.97.708-.707L8 7.792V4H7v4l.146.354z"
     />
   </svg>
@@ -965,4 +984,5 @@ export {
   AddNewChatIcon,
   OpenListConversationsIcon,
   HideListConversationsIcon,
+  CopyIcon
 };

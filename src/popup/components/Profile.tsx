@@ -25,18 +25,24 @@ const customStyles = {
     ...provided,
     color: state.isFocused ? "white" : "black",
     backgroundColor: state.isFocused ? "#56bb55b3" : "white",
+    zIndex: 9999,
+    display: "flex",
+    justifyContent: "space-beetween",
+    alignItems: "center",
   }),
 };
 
 const formatOptionLabel = ({ value, label, image }) => (
-  <div className="d-flex align-items-center gap-2">
-    {image}
+  <div className="d-flex align-items-center justify-content-center">
+    <div className="cwa_image-language">{image}</div>
     <div className="fw-bold">{label}</div>
   </div>
 );
 
 const clearLocalStorage = (setUser) => {
   chrome.storage.local.remove("auth_token");
+  chrome.storage.local.remove("language");
+  chrome.storage.local.remove("contentScriptReady");
   chrome.storage.local.remove("user", function () {
     if (chrome.runtime.lastError) {
       console.error(chrome.runtime.lastError);
@@ -46,26 +52,20 @@ const clearLocalStorage = (setUser) => {
   });
 };
 
-const Logout = ({ user, setUser }) => {
+const Profile = ({ user, setUser }) => {
   const { t, i18n } = useTranslation();
+  const [filteredLanguageOptions, setFilteredLanguageOptions] =
+    useState(languageOptions);
   const [selectedOption, setSelectedOption] = useState(
     languageOptions.find((option) => option.value === i18n.language)
   );
-  const [isChecked, setIsChecked] = useState(true);
 
   useEffect(() => {
-    getCheckedStatus();
-  }, []);
-
-  const getCheckedStatus = () => {
-    chrome.storage.local.get("checked", function (result) {
-      if (result.checked !== undefined) {
-        setIsChecked(result.checked);
-      } else {
-        chrome.storage.local.set({ checked: true });
-      }
-    });
-  };
+    const newOptions = languageOptions.filter(
+      (option) => option.value !== i18n.language
+    );
+    setFilteredLanguageOptions(newOptions);
+  }, [i18n.language]);
 
   const handleLogout = useCallback(() => {
     clearLocalStorage(setUser);
@@ -76,19 +76,7 @@ const Logout = ({ user, setUser }) => {
 
   const executeNewScript = (data) => {
     chrome.storage.local.set(data, () => {
-      chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-        if (tabs.length === 0) return;
-        const currentTabId = tabs[0].id;
-        chrome.scripting.executeScript(
-          {
-            target: { tabId: currentTabId },
-            files: ["contentScript.js"],
-          },
-          () => {
-            chrome.tabs.sendMessage(currentTabId, { cleanup: true });
-          }
-        );
-      });
+      chrome.runtime.sendMessage({ settingUpdate: true });
     });
   };
 
@@ -96,13 +84,11 @@ const Logout = ({ user, setUser }) => {
     setSelectedOption(selectedOption);
     i18n.changeLanguage(selectedOption.value);
     executeNewScript({ language: selectedOption.value });
+    const newOptions = languageOptions.filter(
+      (option) => option.value !== selectedOption.value
+    );
+    setFilteredLanguageOptions(newOptions);
   };
-
-  const handleCheckboxChange = useCallback((event) => {
-    const isChecked = event.target.checked;
-    setIsChecked(isChecked);
-    executeNewScript({ checked: isChecked });
-  }, []);
 
   return (
     <>
@@ -125,7 +111,7 @@ const Logout = ({ user, setUser }) => {
               <p className="cwa_user-name">{user.name}</p>
             </div>
             <Select
-              options={languageOptions}
+              options={filteredLanguageOptions}
               formatOptionLabel={formatOptionLabel}
               value={selectedOption}
               styles={customStyles}
@@ -164,4 +150,4 @@ const Logout = ({ user, setUser }) => {
   );
 };
 
-export default Logout;
+export default Profile;

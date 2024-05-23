@@ -14,8 +14,10 @@ import {
   UrlIconSideBar,
   AddNewChatIcon,
   OpenListConversationsIcon,
+  CopyIcon,
 } from "./SVG";
 import ChatHistoryList from "./ChatHistoryList";
+import { suggestions } from "../suggestion";
 
 const CHAT = process.env.API_CHAT;
 const CWA = process.env.API_DOMAIN;
@@ -28,6 +30,7 @@ const urls = {
 
 function ChatComponent({ user }) {
   const { t, i18n } = useTranslation();
+  const [language, setLanguage] = useState("en");
   const [isOpenFile, setIsOpenFile] = useState(false);
   const [isOpenUrl, setIsOpenUrl] = useState(false);
   const [messages, setMessages] = useState([
@@ -48,6 +51,8 @@ function ChatComponent({ user }) {
   const [chatHistories, setChatHistories] = useState([]);
   const [isShowChatHistory, setIsShowChatHistory] = useState(false);
   const [chatHistoryId, setChatHistoryId] = useState(null);
+  const [copied, setCopied] = useState(false);
+  const [displayedSuggestions, setDisplayedSuggestions] = useState([]);
 
   const inputRef = useRef(null);
   const endOfMessagesRef = useRef(null);
@@ -65,6 +70,39 @@ function ChatComponent({ user }) {
   - <question 1>
   - <question 2>
   and so on...`;
+
+  useEffect(() => {
+    const randomSuggestions = getRandomSuggestions(suggestions, 3);
+    setDisplayedSuggestions(randomSuggestions);
+  }, []);
+
+  useEffect(() => {
+    const messageListener = (request) => {
+      if (request.settingUpdate) {
+        chrome.storage.local.get(["language"], function (result) {
+          if (result.language !== undefined) {
+            setLanguage(result.language);
+            i18n.changeLanguage(result.language);
+          }
+        });
+      }
+    };
+    chrome.runtime.onMessage.addListener(messageListener);
+    return () => {
+      chrome.runtime.onMessage.removeListener(messageListener);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (language) {
+      i18n.changeLanguage(language);
+    }
+  }, [language]);
+
+  const getRandomSuggestions = (suggestions, count) => {
+    const shuffledSuggestions = suggestions.sort(() => 0.5 - Math.random());
+    return shuffledSuggestions.slice(0, count);
+  };
 
   const handleOpenUploadFile = () => {
     setIsOpenFile((prev) => !prev);
@@ -126,20 +164,26 @@ function ChatComponent({ user }) {
 
     setIsDisable(true);
     let answer = "";
+    let debounceTimer;
     eventSource.addEventListener("response", (event) => {
       const data = JSON.parse(event.data);
       for (let char of data.text) {
         answer += char;
-        let splitAnswer = answer.split("Follow-up questions:")[0].trimEnd();
-        if (splitAnswer === "") {
-          splitAnswer = "How can I help you today?";
-        }
-        let getmess = {
-          text: splitAnswer,
-          avatar: urls.icon,
-          type: "answer",
-        };
-        setMessages((prevMessage) => [...prevMessage.slice(0, -1), getmess]);
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+          let splitAnswer = answer
+            .split(/\s*Follow-up questions:/)[0]
+            .trimEnd();
+          if (splitAnswer === "") {
+            splitAnswer = "How can I help you today?";
+          }
+          let getmess = {
+            text: splitAnswer,
+            avatar: urls.icon,
+            type: "answer",
+          };
+          setMessages((prevMessage) => [...prevMessage.slice(0, -1), getmess]);
+        }, 10);
       }
     });
 
@@ -315,6 +359,20 @@ function ChatComponent({ user }) {
     setChatHistoryId(chatHistory.key);
   };
 
+  const handleCopyMessage = (text) => {
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+
+    setTimeout(() => {
+      setCopied(false);
+    }, 1000);
+  };
+
+  const handleSuggestionClick = async (content) => {
+    sendQuestion(content);
+    await getAnswer(content);
+  };
+
   const SummarizeComponent = () => {
     const [currentURL, setCurrentURL] = useState("");
     const getCurrentURL = async () => {
@@ -445,48 +503,24 @@ function ChatComponent({ user }) {
           isShowChatHistory={isShowChatHistory}
         />
         <div className="cwa_suggestion-container">
-          <div className="cwa_box-suggestion">
-            <div className="cwa_box-container">
-              <div className="cwa_box-suggestion-header">
-                <h3>🤓 Explain a complicated thing</h3>
+          {displayedSuggestions.map((suggestion, index) => (
+            <div className="cwa_box-suggestion">
+              <div className="cwa_box-container">
+                <div className="cwa_box-suggestion-header">
+                  <h3>{suggestion.title}</h3>
+                </div>
+                <div className="cwa_box-suggestion-content">
+                  <p>{suggestion.content}</p>
+                </div>
               </div>
-              <div className="cwa_box-suggestion-content">
-                <p>
-                  Explain Artificial Intelligence so I can explain it for my six
-                  year old.
-                </p>
-              </div>
-            </div>
-            <div className="cwa_box-suggestion-btn">
-              <ArrowButton />
-            </div>
-          </div>
-          <div className="cwa_box-suggestion">
-            <div className="cwa_box-container">
-              <div className="cwa_box-suggestion-header">
-                <h3>🧠 Get suggestions and generate new ideas</h3>
-              </div>
-              <div className="cwa_box-suggestion-content">
-                <p>Please give me the 10 best coding ideas in the world.</p>
+              <div
+                className="cwa_box-suggestion-btn"
+                onClick={() => handleSuggestionClick (suggestion.content)}
+              >
+                <ArrowButton />
               </div>
             </div>
-            <div className="cwa_box-suggestion-btn">
-              <ArrowButton />
-            </div>
-          </div>
-          <div className="cwa_box-suggestion">
-            <div className="cwa_box-container">
-              <div className="cwa_box-suggestion-header">
-                <h3>💭 Translate, summarize, correct grammar and more...</h3>
-              </div>
-              <div className="cwa_box-suggestion-content">
-                <p>Translate "I love you", into French.</p>
-              </div>
-            </div>
-            <div className="cwa_box-suggestion-btn">
-              <ArrowButton />
-            </div>
-          </div>
+          ))}
         </div>
         <div className="cwa_messages-container">
           <div className="cwa_messages">
@@ -546,6 +580,15 @@ function ChatComponent({ user }) {
                         className={`cwa_message-content cwa_${message.type}`}
                       >
                         <p className={`cwa_${message.type}`}>{message.text}</p>
+                        <div
+                          className="cwa_copy-message"
+                          onClick={() => handleCopyMessage(message.text)}
+                        >
+                          <CopyIcon />
+                          <span className="cwa_tooltip">
+                            {copied ? "Copied!" : "Copy"}
+                          </span>
+                        </div>
                       </div>
                     </div>
                   );

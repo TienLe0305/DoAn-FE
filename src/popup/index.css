@@ -56,7 +56,6 @@ body {
 .cwa_btn-logout {
   border: none;
   cursor: pointer;
-  z-index: 9999;
 }
 
 .cwa_btn-logout:hover {

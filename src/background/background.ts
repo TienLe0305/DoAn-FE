@@ -24,6 +24,18 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     });
   }
 
+  if (msg.settingUpdate == true) {
+    chrome.storage.local.get(["contentScriptReady"], function (result) {
+      if(result.contentScriptReady) {
+        chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+          if (tabs.length === 0) return;
+          const currentTabId = tabs[0].id;
+          chrome.tabs.sendMessage(currentTabId, { settingUpdate: true });
+        });
+      }
+    })
+  }
+
   if (msg.loading === "load") {
     chrome.storage.local.set({ load: false });
   }

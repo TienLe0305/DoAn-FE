@@ -58,6 +58,7 @@ const Popup = () => {
         .then((res) => {
           setUser(res.data.details);
           chrome.storage.local.set({ user: res.data.details });
+          chrome.storage.local.set({ contentScriptReady: true });
         })
         .catch((error) => {
           setErrors(error);
