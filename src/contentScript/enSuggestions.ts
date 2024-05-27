@@ -1,4 +1,4 @@
-export const suggestions = [
+export const enSuggestions = [
     {
       title: '🤓 Explain a complicated thing',
       content: 'Explain Artificial Intelligence so I can explain it for my six year old.',

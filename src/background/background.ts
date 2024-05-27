@@ -1,14 +1,6 @@
+let contentScriptLoaded = false;
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-  if (msg.isLogin === true) {
-    chrome.tabs.reload();
-  } else if (msg.action === 'getCurrentURL') {
-    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-      if (tabs.length === 0) return;
-      const currentTabId = tabs[0].id;
-      const currentURL = tabs[0].url;
-      sendResponse({ currentURL });
-    });
-  } else {
+  if (msg.isLogin == false) {
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
       if (tabs.length === 0) return;
       const currentTabId = tabs[0].id;
@@ -18,7 +10,8 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
           files: ["contentScript.js"],
         },
         () => {
-          chrome.tabs.sendMessage(currentTabId, { cleanup: true });
+            chrome.tabs.sendMessage(currentTabId, { cleanup: true });
+            contentScriptLoaded = true;
         }
       );
     });

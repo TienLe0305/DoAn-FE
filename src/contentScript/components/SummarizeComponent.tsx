@@ -1,11 +1,17 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useTranslation } from "react-i18next";
 
 const CWA = process.env.API_DOMAIN;
 const EXTRACTFROMURL = process.env.API_EXTRACT_FROM_URL;
 
-const SummarizeComponent = ({ sendQuestion, setIsGetUrl, setIsOpenUrl, getAnswer, urlChatRef }) => {
+const SummarizeComponent = ({ sendQuestion, setIsGetUrl, setIsOpenUrl, getAnswer, urlChatRef, language }) => {
   const [currentURL, setCurrentURL] = useState("");
+  const { t, i18n } = useTranslation();
+
+  useEffect(() => {
+    i18n.changeLanguage(language);
+  }, [language]);
 
   const getCurrentURL = async () => {
     chrome.runtime.sendMessage({ action: "getCurrentURL" }, (response) => {
@@ -50,8 +56,8 @@ const SummarizeComponent = ({ sendQuestion, setIsGetUrl, setIsOpenUrl, getAnswer
   return (
     <div ref={urlChatRef} className="cwa_get-current-url">
       <p>
-        Click here to get main content from current website and you can question
-        about it!!!
+       
+        {t("get-main-content")}
       </p>
       <button
         className="cwa_get-url-button"
@@ -59,7 +65,7 @@ const SummarizeComponent = ({ sendQuestion, setIsGetUrl, setIsOpenUrl, getAnswer
           getInformation();
         }}
       >
-        Get Information
+        {t("get-information")}
       </button>
     </div>
   );

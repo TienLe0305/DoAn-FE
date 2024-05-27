@@ -17,7 +17,7 @@ import {
   UploadImageIcon,
 } from "./SVG";
 import ChatHistoryList from "./ChatHistoryList";
-import { suggestions } from "../suggestion";
+
 import SummarizeComponent from "./SummarizeComponent";
 import FileChatComponent from "./FileChatComponent";
 import ImageChatComponent from "./ImageChatComponent";
@@ -31,6 +31,16 @@ import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import hljs from "highlight.js";
+
+import { jpSuggestions } from "../jpSuggestions";
+import { viSuggestions } from "../viSuggestions";
+import { enSuggestions } from "../enSuggestions";
+
+const languageSuggestions = {
+  en: enSuggestions,
+  jp: jpSuggestions,
+  vi: viSuggestions,
+};
 
 const CHAT = process.env.API_CHAT;
 const CWA = process.env.API_DOMAIN;
@@ -49,7 +59,8 @@ const followUpQuestionsPrompts = `
 Follow-up questions:
 - <question 1>
 - <question 2>
-and so on...`;
+and so on...
+- Always format the line 'Follow-up questions:' regardless of the current language, do not translate this line.`;
 
 const initialMessages = [
   {
@@ -89,8 +100,16 @@ const ChatComponent = ({ user }) => {
   const inputRefImg = useRef(null);
 
   useEffect(() => {
-    const randomSuggestions = getRandomSuggestions(suggestions, 3);
-    setDisplayedSuggestions(randomSuggestions);
+    chrome.storage.local.get(["language"], (result) => {
+      if (result.language !== undefined) {
+        setLanguage(result.language);
+        i18n.changeLanguage(result.language);
+
+        const suggestions = languageSuggestions[result.language] || [];
+        const randomSuggestions = getRandomSuggestions(suggestions, 3);
+        setDisplayedSuggestions(randomSuggestions);
+      }
+    });
   }, []);
 
   useEffect(() => {
@@ -100,11 +119,15 @@ const ChatComponent = ({ user }) => {
           if (result.language !== undefined) {
             setLanguage(result.language);
             i18n.changeLanguage(result.language);
-            console.log("Language changed to", result.language);
+
+            const suggestions = languageSuggestions[result.language] || [];
+            const randomSuggestions = getRandomSuggestions(suggestions, 3);
+            setDisplayedSuggestions(randomSuggestions);
           }
         });
       }
     };
+
     chrome.runtime.onMessage.addListener(messageListener);
     return () => {
       chrome.runtime.onMessage.removeListener(messageListener);
@@ -114,9 +137,11 @@ const ChatComponent = ({ user }) => {
   useEffect(() => {
     if (language) {
       i18n.changeLanguage(language);
+      const suggestions = languageSuggestions[language] || [];
+      const randomSuggestions = getRandomSuggestions(suggestions, 3);
+      setDisplayedSuggestions(randomSuggestions);
     }
   }, [language]);
-
   useEffect(() => {
     chrome.storage.local.get("auth_token", (result) => {
       setAuthToken(result.auth_token);
@@ -175,7 +200,7 @@ const ChatComponent = ({ user }) => {
         text + followUpQuestionsPrompts
       )}&user_email=${encodeURIComponent(user.email)}${
         fileName ? `&file_name=${encodeURIComponent(fileName)}` : ""
-      }`
+      }&language=${encodeURIComponent(language)}`
     );
 
     setIsDisable(true);
@@ -468,6 +493,7 @@ const ChatComponent = ({ user }) => {
             setIsOpenFile={setIsOpenFile}
             getAnswer={getAnswer}
             fileChatRef={fileChatRef}
+            language={language}
           />
         )}
         {isOpenUrl && (
@@ -477,6 +503,7 @@ const ChatComponent = ({ user }) => {
             setIsOpenUrl={setIsOpenUrl}
             getAnswer={getAnswer}
             urlChatRef={urlChatRef}
+            language={language}
           />
         )}
         {isOpenImg && (
@@ -486,6 +513,7 @@ const ChatComponent = ({ user }) => {
             setIsOpenImg={setIsOpenImg}
             getAnswer={getAnswer}
             inputRefImg={inputRefImg}
+            language={language}
           />
         )}
         <ChatHistoryList

@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useEffect } from "react";
 import axios from "axios";
 import { UploadImageIconInput } from "./SVG";
+import { useTranslation } from "react-i18next";
 
 const ImageChatComponent = ({
   sendQuestion,
@@ -8,7 +9,14 @@ const ImageChatComponent = ({
   setIsOpenImg,
   getAnswer,
   inputRefImg,
+  language,
 }) => {
+  const { t, i18n } = useTranslation();
+
+  useEffect(() => {
+    i18n.changeLanguage(language);
+  }, [language]);
+
   const handleImageUpload = async (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -30,7 +38,7 @@ const ImageChatComponent = ({
           }
         );
         const description = response.data.description;
-        
+
         getAnswer(
           `Provide a detailed description of the following description of image: ${description}`
         );
@@ -52,18 +60,15 @@ const ImageChatComponent = ({
       />
       <div className="cwa_upload-img-container">
         <div className="cwa_upload-img-title">
-          <h2>Tải lên hình ảnh để nhận mô tả chi tiết và câu trả lời!</h2>
+          <h2>{t("upload-img-title")}</h2>
         </div>
         <div className="cwa_upload-img-content">
-          <p>
-            Tải lên một hình ảnh để dễ dàng nhận được mô tả chi tiết và câu trả
-            lời cho hình ảnh của bạn.
-          </p>
+          <p>{t("upload-img-content")}</p>
         </div>
         <label htmlFor="img-upload" className="cwa_upload-img-footer">
           <UploadImageIconInput />
-          <p>Loại tệp được hỗ trợ là hình ảnh</p>
-          <p>Kéo hình ảnh của bạn vào đây hoặc nhấp vào để tải lên</p>
+          <p>{t("supported-img-type")}</p>
+          <p>{t("upload-instruction")}</p>
         </label>
       </div>
     </div>

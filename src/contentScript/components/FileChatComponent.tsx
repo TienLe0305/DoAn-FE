@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { UploadFileIcon } from "./SVG";
+import { useTranslation } from "react-i18next";
 
 const CWA = process.env.API_DOMAIN;
 const UPLOADFILE = process.env.API_UPLOAD_FILE;
@@ -10,7 +11,13 @@ const FileChatComponent = ({
   setIsOpenFile,
   getAnswer,
   fileChatRef,
+  language,
 }) => {
+  const { t, i18n } = useTranslation();
+  useEffect(() => {
+    i18n.changeLanguage(language);
+  }, [language]);
+
   const handleFileUpload = async (e) => {
     const file = e.target.files[0];
     const formData = new FormData();
@@ -46,21 +53,15 @@ const FileChatComponent = ({
       />
       <div className="cwa_upload-pdf-container">
         <div className="cwa_upload-pdf-title">
-          <h2>
-            Tải lên tệp PDF hoặc WORD để nhận bản tóm tắt thông minh và câu trả
-            lời!
-          </h2>
+          <h2>{t("upload-file-title")}</h2>
         </div>
         <div className="cwa_upload-pdf-content">
-          <p>
-            Tải lên một tệp PDF hoặc WORD để dễ dàng nhận được bản tóm tắt thông
-            minh và câu trả lời cho tài liệu của bạn.
-          </p>
+          <p>{t("upload-file-content")}</p>
         </div>
         <label htmlFor="pdf-upload" className="cwa_upload-pdf-footer">
           <UploadFileIcon />
-          <p>Loại tệp được hỗ trợ là PDF và WORD</p>
-          <p>Kéo file của bạn vào đây hoặc nhấp vào để tải lên</p>
+          <p>{t("supported-file-type")}</p>
+          <p>{t("upload-instruction")}</p>
         </label>
       </div>
     </div>
