@@ -35,15 +35,20 @@
     "bootstrap": "^5.3.3",
     "dotenv": "^16.4.5",
     "event-source-polyfill": "^1.0.31",
+    "highlight.js": "^11.9.0",
     "i18next": "^23.10.1",
     "i18next-browser-languagedetector": "^7.2.1",
     "i18next-http-backend": "^2.5.0",
+    "katex": "^0.16.10",
     "react-i18next": "^14.1.0",
     "react-markdown": "^9.0.1",
     "react-router-dom": "6.2",
     "react-select": "^5.8.0",
     "react-slick": "^0.30.2",
     "reconnecting-eventsource": "^1.6.2",
+    "rehype-katex": "^7.0.0",
+    "remark-gfm": "^4.0.0",
+    "remark-math": "^6.0.0",
     "webpack-dev-server": "^5.0.3"
   }
 }

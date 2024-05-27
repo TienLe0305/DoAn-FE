@@ -1,3 +1,5 @@
+@import "highlight.js/styles/default.css";
+
 :root {
   --primary-color: #ffffff;
   --h3-color-CWA: #000;
@@ -124,6 +126,154 @@
   font-weight: normal;
   font-style: normal;
   font-display: block;
+}
+
+/* KaTeX Styles */
+#CWA .katex-html {
+  display: none !important;
+}
+
+#CWA .katex-mathml {
+  text-wrap: wrap !important;
+}
+
+#CWA .katex-mathml math {
+  margin: 10px 0 !important;
+  font-size: 1.2rem !important;
+  font-weight: 600;
+  padding: 10px;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+#CWA .katex-display {
+  margin: 20px 0 !important;
+}
+
+/* Code Block Styles */
+#CWA pre {
+  text-wrap: wrap !important;
+  background: #2f2f2f !important;
+  line-height: 1.4rem !important;
+  margin: 1rem 0 !important;
+  padding: 55px 15px 15px 15px !important;
+  position: relative;
+  border-radius: 20px 20px 5px 5px !important;
+  color: white;
+  font-weight: 500;
+}
+
+#CWA pre header {
+  padding: 10px !important;
+  background: #e7e4dc;
+  color: black;
+  border-radius: 10px 10px 0 0 !important;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  right: 0;
+  overflow: hidden;
+}
+
+/* Syntax Highlighting */
+#CWA .hljs-keyword,
+#CWA .hljs-title {
+  color: #65489c !important;
+}
+
+#CWA .hljs-meta {
+  color: #58c1e7 !important;
+}
+
+#CWA .hljs-string {
+  color: #8bdc40 !important;
+}
+
+/* Markdown Body */
+#CWA .markdown-body {
+  font-family: "CohereText";
+  line-height: 1.2 !important;
+  padding: 0.5em !important;
+}
+
+/* Headers */
+#CWA h1,
+#CWA h2,
+#CWA h3,
+#CWA h4,
+#CWA h5,
+#CWA h6 {
+  font-weight: 600 !important;
+  margin-top: 24px !important;
+  margin-bottom: 16px !important;
+  line-height: 1.25 !important;
+}
+
+#CWA h1 {
+  font-size: 1.95em !important;
+}
+
+#CWA h2 {
+  font-size: 1.55em !important;
+}
+
+#CWA h3 {
+  font-size: 1.25em !important;
+}
+
+#CWA h4 {
+  font-size: 1.05em !important;
+}
+
+#CWA h5 {
+  font-size: 0.85em !important;
+}
+
+#CWA h6 {
+  font-size: 0.75em !important;
+}
+
+/* Lists */
+#CWA menu,
+#CWA ol {
+  padding: 10px !important;
+  list-style: auto !important;
+}
+
+#CWA ol li {
+  list-style: unset !important;
+  padding: 10px !important;
+}
+
+#CWA ul {
+  padding-left: 15px !important;
+  list-style: disc !important;
+}
+
+/* Horizontal Rule */
+#CWA hr {
+  margin: 1.5rem 0 !important;
+}
+
+/* Tables */
+#CWA table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+#CWA th,
+#CWA td {
+  border: 1px solid #ccc;
+  padding: 5px;
+}
+
+#CWA .cwa_answer p {
+  overflow: auto;
+  overflow-y: hidden;
+}
+
+#CWA .cwa_answer p::-webkit-scrollbar {
+  height: 4px !important;
 }
 
 ::-webkit-scrollbar {
@@ -398,10 +548,11 @@
 }
 
 #CWA .cwa_box-suggestion-header h3 {
-  font-weight: 600;
-  font-size: 0.9rem;
-  color: black;
-  margin-bottom: 0.2rem;
+  font-weight: 600 !important;
+  font-size: 1.1rem !important;
+  color: black !important;
+  margin-bottom: 0.2rem !important; 
+  margin-top: 0.2rem !important; 
 }
 
 #CWA .cwa_box-container {
@@ -500,14 +651,14 @@
 }
 
 @media screen and (max-width: 1920px) {
-  #CWA .cwa_messages-container {
-    height: 37vh;
+  #CWA .cwa_chat-content-container {
+    height: 70%;
   }
 }
 
 @media screen and ((min-width: 1675px)) {
-  #CWA .cwa_messages-container {
-    height: 46vh;
+  #CWA .cwa_chat-content-container {
+    height: 75%;
   }
 }
 
@@ -562,7 +713,7 @@
   border-radius: var(--border-radius-CWA);
   box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
   flex-grow: 1;
-  max-width: 90%;
+  max-width: 100%;
   min-height: 20px;
   overflow-wrap: break-word;
   font-size: 15px;
@@ -1099,8 +1250,7 @@
   color: rgba(0, 0, 0, 0.5);
 }
 
-#CWA .cwa_upload-pdf-footer:hover
-#CWA .cwa_upload-img-footer:hover {
+#CWA .cwa_upload-pdf-footer:hover #CWA .cwa_upload-img-footer:hover {
   opacity: 0.7;
 }
 
@@ -1407,7 +1557,7 @@
   padding: 10px !important;
   color: black;
   display: flex;
-  justify-content: start;
+  justify-content: center;
   gap: 1rem;
   align-items: center;
   background: white;

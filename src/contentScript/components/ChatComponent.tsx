@@ -1,13 +1,12 @@
-import React, { useState, useEffect, useRef } from "react";
-import axios from "axios";
+import React, { useState, useEffect, useRef, useMemo, memo } from "react";
+import PropTypes from "prop-types";
+import { useTranslation } from "react-i18next";
 
 import { EventSourcePolyfill } from "event-source-polyfill";
-import { useTranslation } from "react-i18next";
 import {
   SendIcon,
   LoadingIcon,
   ArrowButton,
-  UploadFileIcon,
   UploadFileIconInMessage,
   LoadingMessageIcon,
   FileIconSideBar,
@@ -16,34 +15,58 @@ import {
   OpenListConversationsIcon,
   CopyIcon,
   UploadImageIcon,
-  UploadImageIconInput,
 } from "./SVG";
 import ChatHistoryList from "./ChatHistoryList";
 import { suggestions } from "../suggestion";
+import SummarizeComponent from "./SummarizeComponent";
+import FileChatComponent from "./FileChatComponent";
+import ImageChatComponent from "./ImageChatComponent";
+
+import { saveChatMessagesToStorage } from "../utils/saveChatMessagesToStorage";
+import { getChatHistories } from "../utils/getChatHistories";
+import { getRandomSuggestions } from "../utils/getRandomSuggestion";
+
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
+import hljs from "highlight.js";
 
 const CHAT = process.env.API_CHAT;
 const CWA = process.env.API_DOMAIN;
-const UPLOADFILE = process.env.API_UPLOAD_FILE;
-const EXTRACTFROMURL = process.env.API_EXTRACT_FROM_URL;
 
 const urls = {
   icon: chrome.runtime.getURL("assets/images/icon.png"),
 };
 
-function ChatComponent({ user }) {
+const followUpQuestionsPrompts = `
+- Finally, please suggest me 2-3 follow-up questions.
+- Follow-up questions can be related to our conversation.
+- Follow-up questions should help the user understand the content better.
+- Follow-up questions should be short and concise.
+- Follow-up questions should be a single sentence.
+- Follow-up questions should be formated like the follow:
+Follow-up questions:
+- <question 1>
+- <question 2>
+and so on...`;
+
+const initialMessages = [
+  {
+    text: "How can I assist you today?",
+    avatar: urls.icon,
+    type: "answer",
+    image: null,
+  },
+];
+
+const ChatComponent = ({ user }) => {
   const { t, i18n } = useTranslation();
-  const [language, setLanguage] = useState("en");
+  const [language, setLanguage] = useState();
   const [isOpenFile, setIsOpenFile] = useState(false);
   const [isOpenUrl, setIsOpenUrl] = useState(false);
   const [isOpenImg, setIsOpenImg] = useState(false);
-  const [messages, setMessages] = useState([
-    {
-      text: "How can I assist you today?",
-      avatar: urls.icon,
-      type: "answer",
-      image: null,
-    },
-  ]);
+  const [messages, setMessages] = useState(initialMessages);
   const [isGetFile, setIsGetFile] = useState(false);
   const [isGetUrl, setIsGetUrl] = useState(false);
   const [isGetImg, setIsGetImg] = useState(false);
@@ -65,18 +88,6 @@ function ChatComponent({ user }) {
   const urlChatRef = useRef(null);
   const inputRefImg = useRef(null);
 
-  let followUpQuestionsPrompts = `
-  - Finally, please suggest me 2-3 follow-up questions.
-  - Follow-up questions can be related to our conversation.
-  - Follow-up questions should help the user understand the content better.
-  - Follow-up questions should be short and concise.
-  - Follow-up questions should be a single sentence.
-  - Follow-up questions should be formated like the follow:
-  Follow-up questions:
-  - <question 1>
-  - <question 2>
-  and so on...`;
-
   useEffect(() => {
     const randomSuggestions = getRandomSuggestions(suggestions, 3);
     setDisplayedSuggestions(randomSuggestions);
@@ -85,10 +96,11 @@ function ChatComponent({ user }) {
   useEffect(() => {
     const messageListener = (request) => {
       if (request.settingUpdate) {
-        chrome.storage.local.get(["language"], function (result) {
+        chrome.storage.local.get(["language"], (result) => {
           if (result.language !== undefined) {
             setLanguage(result.language);
             i18n.changeLanguage(result.language);
+            console.log("Language changed to", result.language);
           }
         });
       }
@@ -105,30 +117,8 @@ function ChatComponent({ user }) {
     }
   }, [language]);
 
-  const getRandomSuggestions = (suggestions, count) => {
-    const shuffledSuggestions = suggestions.sort(() => 0.5 - Math.random());
-    return shuffledSuggestions.slice(0, count);
-  };
-
-  const handleOpenUploadFile = () => {
-    setIsOpenFile((prev) => !prev);
-  };
-
-  const handleOpenGetSummarizeUrl = () => {
-    setIsOpenUrl((prev) => !prev);
-  };
-
-  const handleOpenUploadImg = () => {
-    setIsOpenImg((prev) => !prev);
-  };
-
   useEffect(() => {
-    chrome.storage.local.get("language", function (result) {
-      if (result.language !== undefined) {
-        i18n.changeLanguage(result.language);
-      }
-    });
-    chrome.storage.local.get("auth_token", function (result) {
+    chrome.storage.local.get("auth_token", (result) => {
       setAuthToken(result.auth_token);
     });
   }, []);
@@ -159,6 +149,18 @@ function ChatComponent({ user }) {
     };
   }, []);
 
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      saveChatMessagesToStorage(messages, chatHistoryId, setChatHistoryId);
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [messages]);
+
   const getAnswer = async (text, fileName = null) => {
     let loadingMessage = {
       text: "Thinking...",
@@ -183,9 +185,12 @@ function ChatComponent({ user }) {
       const data = JSON.parse(event.data);
       for (let char of data.text) {
         answer += char;
+        const processedAnswer = answer
+          .replace(/\\\[([^]*?)\\\]/g, "$$$1$$")
+          .replace(/\\\(([^]*?)\\\)/g, "$$$1$$");
         clearTimeout(debounceTimer);
         debounceTimer = setTimeout(() => {
-          let splitAnswer = answer
+          let splitAnswer = processedAnswer
             .split(/\s*Follow-up questions:/)[0]
             .trimEnd();
           if (splitAnswer === "") {
@@ -277,102 +282,23 @@ function ChatComponent({ user }) {
     setIsShowChatHistory(false);
   };
 
-  useEffect(() => {
-    const handleBeforeUnload = () => {
-      saveChatMessagesToStorage();
-    };
-
-    window.addEventListener("beforeunload", handleBeforeUnload);
-
-    return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload);
-    };
-  }, [messages]);
-
-  const saveChatMessagesToStorage = () => {
-    try {
-      const timestamp = Date.now();
-      const date = new Date();
-      const formattedDate = `${date.getHours()}:${date.getMinutes()} ${date.getDate()}/${
-        date.getMonth() + 1
-      }/${date.getFullYear()}`;
-      const newChatHistory = {
-        messages,
-        createdAt: formattedDate,
-        key: timestamp,
-      };
-      let chatHistories =
-        JSON.parse(localStorage.getItem("chatHistories")) || [];
-      const existingChatHistoryIndex = chatHistories.findIndex(
-        (chatHistory) => chatHistory.key === chatHistoryId
-      );
-      if (existingChatHistoryIndex !== -1) {
-        chatHistories[existingChatHistoryIndex] = newChatHistory;
-      } else {
-        chatHistories.push(newChatHistory);
-        setChatHistoryId(timestamp);
-      }
-      localStorage.setItem("chatHistories", JSON.stringify(chatHistories));
-    } catch (error) {
-      console.error("Error saving chat messages to storage:", error);
-    }
-  };
-
   const handleNewChat = async () => {
     setFollowUpQuestions([]);
     try {
       const timestamp = Date.now();
       if (messages.length > 0) {
-        const date = new Date();
-        const formattedDate = `${date.getHours()}:${date.getMinutes()} ${date.getDate()}/${
-          date.getMonth() + 1
-        }/${date.getFullYear()}`;
-        const newChatHistory = {
-          messages,
-          createdAt: formattedDate,
-          key: timestamp,
-        };
-        let chatHistories =
-          JSON.parse(localStorage.getItem("chatHistories")) || [];
-        const existingChatHistoryIndex = chatHistories.findIndex(
-          (chatHistory) => chatHistory.key === chatHistoryId
-        );
-
-        if (existingChatHistoryIndex !== -1) {
-          chatHistories[existingChatHistoryIndex] = newChatHistory;
-        } else {
-          chatHistories.push(newChatHistory);
-          setChatHistoryId(timestamp);
-        }
-
-        localStorage.setItem("chatHistories", JSON.stringify(chatHistories));
+        saveChatMessagesToStorage(messages, chatHistoryId, setChatHistoryId);
       }
-      setMessages([
-        {
-          text: "How can I assist you today?",
-          avatar: urls.icon,
-          type: "answer",
-          image: null,
-        },
-      ]);
+      setMessages(initialMessages);
     } catch (error) {
       console.error("Error creating new chat history:", error);
     }
   };
 
   const handleOpenListConversations = async () => {
-    await getChatHistories();
+    const chatHistories = await getChatHistories();
+    setChatHistories(chatHistories);
     setIsShowChatHistory(true);
-  };
-
-  const getChatHistories = async () => {
-    try {
-      const chatHistories =
-        JSON.parse(localStorage.getItem("chatHistories")) || [];
-      setChatHistories(chatHistories);
-    } catch (error) {
-      console.error("Error getting chat histories:", error);
-    }
   };
 
   const handleViewChatHistory = (chatHistory) => {
@@ -395,190 +321,173 @@ function ChatComponent({ user }) {
     await getAnswer(content);
   };
 
-  const SummarizeComponent = () => {
-    const [currentURL, setCurrentURL] = useState("");
-    const getCurrentURL = async () => {
-      chrome.runtime.sendMessage({ action: "getCurrentURL" }, (response) => {
-        if (response && response.currentURL) {
-          setCurrentURL(response.currentURL);
-          sendQuestion(`Summarize this website!!!`);
-          setIsGetUrl(true);
-          setIsOpenUrl(false);
-          sendURLToBackend(response.currentURL);
-        } else {
-          console.error("Failed to get current URL");
-        }
-      });
-    };
-
-    const sendURLToBackend = async (url) => {
-      try {
-        const response = await axios.post(
-          `${CWA}/${EXTRACTFROMURL}`,
-          { url },
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        if (response.status === 200) {
-          setIsGetUrl(false);
-          getAnswer("Summarize this website!!!");
-        } else {
-          console.error("Đã xảy ra lỗi khi gửi url lên BE.");
-        }
-      } catch (error) {
-        console.error("Error:", error);
-      }
-    };
-
-    const getInformation = async () => {
-      await getCurrentURL();
-    };
-
-    return (
-      <div ref={urlChatRef} className="cwa_get-current-url">
-        <p>
-          Click here to get main content from current website and you can
-          question about it!!!
-        </p>
-        <button
-          className="cwa_get-url-button"
-          onClick={() => {
-            getInformation();
-          }}
-        >
-          Get Information
-        </button>
-      </div>
-    );
+  const handleOpenUploadFile = () => {
+    setIsOpenFile((prev) => !prev);
   };
 
-  const FileChatComponent = () => {
-    const handleFileUpload = async (e) => {
-      const file = e.target.files[0];
-      const formData = new FormData();
-      formData.append("file", file);
-      sendQuestion(`<file>${file.name}</file>`);
-      setIsGetFile(true);
-      setIsOpenFile(false);
-      try {
-        const response = await fetch(`${CWA}/${UPLOADFILE}`, {
-          method: "POST",
-          body: formData,
-        });
-        if (response.ok) {
-          const fileName = file.name;
-          setIsGetFile(false);
-          getAnswer(`What is the main topic of the document?`, fileName);
-        } else {
-          console.error("Đã xảy ra lỗi khi gửi file lên BE.");
-        }
-      } catch (error) {
-        console.error("Lỗi khi gửi file lên BE:", error);
-      }
-    };
+  const handleOpenGetSummarizeUrl = () => {
+    setIsOpenUrl((prev) => !prev);
+  };
 
-    return (
-      <div ref={fileChatRef} className="cwa_pdf-uploader">
-        <input
-          type="file"
-          id="pdf-upload"
-          accept=".pdf,.docx"
-          onChange={handleFileUpload}
-          style={{ display: "none" }}
-        />
-        <div className="cwa_upload-pdf-container">
-          <div className="cwa_upload-pdf-title">
-            <h2>
-              Tải lên tệp PDF hoặc WORD để nhận bản tóm tắt thông minh và câu
-              trả lời!
-            </h2>
+  const handleOpenUploadImg = () => {
+    setIsOpenImg((prev) => !prev);
+  };
+
+  const renderMessage = (message, index) => {
+    if (message.type === "loading") {
+      return (
+        <div key={index} className={`cwa_content-mess cwa_${message.type}`}>
+          {/* <img className="cwa_message-avatar user" src={message.avatar} /> */}
+          <div className={`cwa_message-content cwa_${message.type}`}>
+            <LoadingMessageIcon />
           </div>
-          <div className="cwa_upload-pdf-content">
-            <p>
-              Tải lên một tệp PDF hoặc WORD để dễ dàng nhận được bản tóm tắt
-              thông minh và câu trả lời cho tài liệu của bạn.
-            </p>
-          </div>
-          <label htmlFor="pdf-upload" className="cwa_upload-pdf-footer">
-            <UploadFileIcon />
-            <p>Loại tệp được hỗ trợ là PDF và WORD</p>
-            <p>Kéo file của bạn vào đây hoặc nhấp vào để tải lên</p>
-          </label>
         </div>
-      </div>
-    );
-  };
-
-  const ImageChatComponent = () => {
-    const handleImageUpload = async (event) => {
-      const file = event.target.files[0];
-      if (file) {
-        const formData = new FormData();
-        formData.append("image", file);
-
-        const imageUrl = URL.createObjectURL(file);
-        sendQuestion(`<img>${file.name}</img>`, imageUrl);
-        setIsGetImg(true);
-        setIsOpenImg(false);
-        try {
-          const response = await axios.post(
-            "http://127.0.0.1:8004/ext/upload_image",
-            formData,
-            {
-              headers: {
-                "Content-Type": "multipart/form-data",
-              },
-            }
-          );
-          const description = response.data.description;
-          getAnswer(
-            `Provide a detailed description of the following image: ${description}`
-          );
-          setIsGetImg(false);
-        } catch (error) {
-          console.error("Error uploading image: ", error);
-        }
-      }
-    };
-
-    return (
-      <div ref={inputRefImg} className="cwa_img-uploader">
-        <input
-          type="file"
-          id="img-upload"
-          accept="image/*"
-          onChange={handleImageUpload}
-          style={{ display: "none" }}
-        />
-        <div className="cwa_upload-img-container">
-          <div className="cwa_upload-img-title">
-            <h2>Tải lên hình ảnh để nhận mô tả chi tiết và câu trả lời!</h2>
+      );
+    } else if (message.type === "file") {
+      return (
+        <div key={index} className={`cwa_content-mess cwa_${message.type}`}>
+          {/* <img className="cwa_message-avatar user" src={message.avatar} /> */}
+          <div className={`cwa_message-content cwa_${message.type}`}>
+            <UploadFileIconInMessage />
+            <div className="cwa_pdf-info">
+              <p>File</p>
+              <div className={`cwa_${message.type}`}>{message.text}</div>
+            </div>
           </div>
-          <div className="cwa_upload-img-content">
-            <p>
-              Tải lên một hình ảnh để dễ dàng nhận được mô tả chi tiết và câu
-              trả lời cho hình ảnh của bạn.
-            </p>
-          </div>
-          <label htmlFor="img-upload" className="cwa_upload-img-footer">
-            <UploadImageIconInput />
-            <p>Loại tệp được hỗ trợ là hình ảnh</p>
-            <p>Kéo hình ảnh của bạn vào đây hoặc nhấp vào để tải lên</p>
-          </label>
         </div>
-      </div>
-    );
+      );
+    } else if (message.type === "img") {
+      return (
+        <div key={index} className={`cwa_content-mess cwa_${message.type}`}>
+          {/* <img className="cwa_message-avatar user" src={message.avatar} /> */}
+          <div className={`cwa_message-content cwa_${message.type}`}>
+            <img
+              className="cwa_upload-img"
+              src={message.image}
+              alt={message.text}
+            />
+          </div>
+        </div>
+      );
+    } else {
+      return (
+        <div key={index} className={`cwa_content-mess cwa_${message.type}`}>
+          {/* <img className="cwa_message-avatar user" src={message.avatar} /> */}
+          <div className={`cwa_message-content cwa_${message.type}`}>
+            <span className={`cwa_${message.type}`}>
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm, remarkMath]}
+                rehypePlugins={[rehypeKatex]}
+                components={{
+                  code({ node, className, children, ...props }) {
+                    const match = /language-(\w+)/.exec(className || "");
+                    return match ? (
+                      <>
+                        <header>{match[1]}</header>
+                        <code
+                          className={className}
+                          {...props}
+                          dangerouslySetInnerHTML={{
+                            __html: hljs.highlight(
+                              children ? children.toString() : "",
+                              { language: match[1] }
+                            ).value,
+                          }}
+                        />
+                      </>
+                    ) : (
+                      <code className={className} {...props}>
+                        {children}
+                      </code>
+                    );
+                  },
+                }}
+              >
+                {message.text}
+              </ReactMarkdown>
+            </span>
+            <div
+              className="cwa_copy-message"
+              onClick={() => handleCopyMessage(message.text)}
+            >
+              <CopyIcon />
+              <span className="cwa_tooltip">{copied ? "Copied!" : "Copy"}</span>
+            </div>
+          </div>
+        </div>
+      );
+    }
   };
+
+  const renderSuggestionQuestions = useMemo(
+    () =>
+      isSuggestions && (
+        <div className="cwa_suggestion-question-container">
+          {followUpQuestions.map((question, index) => (
+            <button
+              key={index}
+              onClick={() => handleQuestionClick(question)}
+              className="cwa_suggestion-question-button"
+            >
+              {question}
+            </button>
+          ))}
+        </div>
+      ),
+    [isSuggestions, followUpQuestions]
+  );
+
+  const renderLoadingState = useMemo(
+    () =>
+      (isGetFile || isGetUrl || isGetImg) && (
+        <div className="cwa_wrapper-container-loading-pdf">
+          <div className="loader">
+            <div className="inner one"></div>
+            <div className="inner two"></div>
+            <div className="inner three"></div>
+          </div>
+          <h1>
+            {isGetFile
+              ? t("wait-read-file")
+              : isGetUrl
+              ? t("wait-process-url")
+              : t("wait-process-img")}
+          </h1>
+        </div>
+      ),
+    [isGetFile, isGetUrl, isGetImg]
+  );
 
   return (
     <>
       <div className="cwa_chat-content-container">
-        {isOpenFile && <FileChatComponent />}
-        {isOpenUrl && <SummarizeComponent />}
-        {isOpenImg && <ImageChatComponent />}
+        {isOpenFile && (
+          <FileChatComponent
+            sendQuestion={sendQuestion}
+            setIsGetFile={setIsGetFile}
+            setIsOpenFile={setIsOpenFile}
+            getAnswer={getAnswer}
+            fileChatRef={fileChatRef}
+          />
+        )}
+        {isOpenUrl && (
+          <SummarizeComponent
+            sendQuestion={sendQuestion}
+            setIsGetUrl={setIsGetUrl}
+            setIsOpenUrl={setIsOpenUrl}
+            getAnswer={getAnswer}
+            urlChatRef={urlChatRef}
+          />
+        )}
+        {isOpenImg && (
+          <ImageChatComponent
+            sendQuestion={sendQuestion}
+            setIsGetImg={setIsGetImg}
+            setIsOpenImg={setIsOpenImg}
+            getAnswer={getAnswer}
+            inputRefImg={inputRefImg}
+          />
+        )}
         <ChatHistoryList
           chatHistories={chatHistories}
           getChatHistories={getChatHistories}
@@ -588,7 +497,7 @@ function ChatComponent({ user }) {
         />
         <div className="cwa_suggestion-container">
           {displayedSuggestions.map((suggestion, index) => (
-            <div className="cwa_box-suggestion">
+            <div key={index} className="cwa_box-suggestion">
               <div className="cwa_box-container">
                 <div className="cwa_box-suggestion-header">
                   <h3>{suggestion.title}</h3>
@@ -609,142 +518,9 @@ function ChatComponent({ user }) {
         <div className="cwa_messages-container">
           <div className="cwa_messages">
             {messages.length > 0 &&
-              messages.map((message, index) => {
-                if (message.type === "loading") {
-                  return (
-                    <div
-                      key={index}
-                      className={`cwa_content-mess cwa_${message.type}`}
-                    >
-                      <img
-                        className="cwa_message-avatar user"
-                        src={message.avatar}
-                      />
-                      <div
-                        className={`cwa_message-content cwa_${message.type}`}
-                      >
-                        <LoadingMessageIcon />
-                      </div>
-                    </div>
-                  );
-                } else if (message.type === "file") {
-                  return (
-                    <div
-                      key={index}
-                      className={`cwa_content-mess cwa_${message.type}`}
-                    >
-                      <img
-                        className="cwa_message-avatar user"
-                        src={message.avatar}
-                      />
-                      <div
-                        className={`cwa_message-content cwa_${message.type}`}
-                      >
-                        <UploadFileIconInMessage />
-                        <div className="cwa_pdf-info">
-                          <p>File</p>
-                          <div className={`cwa_${message.type}`}>
-                            {message.text}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                } else if (message.type === "img") {
-                  return (
-                    <div
-                      key={index}
-                      className={`cwa_content-mess cwa_${message.type}`}
-                    >
-                      <img
-                        className="cwa_message-avatar user"
-                        src={message.avatar}
-                      />
-                      <div
-                        className={`cwa_message-content cwa_${message.type}`}
-                      >
-                        <img
-                          className="cwa_upload-img"
-                          src={message.image}
-                          alt={message.text}
-                        />
-                      </div>
-                    </div>
-                  );
-                } else {
-                  return (
-                    <div
-                      key={index}
-                      className={`cwa_content-mess cwa_${message.type}`}
-                    >
-                      <img
-                        className="cwa_message-avatar user"
-                        src={message.avatar}
-                      />
-                      <div
-                        className={`cwa_message-content cwa_${message.type}`}
-                      >
-                        <p className={`cwa_${message.type}`}>{message.text}</p>
-                        <div
-                          className="cwa_copy-message"
-                          onClick={() => handleCopyMessage(message.text)}
-                        >
-                          <CopyIcon />
-                          <span className="cwa_tooltip">
-                            {copied ? "Copied!" : "Copy"}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                }
-              })}
-            {isSuggestions && (
-              <div className="cwa_suggestion-question-container">
-                {followUpQuestions.map((question, index) => (
-                  <button
-                    key={index}
-                    onClick={() => handleQuestionClick(question)}
-                    className="cwa_suggestion-question-button"
-                  >
-                    {question}
-                  </button>
-                ))}
-              </div>
-            )}
-            {isGetFile && (
-              <div className="cwa_wrapper-container-loading-pdf">
-                <div className="loader">
-                  <div className="inner one"></div>
-                  <div className="inner two"></div>
-                  <div className="inner three"></div>
-                </div>
-                <h1>Đang đọc file, xin vui lòng đợi trong giây lát ...</h1>
-              </div>
-            )}
-            {isGetUrl && (
-              <div className="cwa_wrapper-container-loading-pdf">
-                <div className="loader">
-                  <div className="inner one"></div>
-                  <div className="inner two"></div>
-                  <div className="inner three"></div>
-                </div>
-                <h1>
-                  Đang xử lí thông tin trang web, xin vui lòng đợi trong giây
-                  lát ...
-                </h1>
-              </div>
-            )}
-            {isGetImg && (
-              <div className="cwa_wrapper-container-loading-pdf">
-                <div className="loader">
-                  <div className="inner one"></div>
-                  <div className="inner two"></div>
-                  <div className="inner three"></div>
-                </div>
-                <h1>Đang xử lí ảnh, xin vui lòng đợi trong giây lát ...</h1>
-              </div>
-            )}
+              messages.map((message, index) => renderMessage(message, index))}
+            {renderSuggestionQuestions}
+            {renderLoadingState}
           </div>
           <div ref={endOfMessagesRef}></div>
         </div>
@@ -752,14 +528,14 @@ function ChatComponent({ user }) {
       <div className="cwa_group-btn">
         <div className="cwa_new-chat-btn" onClick={handleNewChat}>
           <AddNewChatIcon isSelected={false} />
-          <span className="tooltip-text-group-btn">New Chat</span>
+          <span className="tooltip-text-group-btn">{t("new-chat")}</span>
         </div>
         <div
           className="cwa_open-list-conversations-btn"
           onClick={handleOpenListConversations}
         >
           <OpenListConversationsIcon isSelected={false} />
-          <span className="tooltip-text-group-btn">List Conversations</span>
+          <span className="tooltip-text-group-btn">{t("list-cvs")}</span>
         </div>
         <div
           className="cwa_upload-pdf-btn"
@@ -768,7 +544,7 @@ function ChatComponent({ user }) {
           }}
         >
           <FileIconSideBar isSelected={false} />
-          <span className="tooltip-text-group-btn">Upload File</span>
+          <span className="tooltip-text-group-btn">{t("upload-file")}</span>
         </div>
         <div
           className="cwa_get-url-btn"
@@ -777,7 +553,7 @@ function ChatComponent({ user }) {
           }}
         >
           <UrlIconSideBar isSelected={false} />
-          <span className="tooltip-text-group-btn">Current website</span>
+          <span className="tooltip-text-group-btn">{t("current-tab")}</span>
         </div>
         <div
           className="cwa_upload-img-btn"
@@ -786,7 +562,7 @@ function ChatComponent({ user }) {
           }}
         >
           <UploadImageIcon isSelected={false} />
-          <span className="tooltip-text-group-btn">Upload Image</span>
+          <span className="tooltip-text-group-btn">{t("upload-img")}</span>
         </div>
       </div>
       <div className="cwa_input-area">
@@ -797,7 +573,7 @@ function ChatComponent({ user }) {
           value={messageText}
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
-          placeholder="Nhập câu hỏi của bạn..."
+          placeholder={t("type-message")}
           style={{ overflow: "hidden" }}
           disabled={isDisable}
         />
@@ -819,8 +595,13 @@ function ChatComponent({ user }) {
       </div>
     </>
   );
-}
+};
 
-ChatComponent.propTypes = {};
+ChatComponent.propTypes = {
+  user: PropTypes.shape({
+    email: PropTypes.string.isRequired,
+    picture: PropTypes.string.isRequired,
+  }).isRequired,
+};
 
-export default ChatComponent;
+export default memo(ChatComponent);
