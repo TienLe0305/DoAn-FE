@@ -4,6 +4,7 @@ import Select from "react-select";
 
 import { DirectToDashboardIcon, JPFlag, LogoIcon, USFlag, VNFlag } from "./SVG";
 import imgBackround from "../../static/assets/images/test.png";
+
 const HOST = process.env.HOST;
 
 const languageOptions = [
