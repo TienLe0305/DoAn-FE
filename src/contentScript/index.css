@@ -591,6 +591,12 @@
   margin: calc(var(--margin-value-CWA) / 2);
 }
 
+#CWA .cwa_upload-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 #CWA .cwa_input-area {
   position: absolute;
   bottom: 10px;
@@ -1017,13 +1023,15 @@
 #CWA .cwa_upload-pdf-btn:hover .tooltip-text-group-btn,
 #CWA .cwa_get-url-btn:hover .tooltip-text-group-btn,
 #CWA .cwa_new-chat-btn:hover .tooltip-text-group-btn,
-#CWA .cwa_open-list-conversations-btn:hover .tooltip-text-group-btn {
+#CWA .cwa_open-list-conversations-btn:hover .tooltip-text-group-btn,
+#CWA .cwa_upload-img-btn:hover .tooltip-text-group-btn {
   visibility: visible;
   opacity: 1;
 }
 
 #CWA .cwa_pdf-uploader,
-#CWA .cwa_get-current-url {
+#CWA .cwa_get-current-url,
+#CWA .cwa_img-uploader {
   color: black;
   box-shadow: 0 5px 50px 1px rgba(0, 0, 0, 0.4);
   background: white;
@@ -1036,9 +1044,11 @@
   border-radius: 15px;
   padding: 20px;
   text-align: center;
+  z-index: 9999;
 }
 
-#CWA .cwa_upload-pdf-container {
+#CWA .cwa_upload-pdf-container,
+#CWA .cwa_upload-img-container {
   display: flex;
   justify-content: space-between;
   flex-direction: column;
@@ -1060,7 +1070,8 @@
   color: white !important;
 }
 
-#CWA .cwa_upload-pdf-footer {
+#CWA .cwa_upload-pdf-footer,
+#CWA .cwa_upload-img-footer {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -1072,20 +1083,24 @@
   cursor: pointer;
 }
 
-#CWA .cwa_upload-pdf-footer p:last-child {
+#CWA .cwa_upload-pdf-footer p:last-child,
+#CWA .cwa_upload-img-footer p:last-child {
   color: rgba(0, 0, 0, 0.5);
 }
 
-#CWA .cwa_upload-pdf-title {
+#CWA .cwa_upload-pdf-title,
+#CWA .cwa_upload-img-title {
   padding-bottom: 1rem;
   border-bottom: 1px solid rgba(0, 0, 0, 0.3);
 }
 
-#CWA .cwa_upload-pdf-content {
+#CWA .cwa_upload-pdf-content,
+#CWA .cwa_upload-img-content {
   color: rgba(0, 0, 0, 0.5);
 }
 
-#CWA .cwa_upload-pdf-footer:hover {
+#CWA .cwa_upload-pdf-footer:hover
+#CWA .cwa_upload-img-footer:hover {
   opacity: 0.7;
 }
 
@@ -1404,7 +1419,8 @@
 .cwa_upload-pdf-btn,
 .cwa_get-url-btn,
 .cwa_new-chat-btn,
-.cwa_open-list-conversations-btn {
+.cwa_open-list-conversations-btn,
+.cwa_upload-img-btn {
   justify-content: center;
   align-items: center;
   display: flex;

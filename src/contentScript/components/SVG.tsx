@@ -70,7 +70,7 @@ const RemoveIcon = () => (
   </svg>
 );
 
-const UploadImageIcon = () => (
+const UploadImageIcon = ({ isSelected }) => (
   <svg
     width="20"
     height="20"
@@ -732,6 +732,56 @@ const UploadFileIcon = () => (
   </svg>
 );
 
+const UploadImageIconInput = () => (
+  <svg
+    width="80"
+    viewBox="0 0 24 24"
+    data-name="Flat Line"
+    xmlns="http://www.w3.org/2000/svg"
+    className="icon flat-line"
+  >
+    <path
+      d="M21 5v14a1 1 0 0 1-.29.71L14 13l-3 3-2-2-5.71 5.71A1 1 0 0 1 3 19V5a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1"
+      style={{ fill: "#2ca9bc", strokeWidth: 2 }}
+    />
+    <path
+      style={{
+        fill: "none",
+        stroke: "#000",
+        strokeLinecap: "round",
+        strokeLinejoin: "round",
+        strokeWidth: 2,
+      }}
+      d="M20.71 19.71 14 13l-3 3-2-2-5.71 5.71"
+    />
+    <path
+      style={{
+        fill: "none",
+        stroke: "#000",
+        strokeLinecap: "round",
+        strokeLinejoin: "round",
+        strokeWidth: 2.5,
+      }}
+      d="M10.95 9h.1"
+    />
+    <rect
+      data-name="primary"
+      x="3"
+      y="4"
+      width="18"
+      height="16"
+      rx="1"
+      style={{
+        fill: "none",
+        stroke: "#000",
+        strokeLinecap: "round",
+        strokeLinejoin: "round",
+        strokeWidth: 2,
+      }}
+    />
+  </svg>
+);
+
 const UploadFileIconInMessage = () => (
   <svg
     height="35px"
@@ -984,5 +1034,6 @@ export {
   AddNewChatIcon,
   OpenListConversationsIcon,
   HideListConversationsIcon,
-  CopyIcon
+  CopyIcon,
+  UploadImageIconInput,
 };

@@ -15,6 +15,8 @@ import {
   AddNewChatIcon,
   OpenListConversationsIcon,
   CopyIcon,
+  UploadImageIcon,
+  UploadImageIconInput,
 } from "./SVG";
 import ChatHistoryList from "./ChatHistoryList";
 import { suggestions } from "../suggestion";
@@ -33,15 +35,18 @@ function ChatComponent({ user }) {
   const [language, setLanguage] = useState("en");
   const [isOpenFile, setIsOpenFile] = useState(false);
   const [isOpenUrl, setIsOpenUrl] = useState(false);
+  const [isOpenImg, setIsOpenImg] = useState(false);
   const [messages, setMessages] = useState([
     {
       text: "How can I assist you today?",
       avatar: urls.icon,
       type: "answer",
+      image: null,
     },
   ]);
   const [isGetFile, setIsGetFile] = useState(false);
   const [isGetUrl, setIsGetUrl] = useState(false);
+  const [isGetImg, setIsGetImg] = useState(false);
   const [followUpQuestions, setFollowUpQuestions] = useState([]);
   const [isSuggestions, setIsSuggestions] = useState(false);
   const [isDisable, setIsDisable] = useState(false);
@@ -58,6 +63,7 @@ function ChatComponent({ user }) {
   const endOfMessagesRef = useRef(null);
   const fileChatRef = useRef(null);
   const urlChatRef = useRef(null);
+  const inputRefImg = useRef(null);
 
   let followUpQuestionsPrompts = `
   - Finally, please suggest me 2-3 follow-up questions.
@@ -112,6 +118,10 @@ function ChatComponent({ user }) {
     setIsOpenUrl((prev) => !prev);
   };
 
+  const handleOpenUploadImg = () => {
+    setIsOpenImg((prev) => !prev);
+  };
+
   useEffect(() => {
     chrome.storage.local.get("language", function (result) {
       if (result.language !== undefined) {
@@ -139,6 +149,9 @@ function ChatComponent({ user }) {
       if (urlChatRef.current && !urlChatRef.current.contains(event.target)) {
         hideUrlChat();
       }
+      if (inputRefImg.current && !inputRefImg.current.contains(event.target)) {
+        hideImgChat();
+      }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
@@ -151,6 +164,7 @@ function ChatComponent({ user }) {
       text: "Thinking...",
       avatar: urls.icon,
       type: "loading",
+      image: null,
     };
     setMessages((prevMessage) => [...prevMessage, loadingMessage]);
 
@@ -181,6 +195,7 @@ function ChatComponent({ user }) {
             text: splitAnswer,
             avatar: urls.icon,
             type: "answer",
+            image: null,
           };
           setMessages((prevMessage) => [...prevMessage.slice(0, -1), getmess]);
         }, 10);
@@ -205,13 +220,15 @@ function ChatComponent({ user }) {
     });
   };
 
-  const sendQuestion = async (text) => {
+  const sendQuestion = async (text, imageUrl = null) => {
     if (text.trim() !== "" && !isDisable) {
       const isFileMessage = text.includes("<file>") && text.includes("</file>");
+      const isImageMessage = text.includes("<img>") && text.includes("</img>");
       let newQuestion = {
         text: isFileMessage ? text.replace(/<\/?file>/g, "") : text,
         avatar: user.picture,
-        type: isFileMessage ? "file" : "question",
+        type: isFileMessage ? "file" : isImageMessage ? "img" : "question",
+        image: imageUrl,
       };
       setMessages((prevMessage) => [...prevMessage, newQuestion]);
       setMessageText("");
@@ -250,6 +267,10 @@ function ChatComponent({ user }) {
 
   const hideUrlChat = () => {
     setIsOpenUrl(false);
+  };
+
+  const hideImgChat = () => {
+    setIsOpenImg(false);
   };
 
   const hideChatHistoryList = () => {
@@ -331,6 +352,7 @@ function ChatComponent({ user }) {
           text: "How can I assist you today?",
           avatar: urls.icon,
           type: "answer",
+          image: null,
         },
       ]);
     } catch (error) {
@@ -490,11 +512,73 @@ function ChatComponent({ user }) {
     );
   };
 
+  const ImageChatComponent = () => {
+    const handleImageUpload = async (event) => {
+      const file = event.target.files[0];
+      if (file) {
+        const formData = new FormData();
+        formData.append("image", file);
+
+        const imageUrl = URL.createObjectURL(file);
+        sendQuestion(`<img>${file.name}</img>`, imageUrl);
+        setIsGetImg(true);
+        setIsOpenImg(false);
+        try {
+          const response = await axios.post(
+            "http://127.0.0.1:8004/ext/upload_image",
+            formData,
+            {
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
+            }
+          );
+          const description = response.data.description;
+          getAnswer(
+            `Provide a detailed description of the following image: ${description}`
+          );
+          setIsGetImg(false);
+        } catch (error) {
+          console.error("Error uploading image: ", error);
+        }
+      }
+    };
+
+    return (
+      <div ref={inputRefImg} className="cwa_img-uploader">
+        <input
+          type="file"
+          id="img-upload"
+          accept="image/*"
+          onChange={handleImageUpload}
+          style={{ display: "none" }}
+        />
+        <div className="cwa_upload-img-container">
+          <div className="cwa_upload-img-title">
+            <h2>Tải lên hình ảnh để nhận mô tả chi tiết và câu trả lời!</h2>
+          </div>
+          <div className="cwa_upload-img-content">
+            <p>
+              Tải lên một hình ảnh để dễ dàng nhận được mô tả chi tiết và câu
+              trả lời cho hình ảnh của bạn.
+            </p>
+          </div>
+          <label htmlFor="img-upload" className="cwa_upload-img-footer">
+            <UploadImageIconInput />
+            <p>Loại tệp được hỗ trợ là hình ảnh</p>
+            <p>Kéo hình ảnh của bạn vào đây hoặc nhấp vào để tải lên</p>
+          </label>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <>
       <div className="cwa_chat-content-container">
         {isOpenFile && <FileChatComponent />}
         {isOpenUrl && <SummarizeComponent />}
+        {isOpenImg && <ImageChatComponent />}
         <ChatHistoryList
           chatHistories={chatHistories}
           getChatHistories={getChatHistories}
@@ -515,7 +599,7 @@ function ChatComponent({ user }) {
               </div>
               <div
                 className="cwa_box-suggestion-btn"
-                onClick={() => handleSuggestionClick (suggestion.content)}
+                onClick={() => handleSuggestionClick(suggestion.content)}
               >
                 <ArrowButton />
               </div>
@@ -563,6 +647,27 @@ function ChatComponent({ user }) {
                             {message.text}
                           </div>
                         </div>
+                      </div>
+                    </div>
+                  );
+                } else if (message.type === "img") {
+                  return (
+                    <div
+                      key={index}
+                      className={`cwa_content-mess cwa_${message.type}`}
+                    >
+                      <img
+                        className="cwa_message-avatar user"
+                        src={message.avatar}
+                      />
+                      <div
+                        className={`cwa_message-content cwa_${message.type}`}
+                      >
+                        <img
+                          className="cwa_upload-img"
+                          src={message.image}
+                          alt={message.text}
+                        />
                       </div>
                     </div>
                   );
@@ -630,6 +735,16 @@ function ChatComponent({ user }) {
                 </h1>
               </div>
             )}
+            {isGetImg && (
+              <div className="cwa_wrapper-container-loading-pdf">
+                <div className="loader">
+                  <div className="inner one"></div>
+                  <div className="inner two"></div>
+                  <div className="inner three"></div>
+                </div>
+                <h1>Đang xử lí ảnh, xin vui lòng đợi trong giây lát ...</h1>
+              </div>
+            )}
           </div>
           <div ref={endOfMessagesRef}></div>
         </div>
@@ -663,6 +778,15 @@ function ChatComponent({ user }) {
         >
           <UrlIconSideBar isSelected={false} />
           <span className="tooltip-text-group-btn">Current website</span>
+        </div>
+        <div
+          className="cwa_upload-img-btn"
+          onClick={() => {
+            handleOpenUploadImg();
+          }}
+        >
+          <UploadImageIcon isSelected={false} />
+          <span className="tooltip-text-group-btn">Upload Image</span>
         </div>
       </div>
       <div className="cwa_input-area">
