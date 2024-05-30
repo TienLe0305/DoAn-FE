@@ -3,6 +3,9 @@ import axios from "axios";
 import { UploadImageIconInput } from "./SVG";
 import { useTranslation } from "react-i18next";
 
+const CWA = process.env.API_DOMAIN;
+const UPLOAD_IMG = process.env.API_UPLOAD_IMG;
+
 const ImageChatComponent = ({
   sendQuestion,
   setIsGetImg,
@@ -29,7 +32,7 @@ const ImageChatComponent = ({
       setIsOpenImg(false);
       try {
         const response = await axios.post(
-          "http://127.0.0.1:8004/ext/upload_image",
+          `${CWA}/${UPLOAD_IMG}`,
           formData,
           {
             headers: {
