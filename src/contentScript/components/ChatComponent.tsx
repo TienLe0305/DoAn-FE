@@ -142,6 +142,7 @@ const ChatComponent = ({ user }) => {
       setDisplayedSuggestions(randomSuggestions);
     }
   }, [language]);
+
   useEffect(() => {
     chrome.storage.local.get("auth_token", (result) => {
       setAuthToken(result.auth_token);
@@ -303,26 +304,75 @@ const ChatComponent = ({ user }) => {
     setIsOpenImg(false);
   };
 
-  const hideChatHistoryList = () => {
-    setIsShowChatHistory(false);
-  };
 
-  const handleNewChat = async () => {
-    setFollowUpQuestions([]);
-    try {
-      const timestamp = Date.now();
-      if (messages.length > 0) {
-        saveChatMessagesToStorage(messages, chatHistoryId, setChatHistoryId);
-      }
-      setMessages(initialMessages);
-    } catch (error) {
-      console.error("Error creating new chat history:", error);
+  useEffect(() => {
+    const currentChatMessages = localStorage.getItem("currentChatMessages");
+    if (currentChatMessages) {
+      setMessages(JSON.parse(currentChatMessages));
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("currentChatMessages", JSON.stringify(messages));
+  }, [messages]);
+
+  const saveChatMessagesToStorage = (
+    messages,
+    chatHistoryId,
+    setChatHistoryId
+  ) => {
+    const savedChatHistories =
+      JSON.parse(localStorage.getItem("chatHistories")) || [];
+    if (chatHistoryId !== null) {
+      const updatedHistories = savedChatHistories.map((history) => {
+        if (history.key === chatHistoryId) {
+          return { ...history, messages };
+        }
+        return history;
+      });
+      localStorage.setItem("chatHistories", JSON.stringify(updatedHistories));
+    } else {
+      const newChatHistory = {
+        key: Date.now(),
+        messages,
+        createdAt: new Date().toLocaleString(),
+      };
+      const updatedHistories = [...savedChatHistories, newChatHistory];
+      localStorage.setItem("chatHistories", JSON.stringify(updatedHistories));
+      setChatHistoryId(newChatHistory.key);
     }
   };
 
-  const handleOpenListConversations = async () => {
-    const chatHistories = await getChatHistories();
-    setChatHistories(chatHistories);
+  const handleNewChat = () => {
+    setFollowUpQuestions([]);
+    console.log(messages);
+    console.log(messages.length);
+
+    if (messages.length > 1) {
+      saveChatMessagesToStorage(messages, chatHistoryId, setChatHistoryId);
+    }
+    setMessages([
+      {
+        text: "How can I assist you today?",
+        avatar: urls.icon,
+        type: "answer",
+        image: null,
+      },
+    ]);
+    setChatHistoryId(null);
+  };
+
+  const getChatHistories = () => {
+    const savedChatHistories =
+      JSON.parse(localStorage.getItem("chatHistories")) || [];
+    setChatHistories(savedChatHistories);
+  };
+
+  const handleOpenListConversations = () => {
+    if (messages.length > 0) {
+      saveChatMessagesToStorage(messages, chatHistoryId, setChatHistoryId);
+    }
+    getChatHistories();
     setIsShowChatHistory(true);
   };
 
@@ -330,6 +380,10 @@ const ChatComponent = ({ user }) => {
     setMessages(chatHistory.messages);
     setIsShowChatHistory(false);
     setChatHistoryId(chatHistory.key);
+  };
+
+  const hideChatHistoryList = () => {
+    setIsShowChatHistory(false);
   };
 
   const handleCopyMessage = (text) => {

@@ -6,9 +6,10 @@ const ChatHistoryList = ({
   getChatHistories,
   handleViewChatHistory,
   hideChatHistoryList,
-  isShowChatHistory
+  isShowChatHistory,
 }) => {
   const [hoveredIndex, setHoveredIndex] = useState(null);
+
   const handleDelete = (index) => {
     const updatedChatHistories = [...chatHistories];
     updatedChatHistories.splice(index, 1);
@@ -25,8 +26,9 @@ const ChatHistoryList = ({
       <div className="cwa_chat-history-header">
         <p>Lịch sử cuộc hội thoại</p>
       </div>
-      <div className="cwa_hide-chat-history-list" onClick={hideChatHistoryList}><HideListConversationsIcon /></div>
-      
+      <div className="cwa_hide-chat-history-list" onClick={hideChatHistoryList}>
+        <HideListConversationsIcon />
+      </div>
       <div className="cwa_chat-history-list">
         {chatHistories.map((chatHistory, index) => {
           return (
