@@ -21,6 +21,9 @@ const exchangeCodeForTokens = async (code, state, setErrors) => {
       chrome.storage.local.set({ auth_token: response.data.auth_token });
       chrome.runtime.sendMessage({ isLogin: true }, () => {
         window.location.reload();
+        chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+          chrome.tabs.reload(tabs[0].id);
+        });
       });
     } else {
       console.log("Access token or auth token not found in response");

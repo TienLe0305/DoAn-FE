@@ -61,7 +61,15 @@ const Popup = () => {
           chrome.storage.local.set({ contentScriptReady: true });
         })
         .catch((error) => {
-          setErrors(error);
+          if (error.response && error.response.status === 401) {
+            chrome.storage.local.remove("auth_token");
+            chrome.storage.local.remove("contentScriptReady");
+            chrome.storage.local.remove("user");
+            setAuthToken("");
+            console.log("Auth token expired");
+          } else {
+            setErrors(error);
+          }
         })
         .finally(() => {
           setLoading(false);
