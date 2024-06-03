@@ -31,16 +31,13 @@ const ImageChatComponent = ({
       setIsGetImg(true);
       setIsOpenImg(false);
       try {
-        const response = await axios.post(
-          `${CWA}/${UPLOAD_IMG}`,
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
+        const response = await axios.post(`${CWA}/${UPLOAD_IMG}`, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
         const description = response.data.description;
+        console.log("description: ", description);
 
         getAnswer(
           `Provide a detailed description of the following description of image: ${description}`

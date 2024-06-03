@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Select from "react-select";
 import {
   IconType,
@@ -18,6 +18,9 @@ import {
   LoadingMessageIcon,
 } from "./SVG";
 import { EventSourcePolyfill } from "event-source-polyfill";
+import languageOptions from "../utils/languages";
+import { useTranslation } from "react-i18next";
+import { t } from "i18next";
 
 const CWA = process.env.API_DOMAIN;
 const CHAT = process.env.API_CHAT;
@@ -35,34 +38,24 @@ const typeItems = [
   { icon: <IconTwitter />, text: "Twitter" },
 ];
 
-const toneItems = [
-  { icon: "🙂", text: "Official" },
-  { icon: "😉", text: "Normal" },
-  { icon: "🧐", text: "Professional" },
-  { icon: "🤩", text: "Enthusiastic" },
-  { icon: "🤓", text: "Information" },
-  { icon: "😄", text: "Humorous" },
-];
-
-const lengthItems = [
-  { icon: "", text: "Short" },
-  { icon: "", text: "Medium" },
-  { icon: "", text: "Long" },
-];
-
-const languageOptions = [
-  { value: "en", label: "English" },
-  { value: "vi", label: "Vietnamese" },
-  { value: "es", label: "Spanish" },
-  { value: "fr", label: "French" },
-  { value: "de", label: "German" },
-  { value: "it", label: "Italian" },
-  { value: "ru", label: "Russian" },
-  { value: "jp", label: "Japanese" },
-  { value: "cn", label: "Chinese" },
-];
-
 function WriteComponent({ user }) {
+  const { t, i18n } = useTranslation();
+  const toneItems = [
+    { icon: "🙂", text: t("Official") },
+    { icon: "😉", text: t("Normal") },
+    { icon: "🧐", text: t("Professional") },
+    { icon: "🤩", text: t("Enthusiastic") },
+    { icon: "🤓", text: t("Information") },
+    { icon: "😄", text: t("Humorous") },
+  ];
+
+  const lengthItems = [
+    { icon: "", text: t("Short") },
+    { icon: "", text: t("Medium") },
+    { icon: "", text: t("Long") },
+  ];
+
+  const [language, setLanguage] = useState();
   const [activeTab, setActiveTab] = useState("Composer");
   const [context, setContext] = useState({
     subject: "",
@@ -80,6 +73,24 @@ function WriteComponent({ user }) {
   const [isLoading, setIsLoading] = useState(false);
   const [isAnswer, setIsAnswer] = useState(false);
   const [originText, setOriginText] = useState("");
+
+  useEffect(() => {
+    const messageListener = (request) => {
+      if (request.settingUpdate) {
+        chrome.storage.local.get(["language"], (result) => {
+          if (result.language !== undefined) {
+            setLanguage(result.language);
+            i18n.changeLanguage(result.language);
+          }
+        });
+      }
+    };
+
+    chrome.runtime.onMessage.addListener(messageListener);
+    return () => {
+      chrome.runtime.onMessage.removeListener(messageListener);
+    };
+  }, []);
 
   const handleTextareaChange = (event) => {
     setTextareaContent(event.target.value);
@@ -161,7 +172,7 @@ function WriteComponent({ user }) {
           }`}
           onClick={() => setActiveTab("Composer")}
         >
-          Composer
+          {t("Composer")}
         </div>
         <div
           className={`cwa_answer-button ${
@@ -169,32 +180,32 @@ function WriteComponent({ user }) {
           }`}
           onClick={() => setActiveTab("Answer")}
         >
-          Answer
+          {t("Answer")}
         </div>
       </div>
       {activeTab === "Composer" && (
         <div className="cwa_composer-content">
           <textarea
             className="cwa_composer-textarea"
-            placeholder="Subject that you want to write about..."
+            placeholder={t("Subject that you want to write about...")}
             value={textareaContent}
             onChange={handleTextareaChange}
             onBlur={handleTextareaBlur}
           ></textarea>
           <TypeComposerTypeItem
-            title="Type"
+            title={t("Type")}
             icon={<IconType />}
             items={typeItems}
             onSelect={handleTypeSelect}
           />
           <ToneComposerTypeItem
-            title="Tone"
+            title={t("Tone")}
             icon={<IconTone />}
             items={toneItems}
             onSelect={handleToneSelect}
           />
           <LengthComposerTypeItem
-            title="Length"
+            title={t("Length")}
             icon={<IconLength />}
             items={lengthItems}
             onSelect={handleLengthSelect}
@@ -208,46 +219,48 @@ function WriteComponent({ user }) {
       )}
       {activeTab === "Answer" && (
         <div className="cwa_answer-content">
-          <textarea
-            className="cwa_answer-textarea"
-            placeholder="The original text you want to reply to..."
-            onChange={(e) => setOriginText(e.target.value)}
-            value={originText}
-          ></textarea>
-          <textarea
-            className="cwa_composer-textarea"
-            placeholder="Subject that you want to write about..."
-            value={textareaContent}
-            onChange={handleTextareaChange}
-            onBlur={handleTextareaBlur}
-          ></textarea>
-          <TypeComposerTypeItem
-            title="Type"
-            icon={<IconType />}
-            items={typeItems}
-            onSelect={handleTypeSelect}
-          />
-          <ToneComposerTypeItem
-            title="Tone"
-            icon={<IconTone />}
-            items={toneItems}
-            onSelect={handleToneSelect}
-          />
-          <LengthComposerTypeItem
-            title="Length"
-            icon={<IconLength />}
-            items={lengthItems}
-            onSelect={handleLengthSelect}
-          />
-          <ComposerLanguage
-            icon={<IconLanguage />}
-            options={languageOptions}
-            onSelect={handleLanguageSelect}
-          />
+          <div>
+            <textarea
+              className="cwa_answer-textarea"
+              placeholder={t("The original text you want to reply to...")}
+              onChange={(e) => setOriginText(e.target.value)}
+              value={originText}
+            ></textarea>
+            <textarea
+              className="cwa_composer-textarea"
+              placeholder={t("Subject that you want to write about...")}
+              value={textareaContent}
+              onChange={handleTextareaChange}
+              onBlur={handleTextareaBlur}
+            ></textarea>
+            <TypeComposerTypeItem
+              title="Type"
+              icon={<IconType />}
+              items={typeItems}
+              onSelect={handleTypeSelect}
+            />
+            <ToneComposerTypeItem
+              title="Tone"
+              icon={<IconTone />}
+              items={toneItems}
+              onSelect={handleToneSelect}
+            />
+            <LengthComposerTypeItem
+              title="Length"
+              icon={<IconLength />}
+              items={lengthItems}
+              onSelect={handleLengthSelect}
+            />
+            <ComposerLanguage
+              icon={<IconLanguage />}
+              options={languageOptions}
+              onSelect={handleLanguageSelect}
+            />
+          </div>
         </div>
       )}
       <button className="cwa_composer-send-btn" onClick={sendContextAndAnswer}>
-        Send
+        {t("submit")}
       </button>
       <div
         className="cwa_write-answer"
@@ -368,7 +381,7 @@ function ComposerLanguage({ icon, options, onSelect }) {
     <div className="cwa_composer-language">
       <div className="cwa_composer-language-title">
         {icon}
-        <p>Languages :</p>
+        <p>{t("Languages")} :</p>
       </div>
       <div className="cwa_composer-language-content">
         <div className="cwa_composer-language-select">

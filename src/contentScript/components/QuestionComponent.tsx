@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Select from "react-select";
 import { EventSourcePolyfill } from "event-source-polyfill";
 import { LoadingMessageIcon } from "./SVG";
 import ReactMarkdown from "react-markdown";
+import languageOptions from "../utils/languages";
+import { useTranslation } from "react-i18next";
 
 const CHAT = process.env.API_CHAT;
 const CWA = process.env.API_DOMAIN;
@@ -42,7 +44,7 @@ const optionStyles = {
 const languageOptionStyles = {
   control: (provided, state) => ({
     ...selectStyles.control(provided, state),
-    width: "120px",
+    width: "130px",
   }),
   option: (provided, state) => ({
     ...provided,
@@ -53,30 +55,19 @@ const languageOptionStyles = {
   }),
 };
 
-const taskOptions = [
-  { value: "answer", label: "Trả lời câu hỏi này" },
-  { value: "explain", label: "Giải thích điều này" },
-  { value: "translate", label: "Dịch" },
-  { value: "summarize", label: "Tóm tắt" },
-  { value: "improve", label: "Cải thiện kỹ năng viết" },
-  { value: "correct", label: "Sửa chính tả và ngữ pháp" },
-  { value: "shorten", label: "Rút ngắn" },
-  { value: "lengthen", label: "Làm dài hơn" },
-];
-
-const languageOptions = [
-  { value: "en", label: "English" },
-  { value: "vi", label: "Vietnamese" },
-  { value: "es", label: "Spanish" },
-  { value: "fr", label: "French" },
-  { value: "de", label: "German" },
-  { value: "it", label: "Italian" },
-  { value: "ru", label: "Russian" },
-  { value: "jp", label: "Japanese" },
-  { value: "cn", label: "Chinese" },
-];
-
 function QuestionComponent({ user }) {
+  const { t, i18n } = useTranslation();
+  const taskOptions = [
+    { value: "answer", label: t("Answer this question") },
+    { value: "explain", label: t("Explain this") },
+    { value: "translate", label: t("Translate") },
+    { value: "summarize", label: t("Summarize") },
+    { value: "improve", label: t("Improve writing skills") },
+    { value: "correct", label: t("Correct spelling and grammar") },
+    { value: "shorten", label: t("Shorten") },
+    { value: "lengthen", label: t("Lengthen") },
+  ];
+  const [language, setLanguage] = useState();
   const [selectedTask, setSelectedTask] = useState(taskOptions[0]);
   const [selectedLanguage, setSelectedLanguage] = useState(languageOptions[0]);
   const [promptText, setPromptText] = useState(
@@ -86,6 +77,24 @@ function QuestionComponent({ user }) {
   const [outputText, setOutputText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showLanguageSelect, setShowLanguageSelect] = useState(true);
+
+  useEffect(() => {
+    const messageListener = (request) => {
+      if (request.settingUpdate) {
+        chrome.storage.local.get(["language"], (result) => {
+          if (result.language !== undefined) {
+            setLanguage(result.language);
+            i18n.changeLanguage(result.language);
+          }
+        });
+      }
+    };
+
+    chrome.runtime.onMessage.addListener(messageListener);
+    return () => {
+      chrome.runtime.onMessage.removeListener(messageListener);
+    };
+  }, []);
 
   const handleTaskChange = (option) => {
     setSelectedTask(option);
@@ -102,11 +111,11 @@ function QuestionComponent({ user }) {
         );
         break;
       case "explain":
-        setPromptText('Please explain in ${lang}: "${selection}"');
+        setPromptText('Please explain in ${lang}: """${selection}"""');
         break;
       case "translate":
         setPromptText(
-          'As an AI language translation expert, your task is to translate the provided text into ${lang} language. Your goal is to deliver a colloquial and authentic translation. Please provide only the output without any additional information or quotes. """""" ${selection} """""""'
+          'As an AI language translation expert, your task is to translate the provided text into ${lang} language. Your goal is to deliver a colloquial and authentic translation. Please provide only the output without any additional information or quotes. """ ${selection} """'
         );
         break;
       case "summarize":
@@ -116,12 +125,12 @@ function QuestionComponent({ user }) {
         break;
       case "improve":
         setPromptText(
-          'As a proficient AI, specialized in language comprehension and writing enhancement, your task is to review the text within the triple quotes and improve it while maintaining its original essence. Strive to keep the original meaning, structure, character length and format intact to ensure coherence and readability. Provide only the improved version of the text without wrapping responses in quotes or changing the language of the text. """"""${selection}"""""""'
+          'As a proficient AI, specialized in language comprehension and writing enhancement, your task is to review the text within the triple quotes and improve it while maintaining its original essence. Strive to keep the original meaning, structure, character length and format intact to ensure coherence and readability. Provide only the improved version of the text without wrapping responses in quotes or changing the language of the text. """${selection}"""'
         );
         break;
       case "correct":
         setPromptText(
-          'As an AI trained in language correction, your task is to scrutinize the text encased within the triple quotes and rectify any spelling, syntax, or grammar errors without altering its original meaning or style. Your corrections should solely focus on spelling, syntax, and grammar mistakes without making any enhancements. Should the original text be error-free, output it as it is without encasing responses in quotes.""""""${selection}"""""""'
+          'As an AI trained in language correction, your task is to scrutinize the text encased within the triple quotes and rectify any spelling, syntax, or grammar errors without altering its original meaning or style. Your corrections should solely focus on spelling, syntax, and grammar mistakes without making any enhancements. Should the original text be error-free, output it as it is without encasing responses in quotes."""${selection}"""'
         );
         break;
       case "shorten":
@@ -131,7 +140,7 @@ function QuestionComponent({ user }) {
         break;
       case "lengthen":
         setPromptText(
-          'As an AI adept in the art of elaborative writing, your task is to rewrite the text enclosed within the triple quotes. Ensure that the revised text is more than double the length of the original, whilst maintaining its original meaning. Deliver only the output without any extra information or quotes. Your response should mirror the language variety or dialect used in this given text. """""" ${selection} """""""'
+          'As an AI adept in the art of elaborative writing, your task is to rewrite the text enclosed within the triple quotes. Ensure that the revised text is more than double the length of the original, whilst maintaining its original meaning. Deliver only the output without any extra information or quotes. Your response should mirror the language variety or dialect used in this given text. """ ${selection} """'
         );
         break;
       default:
@@ -148,10 +157,13 @@ function QuestionComponent({ user }) {
     setOutputText("");
 
     const selection = inputText;
+    console.log(selection, "selection");
+
     const lang = selectedLanguage.label;
     const prompt = promptText
       .replace("${lang}", lang)
-      .replace('"""${selection}"""', selection);
+      .replace("${selection}", selection);
+    console.log(prompt, "prompt");
 
     const eventSource = new EventSourcePolyfill(
       `${CWA}/${CHAT}?query=${encodeURIComponent(
@@ -222,13 +234,13 @@ function QuestionComponent({ user }) {
       <textarea
         name="content"
         className="cwa_question-component-content"
-        placeholder="Dán hoặc nhập nội dung câu hỏi vào đây... Nhấn Shift + Enter để bắt đầu 1 dòng mới và Enter để gửi câu hỏi."
+        placeholder={t("enter-text-here")}
         value={inputText}
         onChange={(e) => setInputText(e.target.value)}
       ></textarea>
 
       <div className="cwa_question-component-submit">
-        <button onClick={handleSubmit}>Submit</button>
+        <button onClick={handleSubmit}>{t("submit")}</button>
       </div>
       <div
         className="cwa_question-component-result"

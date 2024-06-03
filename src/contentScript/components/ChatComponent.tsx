@@ -22,8 +22,6 @@ import SummarizeComponent from "./SummarizeComponent";
 import FileChatComponent from "./FileChatComponent";
 import ImageChatComponent from "./ImageChatComponent";
 
-import { saveChatMessagesToStorage } from "../utils/saveChatMessagesToStorage";
-import { getChatHistories } from "../utils/getChatHistories";
 import { getRandomSuggestions } from "../utils/getRandomSuggestion";
 
 import ReactMarkdown from "react-markdown";
@@ -100,47 +98,34 @@ const ChatComponent = ({ user }) => {
   const inputRefImg = useRef(null);
 
   useEffect(() => {
-    chrome.storage.local.get(["language"], (result) => {
-      if (result.language !== undefined) {
-        setLanguage(result.language);
-        i18n.changeLanguage(result.language);
+    const updateLanguageAndSuggestions = (lang) => {
+      setLanguage(lang);
+      i18n.changeLanguage(lang);
 
-        const suggestions = languageSuggestions[result.language] || [];
-        const randomSuggestions = getRandomSuggestions(suggestions, 3);
-        setDisplayedSuggestions(randomSuggestions);
-      }
-    });
-  }, []);
+      const suggestions = languageSuggestions[lang] || [];
+      const randomSuggestions = getRandomSuggestions(suggestions, 3);
+      setDisplayedSuggestions(randomSuggestions);
+    };
 
-  useEffect(() => {
     const messageListener = (request) => {
       if (request.settingUpdate) {
         chrome.storage.local.get(["language"], (result) => {
           if (result.language !== undefined) {
-            setLanguage(result.language);
-            i18n.changeLanguage(result.language);
-
-            const suggestions = languageSuggestions[result.language] || [];
-            const randomSuggestions = getRandomSuggestions(suggestions, 3);
-            setDisplayedSuggestions(randomSuggestions);
+            updateLanguageAndSuggestions(result.language);
           }
         });
       }
     };
 
     chrome.runtime.onMessage.addListener(messageListener);
+
+    if (language) {
+      updateLanguageAndSuggestions(language);
+    }
+
     return () => {
       chrome.runtime.onMessage.removeListener(messageListener);
     };
-  }, []);
-
-  useEffect(() => {
-    if (language) {
-      i18n.changeLanguage(language);
-      const suggestions = languageSuggestions[language] || [];
-      const randomSuggestions = getRandomSuggestions(suggestions, 3);
-      setDisplayedSuggestions(randomSuggestions);
-    }
   }, [language]);
 
   useEffect(() => {
@@ -195,6 +180,7 @@ const ChatComponent = ({ user }) => {
       image: null,
     };
     setMessages((prevMessage) => [...prevMessage, loadingMessage]);
+    console.log(text, "text");
 
     const eventSource = new EventSourcePolyfill(
       `${CWA}/${CHAT}?query=${encodeURIComponent(
@@ -304,16 +290,20 @@ const ChatComponent = ({ user }) => {
     setIsOpenImg(false);
   };
 
-
   useEffect(() => {
     const currentChatMessages = localStorage.getItem("currentChatMessages");
     if (currentChatMessages) {
-      setMessages(JSON.parse(currentChatMessages));
+      const parsedMessages = JSON.parse(currentChatMessages);
+      if (parsedMessages.length > 0) {
+        setMessages(parsedMessages);
+      }
     }
   }, []);
 
   useEffect(() => {
-    localStorage.setItem("currentChatMessages", JSON.stringify(messages));
+    if (messages.length > 0) {
+      localStorage.setItem("currentChatMessages", JSON.stringify(messages));
+    }
   }, [messages]);
 
   const saveChatMessagesToStorage = (
@@ -321,6 +311,10 @@ const ChatComponent = ({ user }) => {
     chatHistoryId,
     setChatHistoryId
   ) => {
+    if (messages.length === 0) {
+      return;
+    }
+
     const savedChatHistories =
       JSON.parse(localStorage.getItem("chatHistories")) || [];
     if (chatHistoryId !== null) {
@@ -345,20 +339,10 @@ const ChatComponent = ({ user }) => {
 
   const handleNewChat = () => {
     setFollowUpQuestions([]);
-    console.log(messages);
-    console.log(messages.length);
-
-    if (messages.length > 1) {
+    if (messages.length > 0) {
       saveChatMessagesToStorage(messages, chatHistoryId, setChatHistoryId);
     }
-    setMessages([
-      {
-        text: "How can I assist you today?",
-        avatar: urls.icon,
-        type: "answer",
-        image: null,
-      },
-    ]);
+    setMessages([]);
     setChatHistoryId(null);
   };
 
@@ -416,7 +400,7 @@ const ChatComponent = ({ user }) => {
     if (message.type === "loading") {
       return (
         <div key={index} className={`cwa_content-mess cwa_${message.type}`}>
-          {/* <img className="cwa_message-avatar user" src={message.avatar} /> */}
+          <img className="cwa_message-avatar user" src={message.avatar} />
           <div className={`cwa_message-content cwa_${message.type}`}>
             <LoadingMessageIcon />
           </div>
@@ -425,7 +409,7 @@ const ChatComponent = ({ user }) => {
     } else if (message.type === "file") {
       return (
         <div key={index} className={`cwa_content-mess cwa_${message.type}`}>
-          {/* <img className="cwa_message-avatar user" src={message.avatar} /> */}
+          <img className="cwa_message-avatar user" src={message.avatar} />
           <div className={`cwa_message-content cwa_${message.type}`}>
             <UploadFileIconInMessage />
             <div className="cwa_pdf-info">
@@ -438,7 +422,7 @@ const ChatComponent = ({ user }) => {
     } else if (message.type === "img") {
       return (
         <div key={index} className={`cwa_content-mess cwa_${message.type}`}>
-          {/* <img className="cwa_message-avatar user" src={message.avatar} /> */}
+          <img className="cwa_message-avatar user" src={message.avatar} />
           <div className={`cwa_message-content cwa_${message.type}`}>
             <img
               className="cwa_upload-img"
@@ -451,7 +435,7 @@ const ChatComponent = ({ user }) => {
     } else {
       return (
         <div key={index} className={`cwa_content-mess cwa_${message.type}`}>
-          {/* <img className="cwa_message-avatar user" src={message.avatar} /> */}
+          <img className="cwa_message-avatar user" src={message.avatar} />
           <div className={`cwa_message-content cwa_${message.type}`}>
             <span className={`cwa_${message.type}`}>
               <ReactMarkdown
