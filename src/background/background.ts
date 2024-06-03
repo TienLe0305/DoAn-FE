@@ -1,6 +1,13 @@
 let contentScriptLoaded = false;
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-  if (msg.isLogin == false) {
+  if (msg.action === "getCurrentURL") {
+    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+      if (tabs.length === 0) return;
+      const currentTabId = tabs[0].id;
+      const currentURL = tabs[0].url;
+      sendResponse({ currentURL });
+    });
+  } else {
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
       if (tabs.length === 0) return;
       const currentTabId = tabs[0].id;
@@ -10,8 +17,8 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
           files: ["contentScript.js"],
         },
         () => {
-            chrome.tabs.sendMessage(currentTabId, { cleanup: true });
-            contentScriptLoaded = true;
+          chrome.tabs.sendMessage(currentTabId, { cleanup: true });
+          contentScriptLoaded = true;
         }
       );
     });
@@ -19,14 +26,17 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 
   if (msg.settingUpdate == true) {
     chrome.storage.local.get(["contentScriptReady"], function (result) {
-      if(result.contentScriptReady) {
-        chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-          if (tabs.length === 0) return;
-          const currentTabId = tabs[0].id;
-          chrome.tabs.sendMessage(currentTabId, { settingUpdate: true });
-        });
+      if (result.contentScriptReady) {
+        chrome.tabs.query(
+          { active: true, currentWindow: true },
+          function (tabs) {
+            if (tabs.length === 0) return;
+            const currentTabId = tabs[0].id;
+            chrome.tabs.sendMessage(currentTabId, { settingUpdate: true });
+          }
+        );
       }
-    })
+    });
   }
 
   if (msg.loading === "load") {
