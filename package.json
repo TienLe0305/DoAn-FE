@@ -1,6 +1,6 @@
 {
-  "name": "cw-asisstant",
-  "author": "CWA",
+  "name": "nebula-asisstant",
+  "author": "TienLV",
   "version": "v2.5.1",
   "main": "index.js",
   "license": "MIT",

@@ -1,11 +1,11 @@
 {
   "manifest_version": 3,
-  "name": "CWAsisstant",
-  "description": "Introduced a new virtual assistant called CWAsisstant, which allows employee of CO-WELL company to use",
+  "name": "nebulAsisstant",
+  "description": "Introduced a new virtual assistant called nebulAsisstant, which allows everybody to use",
   "version": "2.5.1",
   "action": {
     "default_popup": "popup.html",
-    "default_title": "CWA-Assistant",
+    "default_title": "nebulAsisstant",
     "default_icon": "assets/images/icon.png"
   },
   "background": {
