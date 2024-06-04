@@ -1030,6 +1030,7 @@
   border-radius: 10px;
   padding: 10px;
   resize: none;
+  width: 100%;
 }
 
 #CWA .cwa_composer-type-title,
