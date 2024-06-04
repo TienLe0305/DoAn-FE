@@ -33,7 +33,7 @@ const FileChatComponent = ({
       if (response.ok) {
         const fileName = file.name;
         setIsGetFile(false);
-        getAnswer(`What is the main topic of the document?`, fileName);
+        getAnswer(`What is the main topic of the document?`, fileName, true);
       } else {
         console.error("Đã xảy ra lỗi khi gửi file lên BE.");
       }

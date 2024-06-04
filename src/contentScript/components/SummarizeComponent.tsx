@@ -40,7 +40,7 @@ const SummarizeComponent = ({ sendQuestion, setIsGetUrl, setIsOpenUrl, getAnswer
       );
       if (response.status === 200) {
         setIsGetUrl(false);
-        getAnswer("Summarize this website!!!");
+        getAnswer("Summarize this website!!!", null, true); 
       } else {
         console.error("Đã xảy ra lỗi khi gửi url lên BE.");
       }

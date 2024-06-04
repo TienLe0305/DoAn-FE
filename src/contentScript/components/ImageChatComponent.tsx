@@ -40,7 +40,7 @@ const ImageChatComponent = ({
         console.log("description: ", description);
 
         getAnswer(
-          `Provide a detailed description of the following description of image: ${description}`
+          `Please help me write the description inside the quotes a little longer: "${description}"`
         );
         setIsGetImg(false);
       } catch (error) {
