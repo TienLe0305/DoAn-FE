@@ -33,6 +33,7 @@ import hljs from "highlight.js";
 import { jpSuggestions } from "../jpSuggestions";
 import { viSuggestions } from "../viSuggestions";
 import { enSuggestions } from "../enSuggestions";
+import axios from "axios";
 
 const languageSuggestions = {
   en: enSuggestions,
@@ -42,6 +43,7 @@ const languageSuggestions = {
 
 const CHAT = process.env.API_CHAT;
 const CWA = process.env.API_DOMAIN;
+const CLEAR_CONTEXT = process.env.API_CLEAR_CONTEXT;
 
 const urls = {
   icon: chrome.runtime.getURL("assets/images/icon.png"),
@@ -98,34 +100,47 @@ const ChatComponent = ({ user }) => {
   const inputRefImg = useRef(null);
 
   useEffect(() => {
-    const updateLanguageAndSuggestions = (lang) => {
-      setLanguage(lang);
-      i18n.changeLanguage(lang);
+    chrome.storage.local.get(["language"], (result) => {
+      if (result.language !== undefined) {
+        setLanguage(result.language);
+        i18n.changeLanguage(result.language);
 
-      const suggestions = languageSuggestions[lang] || [];
-      const randomSuggestions = getRandomSuggestions(suggestions, 3);
-      setDisplayedSuggestions(randomSuggestions);
-    };
+        const suggestions = languageSuggestions[result.language] || [];
+        const randomSuggestions = getRandomSuggestions(suggestions, 3);
+        setDisplayedSuggestions(randomSuggestions);
+      }
+    });
+  }, []);
 
+  useEffect(() => {
     const messageListener = (request) => {
       if (request.settingUpdate) {
         chrome.storage.local.get(["language"], (result) => {
           if (result.language !== undefined) {
-            updateLanguageAndSuggestions(result.language);
+            setLanguage(result.language);
+            i18n.changeLanguage(result.language);
+
+            const suggestions = languageSuggestions[result.language] || [];
+            const randomSuggestions = getRandomSuggestions(suggestions, 3);
+            setDisplayedSuggestions(randomSuggestions);
           }
         });
       }
     };
 
     chrome.runtime.onMessage.addListener(messageListener);
-
-    if (language) {
-      updateLanguageAndSuggestions(language);
-    }
-
     return () => {
       chrome.runtime.onMessage.removeListener(messageListener);
     };
+  }, []);
+
+  useEffect(() => {
+    if (language) {
+      i18n.changeLanguage(language);
+      const suggestions = languageSuggestions[language] || [];
+      const randomSuggestions = getRandomSuggestions(suggestions, 3);
+      setDisplayedSuggestions(randomSuggestions);
+    }
   }, [language]);
 
   useEffect(() => {
@@ -172,7 +187,7 @@ const ChatComponent = ({ user }) => {
     };
   }, [messages]);
 
-  const getAnswer = async (text, fileName = null) => {
+  const getAnswer = async (text, fileName = null, includeContext = false) => {
     let loadingMessage = {
       text: "Thinking...",
       avatar: urls.icon,
@@ -187,7 +202,9 @@ const ChatComponent = ({ user }) => {
         text + followUpQuestionsPrompts
       )}&user_email=${encodeURIComponent(user.email)}${
         fileName ? `&file_name=${encodeURIComponent(fileName)}` : ""
-      }&language=${encodeURIComponent(language)}`
+      }&language=${encodeURIComponent(
+        language
+      )}&include_context=${includeContext}`
     );
 
     setIsDisable(true);
@@ -337,13 +354,19 @@ const ChatComponent = ({ user }) => {
     }
   };
 
-  const handleNewChat = () => {
+  const handleNewChat = async () => {
     setFollowUpQuestions([]);
     if (messages.length > 0) {
       saveChatMessagesToStorage(messages, chatHistoryId, setChatHistoryId);
     }
     setMessages([]);
     setChatHistoryId(null);
+
+    try {
+      const response = await axios.get(`${CWA}/${CLEAR_CONTEXT}`);
+    } catch (error) {
+      console.error("Error:", error);
+    }
   };
 
   const getChatHistories = () => {
