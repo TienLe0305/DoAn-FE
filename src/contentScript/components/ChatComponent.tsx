@@ -309,10 +309,14 @@ const ChatComponent = ({ user }) => {
 
   useEffect(() => {
     const currentChatMessages = localStorage.getItem("currentChatMessages");
+    const currentChatHistoryId = localStorage.getItem("currentChatHistoryId");
     if (currentChatMessages) {
       const parsedMessages = JSON.parse(currentChatMessages);
       if (parsedMessages.length > 0) {
         setMessages(parsedMessages);
+        if (currentChatHistoryId) {
+          setChatHistoryId(JSON.parse(currentChatHistoryId));
+        }
       }
     }
   }, []);
@@ -320,8 +324,17 @@ const ChatComponent = ({ user }) => {
   useEffect(() => {
     if (messages.length > 0) {
       localStorage.setItem("currentChatMessages", JSON.stringify(messages));
+      if (chatHistoryId !== null) {
+        localStorage.setItem(
+          "currentChatHistoryId",
+          JSON.stringify(chatHistoryId)
+        );
+      }
+    } else {
+      localStorage.removeItem("currentChatMessages");
+      localStorage.removeItem("currentChatHistoryId");
     }
-  }, [messages]);
+  }, [messages, chatHistoryId]);
 
   const saveChatMessagesToStorage = (
     messages,
