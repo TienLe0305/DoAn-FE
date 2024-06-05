@@ -78,7 +78,6 @@
 
 @font-face {
   font-family: "CohereMono";
-  /* In the nature design system, bolded fonts always use Cohere Variable. */
   src: url("https://cohere-readme-docs.netlify.app/fonts/CohereVariable.woff2")
       format("woff2"),
     url("https://cohere-readme-docs.netlify.app/fonts/CohereVariable.woff")
@@ -140,7 +139,7 @@
 #CWA .katex-mathml math {
   margin: 10px 0 !important;
   font-size: 1.2rem !important;
-  font-weight: 600;
+  font-weight: 525;
   padding: 10px;
   overflow-x: auto;
   overflow-y: hidden;
@@ -153,20 +152,20 @@
 /* Code Block Styles */
 #CWA pre {
   text-wrap: wrap !important;
-  background: #2f2f2f !important;
+  background: #000 !important;
   line-height: 1.4rem !important;
   margin: 1rem 0 !important;
   padding: 55px 15px 15px 15px !important;
   position: relative;
-  border-radius: 20px 20px 5px 5px !important;
+  border-radius: 10px 10px 5px 5px !important;
   color: white;
-  font-weight: 500;
+  font-weight: 525;
 }
 
 #CWA pre header {
-  padding: 10px !important;
-  background: #e7e4dc;
-  color: black;
+  padding: 5px !important;
+  background: #1b7fcccc;
+  color: wheat;
   border-radius: 10px 10px 0 0 !important;
   position: absolute;
   top: 0;
@@ -203,7 +202,6 @@
 #CWA h4,
 #CWA h5,
 #CWA h6 {
-  font-weight: 600 !important;
   margin-top: 24px !important;
   margin-bottom: 16px !important;
   line-height: 1.25 !important;
@@ -211,14 +209,17 @@
 
 #CWA h1 {
   font-size: 1.95em !important;
+  font-weight: 525 !important;
 }
 
 #CWA h2 {
   font-size: 1.55em !important;
+  font-weight: 500 !important;
 }
 
 #CWA h3 {
   font-size: 1.25em !important;
+  font-weight: 400 !important;
 }
 
 #CWA h4 {
@@ -277,7 +278,7 @@
 }
 
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 4px;
 }
 
 ::-webkit-scrollbar-track {
@@ -518,7 +519,7 @@
 #CWA .cwa_title .cwa_h3 {
   font-family: CohereHeadline !important;
   font-size: 26px !important;
-  font-weight: 700 !important;
+  font-weight: 525 !important;
   margin: 0 !important;
   display: flex;
   align-items: center;
@@ -539,7 +540,7 @@
   box-shadow: 0 5px 5px 2px rgba(0, 0, 0, 0.1);
   padding: 10px;
   border-radius: 10px;
-  font-size: 0.85rem;
+  font-size: 0.7rem;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -548,11 +549,11 @@
 }
 
 #CWA .cwa_box-suggestion-header h3 {
-  font-weight: 600 !important;
+  font-weight: 525 !important;
   font-size: 1.1rem !important;
   color: black !important;
-  margin-bottom: 0.2rem !important; 
-  margin-top: 0.2rem !important; 
+  margin-bottom: 0.2rem !important;
+  margin-top: 0.2rem !important;
 }
 
 #CWA .cwa_box-container {
@@ -704,7 +705,7 @@
 }
 
 #CWA .cwa_pdf-info .cwa_file {
-  font-weight: 500;
+  font-weight: 525;
 }
 
 #CWA .cwa_message-content {
@@ -985,6 +986,11 @@
 #CWA .cwa_write-container {
   color: #000;
   padding: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 10px !important;
 }
 
 #CWA .cwa_write-button-switch {
@@ -1113,18 +1119,22 @@
   border: none;
   background-color: #378ba5;
   color: white;
+  cursor: pointer;
 }
 
 #CWA .cwa_write-answer {
-  display: block;
+  line-height: 1.3rem;
   color: black;
   margin-top: 10px;
   padding: 10px;
   border-radius: 5px;
-  border: 1px solid;
   width: 100%;
-  background: #e8ede7;
-  box-shadow: 0 3px 3px 2px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 3px 3px 2px rgba(0, 0, 0, 0.3);
+  white-space: pre-line;
+}
+
+#CWA .cwa_write-answer .cwa_copy-message {
+  margin-top: 10px;
 }
 
 #CWA .cwa_loading-icon {
@@ -1316,15 +1326,18 @@
 }
 
 #CWA .cwa_question-component-result {
+  line-height: 1.3rem;
   color: black;
   margin-top: 10px;
   padding: 10px;
   border-radius: 5px;
-  border: 1px solid;
   width: 100%;
-  background: #e8ede7;
-  box-shadow: 0 3px 3px 2px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 3px 3px 2px rgba(0, 0, 0, 0.3);
   white-space: pre-line;
+}
+
+#CWA .cwa_question-component-result p {
+  margin-bottom: 10px !important;
 }
 
 @keyframes spin {
@@ -1496,7 +1509,7 @@
 
 .cwa_wrapper-container-loading-pdf h1 {
   font-size: 1.2rem;
-  font-weight: 600;
+  font-weight: 525;
   color: black;
   text-align: center;
 }
