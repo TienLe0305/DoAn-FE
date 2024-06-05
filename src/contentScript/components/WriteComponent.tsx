@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import ReactMarkdown from "react-markdown";
 import Select from "react-select";
 import {
   IconType,
@@ -16,6 +17,7 @@ import {
   IconLength,
   IconLanguage,
   LoadingMessageIcon,
+  CopyIcon,
 } from "./SVG";
 import { EventSourcePolyfill } from "event-source-polyfill";
 import languageOptions from "../utils/languages";
@@ -73,6 +75,9 @@ function WriteComponent({ user }) {
   const [isLoading, setIsLoading] = useState(false);
   const [isAnswer, setIsAnswer] = useState(false);
   const [originText, setOriginText] = useState("");
+  const [copied, setCopied] = useState(false);
+
+  const responseRef = useRef(null);
 
   useEffect(() => {
     const messageListener = (request) => {
@@ -91,6 +96,19 @@ function WriteComponent({ user }) {
       chrome.runtime.onMessage.removeListener(messageListener);
     };
   }, []);
+
+  useEffect(() => {
+    responseRef.current?.scrollIntoView({ behavior: "instant" });
+  }, [response]);
+
+  const handleCopyMessage = (text) => {
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+
+    setTimeout(() => {
+      setCopied(false);
+    }, 1000);
+  };
 
   const handleTextareaChange = (event) => {
     setTextareaContent(event.target.value);
@@ -125,10 +143,10 @@ function WriteComponent({ user }) {
 
   const handleSend = () => {
     if (activeTab === "Composer") {
-      const formattedContext = `Tôi muốn viết một đoạn văn với chủ đề ${context.subject}, loại văn bản ${context.type}, tone giọng ${context.tone}, độ dài ${context.length}, và bằng ngôn ngữ ${context.language}. Bạn có thể giúp tôi không?`;
+      const formattedContext = `Tôi muốn viết một đoạn văn với chủ đề ${context.subject}, loại văn bản ${context.type}, tone giọng ${context.tone}, độ dài ${context.length}, và bằng ngôn ngữ ${context.language}. Hãy viết giúp tôi ngay, không cần giải thích và thêm các thông tin không cần thiết!`;
       return formattedContext;
     } else {
-      const formattedContext = `Tôi muốn trả lời đoạn văn bản ${originText} với chủ đề ${context.subject}, loại văn bản ${context.type}, tone giọng ${context.tone}, độ dài ${context.length}, và bằng ngôn ngữ ${context.language}. Bạn có thể giúp tôi không?`;
+      const formattedContext = `Tôi muốn trả lời đoạn văn bản ${originText} với chủ đề ${context.subject}, loại văn bản ${context.type}, tone giọng ${context.tone}, độ dài ${context.length}, và bằng ngôn ngữ ${context.language}. Hãy viết giúp tôi ngay, không cần giải thích và thêm các thông tin không cần thiết!`;
       return formattedContext;
     }
   };
@@ -144,10 +162,9 @@ function WriteComponent({ user }) {
     let answer = "";
     eventSource.addEventListener("response", (event) => {
       const data = JSON.parse(event.data);
-
       for (let char of data.text) {
         answer += char;
-        setResponse(answer);
+        setResponse((prevResponse) => prevResponse + char);
         setIsAnswer(true);
         setIsLoading(false);
       }
@@ -219,44 +236,42 @@ function WriteComponent({ user }) {
       )}
       {activeTab === "Answer" && (
         <div className="cwa_answer-content">
-          <div>
-            <textarea
-              className="cwa_answer-textarea"
-              placeholder={t("The original text you want to reply to...")}
-              onChange={(e) => setOriginText(e.target.value)}
-              value={originText}
-            ></textarea>
-            <textarea
-              className="cwa_composer-textarea"
-              placeholder={t("Subject that you want to write about...")}
-              value={textareaContent}
-              onChange={handleTextareaChange}
-              onBlur={handleTextareaBlur}
-            ></textarea>
-            <TypeComposerTypeItem
-              title="Type"
-              icon={<IconType />}
-              items={typeItems}
-              onSelect={handleTypeSelect}
-            />
-            <ToneComposerTypeItem
-              title="Tone"
-              icon={<IconTone />}
-              items={toneItems}
-              onSelect={handleToneSelect}
-            />
-            <LengthComposerTypeItem
-              title="Length"
-              icon={<IconLength />}
-              items={lengthItems}
-              onSelect={handleLengthSelect}
-            />
-            <ComposerLanguage
-              icon={<IconLanguage />}
-              options={languageOptions}
-              onSelect={handleLanguageSelect}
-            />
-          </div>
+          <textarea
+            className="cwa_answer-textarea"
+            placeholder={t("The original text you want to reply to...")}
+            onChange={(e) => setOriginText(e.target.value)}
+            value={originText}
+          ></textarea>
+          <textarea
+            className="cwa_composer-textarea"
+            placeholder={t("Subject that you want to write about...")}
+            value={textareaContent}
+            onChange={handleTextareaChange}
+            onBlur={handleTextareaBlur}
+          ></textarea>
+          <TypeComposerTypeItem
+            title="Type"
+            icon={<IconType />}
+            items={typeItems}
+            onSelect={handleTypeSelect}
+          />
+          <ToneComposerTypeItem
+            title="Tone"
+            icon={<IconTone />}
+            items={toneItems}
+            onSelect={handleToneSelect}
+          />
+          <LengthComposerTypeItem
+            title="Length"
+            icon={<IconLength />}
+            items={lengthItems}
+            onSelect={handleLengthSelect}
+          />
+          <ComposerLanguage
+            icon={<IconLanguage />}
+            options={languageOptions}
+            onSelect={handleLanguageSelect}
+          />
         </div>
       )}
       <button className="cwa_composer-send-btn" onClick={sendContextAndAnswer}>
@@ -266,8 +281,22 @@ function WriteComponent({ user }) {
         className="cwa_write-answer"
         style={{ display: isLoading || isAnswer ? "block" : "none" }}
       >
-        {isLoading ? <LoadingMessageIcon /> : response}
+        {(isLoading && response) || response ? (
+          <ReactMarkdown>{response}</ReactMarkdown>
+        ) : (
+          <LoadingMessageIcon />
+        )}
+        {!isLoading && isAnswer && (
+          <div
+            className="cwa_copy-message"
+            onClick={() => handleCopyMessage(response)}
+          >
+            <CopyIcon />
+            <span className="cwa_tooltip">{copied ? "Copied!" : "Copy"}</span>
+          </div>
+        )}
       </div>
+      <div ref={responseRef}></div>
     </div>
   );
 }

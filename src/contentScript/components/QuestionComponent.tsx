@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Select from "react-select";
 import { EventSourcePolyfill } from "event-source-polyfill";
-import { LoadingMessageIcon } from "./SVG";
+import { CopyIcon, LoadingMessageIcon } from "./SVG";
 import ReactMarkdown from "react-markdown";
 import languageOptions from "../utils/languages";
 import { useTranslation } from "react-i18next";
@@ -77,6 +77,9 @@ function QuestionComponent({ user }) {
   const [outputText, setOutputText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showLanguageSelect, setShowLanguageSelect] = useState(true);
+  const [copied, setCopied] = useState(false);
+
+  const responseRef = useRef(null);
 
   useEffect(() => {
     const messageListener = (request) => {
@@ -96,6 +99,10 @@ function QuestionComponent({ user }) {
     };
   }, []);
 
+  useEffect(() => {
+    responseRef.current?.scrollIntoView({ behavior: "instant" });
+  }, [outputText]);
+
   const handleTaskChange = (option) => {
     setSelectedTask(option);
     setShowLanguageSelect(
@@ -107,40 +114,40 @@ function QuestionComponent({ user }) {
     switch (option.value) {
       case "answer":
         setPromptText(
-          'Your task as an AI is to generate a response in ${lang} language to the following question: """${selection}""". Ensure your response is clear and accurate, and present it without wrapping in quotes.'
+          "Your task as an AI is to generate a response in ${lang} to the following question: '${selection}'. Ensure your response is clear and accurate, and present it without wrapping in quotes."
         );
         break;
       case "explain":
-        setPromptText('Please explain in ${lang}: """${selection}"""');
+        setPromptText("Please explain in ${lang}: '${selection}'");
         break;
       case "translate":
         setPromptText(
-          'As an AI language translation expert, your task is to translate the provided text into ${lang} language. Your goal is to deliver a colloquial and authentic translation. Please provide only the output without any additional information or quotes. """ ${selection} """'
+          "As an AI language translation expert, your task is to translate the provided text as '${selection}' into ${lang}. Your goal is to deliver a colloquial and authentic translation. Please provide only the output without any additional information or quotes."
         );
         break;
       case "summarize":
         setPromptText(
-          'As an AI trained in concise writing, your task is to condense the text within the triple quotes. Make sure the revised text is no more than half the length of the original while retaining its meaning. Present only the output without any additional information or wrapping it in quotes. Your response should be in the same language variety or dialect as that of the given text."""${selection}"""'
+          "As an AI trained in concise writing, your task is to condense the text within the quotes. Ensure the revised text is no more than half the length of the original while retaining its meaning. Present only the output without any additional information or wrapping it in quotes. Your response should be in the same language variety or dialect as that of the given text: '${selection}'"
         );
         break;
       case "improve":
         setPromptText(
-          'As a proficient AI, specialized in language comprehension and writing enhancement, your task is to review the text within the triple quotes and improve it while maintaining its original essence. Strive to keep the original meaning, structure, character length and format intact to ensure coherence and readability. Provide only the improved version of the text without wrapping responses in quotes or changing the language of the text. """${selection}"""'
+          "As a proficient AI specialized in language comprehension and writing enhancement, your task is to review the text within the quotes and improve it while maintaining its original essence. Strive to keep the original meaning, structure, character length, and format intact to ensure coherence and readability. Provide only the improved version of the text without wrapping responses in quotes or changing the language of the text: '${selection}'"
         );
         break;
       case "correct":
         setPromptText(
-          'As an AI trained in language correction, your task is to scrutinize the text encased within the triple quotes and rectify any spelling, syntax, or grammar errors without altering its original meaning or style. Your corrections should solely focus on spelling, syntax, and grammar mistakes without making any enhancements. Should the original text be error-free, output it as it is without encasing responses in quotes."""${selection}"""'
+          "As an AI trained in language correction, your task is to scrutinize the text within the quotes and rectify any spelling, syntax, or grammar errors without altering its original meaning or style. Your corrections should focus solely on spelling, syntax, and grammar mistakes without making any enhancements. If the original text is error-free, output it as it is without encasing responses in quotes: '${selection}'"
         );
         break;
       case "shorten":
         setPromptText(
-          'As an AI trained in concise writing, your task is to condense the text within the triple quotes. Make sure the revised text is no more than half the length of the original while retaining its meaning. Present only the output without any additional information or wrapping it in quotes. Your response should be in the same language variety or dialect as that of the given text."""${selection}"""'
+          "As an AI trained in concise writing, your task is to condense the text within the quotes. Ensure the revised text is no more than half the length of the original while retaining its meaning. Present only the output without any additional information or wrapping it in quotes. Your response should be in the same language variety or dialect as that of the given text: '${selection}'"
         );
         break;
       case "lengthen":
         setPromptText(
-          'As an AI adept in the art of elaborative writing, your task is to rewrite the text enclosed within the triple quotes. Ensure that the revised text is more than double the length of the original, whilst maintaining its original meaning. Deliver only the output without any extra information or quotes. Your response should mirror the language variety or dialect used in this given text. """ ${selection} """'
+          "As an AI adept in the art of elaborative writing, your task is to rewrite the text enclosed within the quotes. Ensure that the revised text is more than double the length of the original while maintaining its original meaning. Deliver only the output without any extra information or quotes. Your response should mirror the language variety or dialect used in the given text: '${selection}'"
         );
         break;
       default:
@@ -191,6 +198,15 @@ function QuestionComponent({ user }) {
 
   const handleSubmit = async () => {
     await getContextAnswer();
+  };
+
+  const handleCopyMessage = (text) => {
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+
+    setTimeout(() => {
+      setCopied(false);
+    }, 1000);
   };
 
   const optionStyle = showLanguageSelect
@@ -251,7 +267,17 @@ function QuestionComponent({ user }) {
         ) : (
           <LoadingMessageIcon />
         )}
+        {!isLoading && outputText && (
+          <div
+            className="cwa_copy-message"
+            onClick={() => handleCopyMessage(outputText)}
+          >
+            <CopyIcon />
+            <span className="cwa_tooltip">{copied ? "Copied!" : "Copy"}</span>
+          </div>
+        )}
       </div>
+      <div ref={responseRef}></div>
     </div>
   );
 }
