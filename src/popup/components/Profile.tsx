@@ -20,6 +20,7 @@ const customStyles = {
     borderRadius: "10px",
     background: "#F6F6F6",
     width: "120px",
+    minHeight: "30px",
   }),
 
   option: (provided, state) => ({

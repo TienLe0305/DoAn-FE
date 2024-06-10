@@ -37,8 +37,6 @@ const ImageChatComponent = ({
           },
         });
         const description = response.data.description;
-        console.log("description: ", description);
-
         getAnswer(
           `Please help me write the description inside the quotes a little longer: "${description}"`
         );

@@ -195,8 +195,6 @@ const ChatComponent = ({ user }) => {
       image: null,
     };
     setMessages((prevMessage) => [...prevMessage, loadingMessage]);
-    console.log(text, "text");
-
     const eventSource = new EventSourcePolyfill(
       `${CWA}/${CHAT}?query=${encodeURIComponent(
         text + followUpQuestionsPrompts
@@ -212,6 +210,7 @@ const ChatComponent = ({ user }) => {
     let debounceTimer;
     eventSource.addEventListener("response", (event) => {
       const data = JSON.parse(event.data);
+      console.log(data.text);      
       for (let char of data.text) {
         answer += char;
         const processedAnswer = answer

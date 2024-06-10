@@ -164,13 +164,11 @@ function QuestionComponent({ user }) {
     setOutputText("");
 
     const selection = inputText;
-    console.log(selection, "selection");
 
     const lang = selectedLanguage.label;
     const prompt = promptText
       .replace("${lang}", lang)
       .replace("${selection}", selection);
-    console.log(prompt, "prompt");
 
     const eventSource = new EventSourcePolyfill(
       `${CWA}/${CHAT}?query=${encodeURIComponent(

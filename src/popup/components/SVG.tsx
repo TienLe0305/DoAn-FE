@@ -26,8 +26,8 @@ const DirectToDashboardIcon = () => (
 
 const USFlag = () => (
   <svg
-    width="30"
-    height="30"
+    width="25"
+    height="25"
     className="me-2"
     viewBox="0 0 512 512"
     fill="none"
@@ -68,8 +68,8 @@ const USFlag = () => (
 
 const VNFlag = () => (
   <svg
-    width="30"
-    height="30"
+    width="25"
+    height="25"
     className="me-2"
     viewBox="0 0 512 512"
     fill="none"
@@ -85,8 +85,8 @@ const VNFlag = () => (
 
 const JPFlag = () => (
   <svg
-    width="30"
-    height="30"
+    width="25"
+    height="25"
     className="me-2"
     viewBox="0 0 512 512"
     fill="none"
