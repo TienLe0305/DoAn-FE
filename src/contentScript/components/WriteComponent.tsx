@@ -153,6 +153,7 @@ function WriteComponent({ user }) {
 
   const getContextAnswer = async (formattedContext) => {
     setIsLoading(true);
+    setResponse("");
     const eventSource = new EventSourcePolyfill(
       `${CWA}/${CHAT}?query=${encodeURIComponent(
         formattedContext
@@ -176,8 +177,10 @@ function WriteComponent({ user }) {
   };
 
   const sendContextAndAnswer = async () => {
-    const formattedContext = handleSend();
-    await getContextAnswer(formattedContext);
+    if (!isLoading) {
+      const formattedContext = handleSend();
+      await getContextAnswer(formattedContext);
+    }
   };
 
   return (
