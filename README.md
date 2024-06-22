@@ -8,6 +8,7 @@ Make sure you have the following installed on your machine:
 
 - [Node.js](https://nodejs.org/)
 - [npm](https://www.npmjs.com/)
+- [React.js](https://reactjs.org/)
 - [Google Chrome](https://www.google.com/chrome/)
 
 ## Project Structure
@@ -57,6 +58,42 @@ Copy the `.env_sample` file to `.env` and configure the environment variables as
 cp .env_sample .env
 ```
 
+#### `.env` Configuration
+
+- **Development Mode with Local Backend**: To run the extension with a local backend during development, set `API_DOMAIN` to `http://127.0.0.1:8002/ext`.
+
+    ```env
+    API_DOMAIN=http://127.0.0.1:8002/ext
+    HOST=https://nebula-mu-ecru.vercel.app/
+
+    API_HISTORY=chat_history
+    API_CHAT=chat
+    API_UPLOAD_FILE=upload_file
+    API_UPLOAD_IMG=upload_image
+    API_CLEAR_CONTEXT=clear_context
+    API_USER=who_am_i
+    API_LOGIN=auth/ext_google_login
+    API_TOKEN=auth/ext_google_auth
+    API_EXTRACT_FROM_URL=extract_from_url
+    ```
+
+- **Development Mode with Deployed Backend**: To run the extension with the deployed backend during development, set `API_DOMAIN` to `https://tienlevan-api-ext.sg.vnict.net/ext`.
+
+    ```env
+    API_DOMAIN=https://tienlevan-api-ext.sg.vnict.net/ext
+    HOST=https://nebula-mu-ecru.vercel.app/
+
+    API_HISTORY=chat_history
+    API_CHAT=chat
+    API_UPLOAD_FILE=upload_file
+    API_UPLOAD_IMG=upload_image
+    API_CLEAR_CONTEXT=clear_context
+    API_USER=who_am_i
+    API_LOGIN=auth/ext_google_login
+    API_TOKEN=auth/ext_google_auth
+    API_EXTRACT_FROM_URL=extract_from_url
+    ```
+
 ## Build the Project
 
 ### Development Build
@@ -93,7 +130,7 @@ Follow these steps to load the extension in Chrome in development mode:
 
 - If you encounter issues during the build process, make sure all dependencies are installed correctly and that you have the correct version of Node.js.
 - Check the console for any errors or warnings during development and loading of the extension.
-s
+
 ## Conclusion
 
 This setup allows you to quickly build and test your Chrome extension chatbot assistant in development mode.
