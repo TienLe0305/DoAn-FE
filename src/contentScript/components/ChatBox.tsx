@@ -57,17 +57,26 @@ const ChatBox = ({ user, setIsOpen }) => {
             : ""
         }`}
       >
-        <div className="cwa_header">
-          <div className="cwa_title">
-            <LogoIcon />
-            <h3 className="cwa_h3">nebulAsisstant</h3>
+        <div
+          className={`${
+            selectedComponent === "Write" ? "" : "cwa_box-chat-content"
+          }`}
+        >
+          <div className="cwa_header">
+            <div className="cwa_title">
+              <div className="cwa_title_with_logo">
+                <LogoIcon />
+                <h3 className="cwa_h3">nebulAsisstant</h3>
+              </div>
+              <p>Your everyday AI assistant companion</p>
+            </div>
           </div>
+          {selectedComponent === "Chat" && <ChatComponent user={user} />}
+          {selectedComponent === "Write" && <WriteComponent user={user} />}
+          {selectedComponent === "Question" && (
+            <QuestionComponent user={user} />
+          )}
         </div>
-        {selectedComponent === "Chat" && (
-          <ChatComponent user={user} />
-        )}
-        {selectedComponent === "Write" && <WriteComponent user={user} />}
-        {selectedComponent === "Question" && <QuestionComponent user={user} />}
       </div>
       <div className="cwa_side-bar-container">
         <div className="cwa_exit-icon" onClick={handleClose}>

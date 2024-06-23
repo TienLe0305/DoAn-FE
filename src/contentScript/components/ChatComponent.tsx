@@ -15,6 +15,8 @@ import {
   OpenListConversationsIcon,
   CopyIcon,
   UploadImageIcon,
+  PageSummaryIcon,
+  SuggestionIcon,
 } from "./SVG";
 import ChatHistoryList from "./ChatHistoryList";
 
@@ -44,10 +46,16 @@ const languageSuggestions = {
 const CHAT = process.env.API_CHAT;
 const CWA = process.env.API_DOMAIN;
 const CLEAR_CONTEXT = process.env.API_CLEAR_CONTEXT;
+const EXTRACTFROMURL = process.env.API_EXTRACT_FROM_URL;
 
 const urls = {
   icon: chrome.runtime.getURL("assets/images/icon.png"),
 };
+
+const summaryPrompt =
+  "Generate a detailed summary of the current page in Markdown format, highlighting 4-5 key points. Each key point should have a summary keyword in bold. Do not enclose the summary in a code block.";
+const suggestionPrompt =
+  "Generate a list of insightful questions about the current page. The questions should cover various aspects of the content and provoke thoughtful consideration.";
 
 const followUpQuestionsPrompts = `
 - Finally, please suggest me 2-3 follow-up questions.
@@ -55,7 +63,7 @@ const followUpQuestionsPrompts = `
 - Follow-up questions should help the user understand the content better.
 - Follow-up questions should be short and concise.
 - Follow-up questions should be a single sentence.
-- Follow-up questions should be formated like the follow:
+- Follow-up questions should be formatted like the following:
 Follow-up questions:
 - <question 1>
 - <question 2>
@@ -92,6 +100,8 @@ const ChatComponent = ({ user }) => {
   const [chatHistoryId, setChatHistoryId] = useState(null);
   const [copied, setCopied] = useState(false);
   const [displayedSuggestions, setDisplayedSuggestions] = useState([]);
+  const [contextMode, setContextMode] = useState("usingRelevantSources");
+  const [includeContext, setIncludeContext] = useState(false);
 
   const inputRef = useRef(null);
   const endOfMessagesRef = useRef(null);
@@ -187,7 +197,7 @@ const ChatComponent = ({ user }) => {
     };
   }, [messages]);
 
-  const getAnswer = async (text, fileName = null, includeContext = false) => {
+  const getAnswer = async (text, fileName = null, includeContext) => {
     let loadingMessage = {
       text: "Thinking...",
       avatar: urls.icon,
@@ -195,6 +205,8 @@ const ChatComponent = ({ user }) => {
       image: null,
     };
     setMessages((prevMessage) => [...prevMessage, loadingMessage]);
+    console.log(includeContext);
+
     const eventSource = new EventSourcePolyfill(
       `${CWA}/${CHAT}?query=${encodeURIComponent(
         text + followUpQuestionsPrompts
@@ -210,7 +222,6 @@ const ChatComponent = ({ user }) => {
     let debounceTimer;
     eventSource.addEventListener("response", (event) => {
       const data = JSON.parse(event.data);
-      console.log(data.text);      
       for (let char of data.text) {
         answer += char;
         const processedAnswer = answer
@@ -268,15 +279,23 @@ const ChatComponent = ({ user }) => {
     }
   };
 
+  const handleContextModeChange = (event) => {
+    const mode = event.target.value;
+    setContextMode(mode);
+    setIncludeContext(mode === "usingWithPage");
+    setFollowUpQuestions([]);
+  };
+
   const chat = async () => {
     sendQuestion(messageText);
-    await getAnswer(messageText);
+    await getAnswer(messageText, null, includeContext);
   };
 
   const handleQuestionClick = (question) => {
     sendQuestion(question);
-    getAnswer(question);
+    getAnswer(question, null, includeContext);
     setIsSuggestions(false);
+    setFollowUpQuestions([]);
   };
 
   const handleKeyDown = (e) => {
@@ -414,17 +433,13 @@ const ChatComponent = ({ user }) => {
     }, 1000);
   };
 
-  const handleSuggestionClick = async (content) => {
-    sendQuestion(content);
-    await getAnswer(content);
-  };
+  // const handleSuggestionClick = async (content) => {
+  //   sendQuestion(content);
+  //   await getAnswer(content);
+  // };
 
   const handleOpenUploadFile = () => {
     setIsOpenFile((prev) => !prev);
-  };
-
-  const handleOpenGetSummarizeUrl = () => {
-    setIsOpenUrl((prev) => !prev);
   };
 
   const handleOpenUploadImg = () => {
@@ -556,6 +571,53 @@ const ChatComponent = ({ user }) => {
     [isGetFile, isGetUrl, isGetImg]
   );
 
+  const sendURLToBackend = async (url, setIsGetUrl, getAnswer, prompt) => {
+    try {
+      const response = await axios.post(
+        `${CWA}/${EXTRACTFROMURL}`,
+        { url },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (response.status === 200) {
+        setIsGetUrl(false);
+        getAnswer(prompt, null, true);
+      } else {
+        console.error("Đã xảy ra lỗi khi gửi url lên BE.");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+  const getCurrentURL = async (setIsGetUrl, getAnswer, prompt, isSummary) => {
+    chrome.runtime.sendMessage({ action: "getCurrentURL" }, (response) => {
+      if (response && response.currentURL) {
+        sendURLToBackend(response.currentURL, setIsGetUrl, getAnswer, prompt);
+        setIsGetUrl(true);
+        setIncludeContext(true);
+        setContextMode("usingWithPage");
+        setFollowUpQuestions([]);
+        sendQuestion(
+          `${
+            isSummary
+              ? "Generate page summary"
+              : "Suggest question about this page"
+          }`
+        );
+      } else {
+        console.error("Failed to get current URL");
+      }
+    });
+  };
+
+  useEffect(() => {
+    setIncludeContext(contextMode === "usingWithPage");
+  }, [contextMode]);
+
   return (
     <>
       <div className="cwa_chat-content-container">
@@ -597,24 +659,30 @@ const ChatComponent = ({ user }) => {
           isShowChatHistory={isShowChatHistory}
         />
         <div className="cwa_suggestion-container">
-          {displayedSuggestions.map((suggestion, index) => (
-            <div key={index} className="cwa_box-suggestion">
-              <div className="cwa_box-container">
-                <div className="cwa_box-suggestion-header">
-                  <h3>{suggestion.title}</h3>
-                </div>
-                <div className="cwa_box-suggestion-content">
-                  <p>{suggestion.content}</p>
-                </div>
-              </div>
-              <div
-                className="cwa_box-suggestion-btn"
-                onClick={() => handleSuggestionClick(suggestion.content)}
-              >
-                <ArrowButton />
-              </div>
+          <p>
+            Hi {user.name}, see what's possible with nebulAssistant in this
+            website
+          </p>
+          <div className="cwa_suggestion-card-list">
+            <div
+              className="cwa_suggestion-card"
+              onClick={() => {
+                getCurrentURL(setIsGetUrl, getAnswer, summaryPrompt, true);
+              }}
+            >
+              <PageSummaryIcon />
+              <p>Generate page summary</p>
             </div>
-          ))}
+            <div
+              className="cwa_suggestion-card"
+              onClick={() => {
+                getCurrentURL(setIsGetUrl, getAnswer, suggestionPrompt, false);
+              }}
+            >
+              <SuggestionIcon />
+              <p>Suggest question about this page</p>
+            </div>
+          </div>
         </div>
         <div className="cwa_messages-container">
           <div className="cwa_messages">
@@ -627,6 +695,14 @@ const ChatComponent = ({ user }) => {
         </div>
       </div>
       <div className="cwa_group-btn">
+        <select
+          value={contextMode}
+          onChange={handleContextModeChange}
+          className="cwa_custom-select"
+        >
+          <option value="usingWithPage">Using with page</option>
+          <option value="usingRelevantSources">Using relevant sources</option>
+        </select>
         <div className="cwa_new-chat-btn" onClick={handleNewChat}>
           <AddNewChatIcon isSelected={false} />
           <span className="tooltip-text-group-btn">{t("new-chat")}</span>
@@ -647,7 +723,7 @@ const ChatComponent = ({ user }) => {
           <FileIconSideBar isSelected={false} />
           <span className="tooltip-text-group-btn">{t("upload-file")}</span>
         </div>
-        <div
+        {/* <div
           className="cwa_get-url-btn"
           onClick={() => {
             handleOpenGetSummarizeUrl();
@@ -655,7 +731,7 @@ const ChatComponent = ({ user }) => {
         >
           <UrlIconSideBar isSelected={false} />
           <span className="tooltip-text-group-btn">{t("current-tab")}</span>
-        </div>
+        </div> */}
         <div
           className="cwa_upload-img-btn"
           onClick={() => {

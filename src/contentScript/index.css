@@ -10,12 +10,11 @@
   --padding-value-CWA: 10px;
   --font-weight-semi-bold: 600;
   --box-shadow-value-CWA: 0 0 10px 10px rgba(0, 0, 0, 0.05);
-  --font-family: CohereText, ui-sans-serif, system-ui, -apple-system,
-    BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans",
-    sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
+  --font-family: CohereText, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
     "Noto Color Emoji";
-  --font-family-monospace: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
-    "Liberation Mono", "Courier New", monospace;
+  --font-family-monospace: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New",
+    monospace;
   --light-color: #25ead5;
   --mid-color: #007d89;
   --dark-color: #114556;
@@ -23,10 +22,9 @@
 
 @font-face {
   font-family: "CohereText";
-  src: url("https://cohere-readme-docs.netlify.app/fonts/CohereText-Regular.woff2")
-      format("woff2"),
-    url("https://cohere-readme-docs.netlify.app/fonts/CohereText-Regular.woff")
-      format("woff");
+  src:
+    url("https://cohere-readme-docs.netlify.app/fonts/CohereText-Regular.woff2") format("woff2"),
+    url("https://cohere-readme-docs.netlify.app/fonts/CohereText-Regular.woff") format("woff");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -34,10 +32,9 @@
 
 @font-face {
   font-family: "CohereText";
-  src: url("https://cohere-readme-docs.netlify.app/fonts/CohereVariable.woff2")
-      format("woff2"),
-    url("https://cohere-readme-docs.netlify.app/fonts/CohereVariable.woff")
-      format("woff");
+  src:
+    url("https://cohere-readme-docs.netlify.app/fonts/CohereVariable.woff2") format("woff2"),
+    url("https://cohere-readme-docs.netlify.app/fonts/CohereVariable.woff") format("woff");
   font-weight: 500 525;
   font-style: normal;
   font-display: swap;
@@ -45,10 +42,9 @@
 
 @font-face {
   font-family: "CohereHeadline";
-  src: url("https://cohere-readme-docs.netlify.app/fonts/CohereHeadline-Regular.woff2")
-      format("woff2"),
-    url("https://cohere-readme-docs.netlify.app/fonts/CohereHeadline-Regular.woff")
-      format("woff");
+  src:
+    url("https://cohere-readme-docs.netlify.app/fonts/CohereHeadline-Regular.woff2") format("woff2"),
+    url("https://cohere-readme-docs.netlify.app/fonts/CohereHeadline-Regular.woff") format("woff");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -56,10 +52,9 @@
 
 @font-face {
   font-family: "CohereHeadline";
-  src: url("https://cohere-readme-docs.netlify.app/fonts/CohereHeadline-Bold.woff2")
-      format("woff2"),
-    url("https://cohere-readme-docs.netlify.app/fonts/CohereHeadline-Bold.woff")
-      format("woff");
+  src:
+    url("https://cohere-readme-docs.netlify.app/fonts/CohereHeadline-Bold.woff2") format("woff2"),
+    url("https://cohere-readme-docs.netlify.app/fonts/CohereHeadline-Bold.woff") format("woff");
   font-weight: 500;
   font-style: normal;
   font-display: swap;
@@ -67,10 +62,9 @@
 
 @font-face {
   font-family: "CohereMono";
-  src: url("https://cohere-readme-docs.netlify.app/fonts/CohereMono-Regular.woff2")
-      format("woff2"),
-    url("https://cohere-readme-docs.netlify.app/fonts/CohereMono-Regular.woff")
-      format("woff");
+  src:
+    url("https://cohere-readme-docs.netlify.app/fonts/CohereMono-Regular.woff2") format("woff2"),
+    url("https://cohere-readme-docs.netlify.app/fonts/CohereMono-Regular.woff") format("woff");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -78,10 +72,9 @@
 
 @font-face {
   font-family: "CohereMono";
-  src: url("https://cohere-readme-docs.netlify.app/fonts/CohereVariable.woff2")
-      format("woff2"),
-    url("https://cohere-readme-docs.netlify.app/fonts/CohereVariable.woff")
-      format("woff");
+  src:
+    url("https://cohere-readme-docs.netlify.app/fonts/CohereVariable.woff2") format("woff2"),
+    url("https://cohere-readme-docs.netlify.app/fonts/CohereVariable.woff") format("woff");
   font-weight: 500 525;
   font-style: normal;
   font-display: swap;
@@ -89,10 +82,9 @@
 
 @font-face {
   font-family: "CohereVariable";
-  src: url("https://cohere-readme-docs.netlify.app/fonts/CohereVariable.woff2")
-      format("woff2"),
-    url("https://cohere-readme-docs.netlify.app/fonts/CohereVariable.woff")
-      format("woff");
+  src:
+    url("https://cohere-readme-docs.netlify.app/fonts/CohereVariable.woff2") format("woff2"),
+    url("https://cohere-readme-docs.netlify.app/fonts/CohereVariable.woff") format("woff");
   font-weight: 400 420 450;
   font-style: normal;
   font-display: swap;
@@ -100,10 +92,9 @@
 
 @font-face {
   font-family: "CohereColor";
-  src: url("https://cohere-readme-docs.netlify.app/fonts/CohereColor-Color.woff")
-      format("woff"),
-    url("https://cohere-readme-docs.netlify.app/fonts/CohereColor-Color.woff2")
-      format("woff2");
+  src:
+    url("https://cohere-readme-docs.netlify.app/fonts/CohereColor-Color.woff") format("woff"),
+    url("https://cohere-readme-docs.netlify.app/fonts/CohereColor-Color.woff2") format("woff2");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -111,8 +102,7 @@
 
 @font-face {
   font-family: "CohereIconDefault";
-  src: url("https://cohere-readme-docs.netlify.app/fonts/CohereIcon-Default.woff")
-    format("woff");
+  src: url("https://cohere-readme-docs.netlify.app/fonts/CohereIcon-Default.woff") format("woff");
   font-weight: normal;
   font-style: normal;
   font-display: block;
@@ -120,8 +110,7 @@
 
 @font-face {
   font-family: "CohereIconOutline";
-  src: url("https://cohere-readme-docs.netlify.app/fonts/CohereIcon-Outline.woff")
-    format("woff");
+  src: url("https://cohere-readme-docs.netlify.app/fonts/CohereIcon-Outline.woff") format("woff");
   font-weight: normal;
   font-style: normal;
   font-display: block;
@@ -202,7 +191,6 @@
 #CWA h4,
 #CWA h5,
 #CWA h6 {
-  margin-top: 24px !important;
   margin-bottom: 16px !important;
   line-height: 1.25 !important;
 }
@@ -237,6 +225,7 @@
 /* Lists */
 #CWA menu,
 #CWA ol {
+  margin: 10px !important;
   padding: 10px !important;
   list-style: auto !important;
 }
@@ -308,6 +297,13 @@
   width: 90%;
 }
 
+#CWA .cwa_box-chat-content {
+  display: flex;
+  height: 86vh;
+  flex-direction: column;
+  overflow: scroll;
+}
+
 #CWA .cwa_side-bar-container {
   height: 100vh;
   width: 10%;
@@ -350,7 +346,9 @@
   cursor: pointer !important;
   background-color: var(--primary-color);
   box-shadow: 0 5px 5px 2px rgba(0, 0, 0, 0.2);
-  transition: transform 0.4s ease, background-color 0.4s ease;
+  transition:
+    transform 0.4s ease,
+    background-color 0.4s ease;
   border-radius: var(--border-radius-CWA);
   border: none;
   outline: none;
@@ -448,7 +446,7 @@
 
 #CWA .cwa_container-chat {
   height: 100vh;
-  width: 500px;
+  width: 800px;
   transform: translateX(0) translateY(-50%);
   top: 50%;
   font-family: var(--font-family) !important;
@@ -464,7 +462,7 @@
 
 @media (max-width: 1024px) {
   #CWA .cwa_container-chat {
-    width: 500px;
+    width: 600px;
   }
 }
 
@@ -482,16 +480,16 @@
 #CWA .cwa_header {
   color: rgba(0, 0, 0, 0.7);
   width: 100%;
-  height: 10vh;
+  height: 20vh;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   padding: 10px 20px;
 }
 
-#CWA .cwa_chat-content-container {
+/* #CWA .cwa_chat-content-container {
   overflow: auto;
-}
+} */
 
 #CWA .cwa_exit-icon {
   box-shadow: inset 0 1px 5px 2px rgba(0, 0, 0, 0.3);
@@ -508,6 +506,18 @@
   display: flex;
   justify-content: flex-end;
   align-items: center;
+  flex-direction: column;
+}
+
+#CWA .cwa_title p {
+  color: black;
+}
+
+#CWA .cwa_title_with_logo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
 }
 
 #CWA .cwa_title img {
@@ -529,10 +539,35 @@
 #CWA .cwa_suggestion-container {
   display: flex;
   justify-content: center;
-  align-items: center;
   flex-direction: column;
-  padding: 10px;
+  padding: 20px;
   gap: 1rem;
+}
+
+#CWA .cwa_suggestion-card-list {
+  grid-template-columns: 1fr 1fr;
+  display: grid;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+#CWA .cwa_suggestion-card {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 25px 10px;
+  border-radius: 10px;
+  box-shadow: 0 5px 5px 2px rgba(0, 0, 0, 0.1);
+  font-size: 0.7rem;
+  color: rgb(0, 0, 0, 0.8);
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+#CWA .cwa_suggestion-card:hover {
+  border: 1px solid #144859;
 }
 
 #CWA .cwa_box-suggestion {
@@ -667,19 +702,26 @@
   color: black;
   display: flex;
   height: auto;
-  padding: 10px;
-  flex-direction: column;
   gap: 5px;
   width: 100%;
+  padding-inline: 16px;
+  flex-flow: wrap !important;
+  gap: 6px;
+  height: unset;
+  overflow: hidden;
+  justify-content: flex-end;
 }
 
 #CWA .cwa_suggestion-question-button {
-  background: #144859;
+  background-color: #f4f4f4;
   border: none;
+  border: 1px solid #144859;
   outline: none;
-  border-radius: 5px;
-  padding: 10px;
-  color: white;
+  border-radius: 10px;
+  padding: 5px 10px;
+  color: black;
+  text-align: end;
+  font-size: 0.85rem;
 }
 
 #CWA .cwa_messages {
@@ -695,7 +737,7 @@
 }
 
 #CWA .cwa_message-content.cwa_answer {
-  background-color: #e7ece6;
+  background-color: #f4f4f4;
 }
 
 #CWA .cwa_message-content.cwa_file {
@@ -760,7 +802,7 @@
   width: 100%;
   border: none;
   outline: none;
-  padding: var(--padding-value-CWA);
+  padding: var(--padding-value-CWA) 20px;
   gap: 10px;
 }
 
@@ -775,8 +817,7 @@
   resize: none;
   overflow: hidden;
   height: 100% !important;
-  padding: var(--padding-value-CWA) var(--padding-value-CWA)
-    var(--padding-value-CWA) calc(2 * var(--padding-value-CWA)) !important;
+  padding: var(--padding-value-CWA) var(--padding-value-CWA) var(--padding-value-CWA) calc(2 * var(--padding-value-CWA)) !important;
   font-size: 16px;
   max-height: 150px;
   z-index: 9999;
@@ -912,8 +953,7 @@
   position: absolute;
   width: 100%;
   bottom: 75px;
-  padding: var(--padding-value-CWA) var(--padding-value-CWA) 0
-    var(--padding-value-CWA);
+  padding: var(--padding-value-CWA) var(--padding-value-CWA) 0 var(--padding-value-CWA);
   display: flex;
   justify-content: left;
   align-items: center;
@@ -1568,10 +1608,10 @@
 }
 
 .cwa_group-btn {
-  padding: 10px !important;
+  padding: 20px !important;
   color: black;
   display: flex;
-  justify-content: center;
+  justify-content: start;
   gap: 1rem;
   align-items: center;
   background: white;
@@ -1697,6 +1737,22 @@
 #CWA .cwa_copy-message:hover .cwa_tooltip {
   visibility: visible;
   opacity: 1;
+}
+
+#CWA .cwa_custom-select {
+  color: inherit;
+  line-height: inherit;
+  box-shadow: 0 2px 2px 1px rgba(0, 0, 0, 0.2);
+  position: relative !important;
+  border-radius: 10px;
+  padding: 10px !important;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg fill='black' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 8px center; 
+  padding-right: 35px !important; 
 }
 
 @keyframes outer {

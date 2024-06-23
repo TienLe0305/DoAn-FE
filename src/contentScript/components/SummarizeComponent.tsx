@@ -17,7 +17,7 @@ const SummarizeComponent = ({ sendQuestion, setIsGetUrl, setIsOpenUrl, getAnswer
     chrome.runtime.sendMessage({ action: "getCurrentURL" }, (response) => {
       if (response && response.currentURL) {
         setCurrentURL(response.currentURL);
-        sendQuestion(`Summarize this website!!!`);
+        sendQuestion(`Generate page summary`);
         setIsGetUrl(true);
         setIsOpenUrl(false);
         sendURLToBackend(response.currentURL);
@@ -40,7 +40,7 @@ const SummarizeComponent = ({ sendQuestion, setIsGetUrl, setIsOpenUrl, getAnswer
       );
       if (response.status === 200) {
         setIsGetUrl(false);
-        getAnswer("Summarize this website!!!", null, true); 
+        getAnswer("Generate a detailed summary of the current page in Markdown format, highlighting 4-5 key points. Each key point should have a summary keyword in bold. Do not enclose the summary in a code block.", null, true); 
       } else {
         console.error("Đã xảy ra lỗi khi gửi url lên BE.");
       }

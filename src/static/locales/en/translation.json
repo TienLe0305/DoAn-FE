@@ -3,7 +3,7 @@
   "use": "Use",
   "visit": "Visit",
   "wait-read-file": "Reading the file, please wait a moment ...",
-  "wait-process-url": "Processing the URL, please wait a moment ...",
+  "wait-process-url": "Processing current website data, please wait a moment ...",
   "wait-process-img": "Processing the image, please wait a moment ...",
   "new-chat": "New chat",
   "list-cvs": "List of conversations",
