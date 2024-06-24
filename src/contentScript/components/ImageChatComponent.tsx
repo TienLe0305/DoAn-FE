@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { UploadImageIconInput } from "./SVG";
 import { useTranslation } from "react-i18next";
@@ -15,13 +15,13 @@ const ImageChatComponent = ({
   language,
 }) => {
   const { t, i18n } = useTranslation();
+  const [isDragging, setIsDragging] = useState(false);
 
   useEffect(() => {
     i18n.changeLanguage(language);
   }, [language]);
 
-  const handleImageUpload = async (event) => {
-    const file = event.target.files[0];
+  const handleImageUpload = async (file) => {
     if (file) {
       const formData = new FormData();
       formData.append("image", file);
@@ -38,12 +38,42 @@ const ImageChatComponent = ({
         });
         const description = response.data.description;
         getAnswer(
-          `Please help me write the description inside the quotes a little longer: "${description}"`
+          `Please help me write the description inside the quotes a little longer: "${description}"`, null, true
         );
         setIsGetImg(false);
       } catch (error) {
         console.error("Error uploading image: ", error);
       }
+    }
+  };
+
+  const handleFileInputChange = (e) => {
+    const file = e.target.files[0];
+    handleImageUpload(file);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files[0];
+    handleImageUpload(file);
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+  };
+
+  const handleDragEnter = (e) => {
+    e.preventDefault();
+    if (e.target === e.currentTarget) {
+      setIsDragging(true);
+    }
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    if (e.target === e.currentTarget) {
+      setIsDragging(false);
     }
   };
 
@@ -53,10 +83,16 @@ const ImageChatComponent = ({
         type="file"
         id="img-upload"
         accept="image/*"
-        onChange={handleImageUpload}
+        onChange={handleFileInputChange}
         style={{ display: "none" }}
       />
-      <div className="cwa_upload-img-container">
+      <div
+        className={`cwa_upload-img-container ${isDragging ? "dragging" : ""}`}
+        onDrop={handleDrop}
+        onDragOver={handleDragOver}
+        onDragEnter={handleDragEnter}
+        onDragLeave={handleDragLeave}
+      >
         <div className="cwa_upload-img-title">
           <h2>{t("upload-img-title")}</h2>
         </div>
@@ -68,6 +104,7 @@ const ImageChatComponent = ({
           <p>{t("supported-img-type")}</p>
           <p>{t("upload-instruction")}</p>
         </label>
+        <p>{t("drag-and-drop-instruction")}</p>
       </div>
     </div>
   );

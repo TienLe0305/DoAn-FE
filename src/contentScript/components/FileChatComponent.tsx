@@ -18,8 +18,7 @@ const FileChatComponent = ({
     i18n.changeLanguage(language);
   }, [language]);
 
-  const handleFileUpload = async (e) => {
-    const file = e.target.files[0];
+  const handleFileUpload = async (file) => {
     const formData = new FormData();
     formData.append("file", file);
     sendQuestion(`<file>${file.name}</file>`);
@@ -42,13 +41,33 @@ const FileChatComponent = ({
     }
   };
 
+  const handleFileInputChange = (e) => {
+    const file = e.target.files[0];
+    handleFileUpload(file);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+    handleFileUpload(file);
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+  };
+
   return (
-    <div ref={fileChatRef} className="cwa_pdf-uploader">
+    <div
+      ref={fileChatRef}
+      className="cwa_pdf-uploader"
+      onDrop={handleDrop}
+      onDragOver={handleDragOver}
+    >
       <input
         type="file"
         id="pdf-upload"
         accept=".pdf,.docx"
-        onChange={handleFileUpload}
+        onChange={handleFileInputChange}
         style={{ display: "none" }}
       />
       <div className="cwa_upload-pdf-container">
@@ -63,6 +82,7 @@ const FileChatComponent = ({
           <p>{t("supported-file-type")}</p>
           <p>{t("upload-instruction")}</p>
         </label>
+        <p>{t("drag-and-drop-instruction")}</p>
       </div>
     </div>
   );

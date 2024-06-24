@@ -30,7 +30,7 @@ const selectStyles = {
 const optionStyles = {
   control: (provided, state) => ({
     ...selectStyles.control(provided, state),
-    width: "280px",
+    width: "520px",
   }),
   option: (provided, state) => ({
     ...provided,
@@ -44,7 +44,7 @@ const optionStyles = {
 const languageOptionStyles = {
   control: (provided, state) => ({
     ...selectStyles.control(provided, state),
-    width: "130px",
+    width: "150px",
   }),
   option: (provided, state) => ({
     ...provided,
