@@ -1803,6 +1803,9 @@
 .cwa_quick-container {
   position: relative;
   background-color: transparent;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .cwa_highlight-container {
@@ -1850,7 +1853,7 @@ button:hover .tooltip {
   position: absolute;
   background: black;
   border: none;
-  padding: 10px;
+  padding: 5px;
   z-index: 1000;
   border-radius: 20px;
   gap: 10px;
@@ -1899,7 +1902,7 @@ button:hover .tooltip {
 .cwa_summary-popup {
   position: fixed;
   width: 600px;
-  background-color: #2D2D2F;
+  background-color: #2d2d2f;
   padding: 10px;
   border-radius: 10px;
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
@@ -1918,6 +1921,12 @@ button:hover .tooltip {
   justify-content: space-between;
   align-items: center;
   cursor: grab;
+}
+
+.cwa_summary-header-container {
+  display: flex;
+  gap: 10px;
+  align-items: center;
 }
 
 .cwa_summary-header.grabbing {
@@ -1939,9 +1948,9 @@ button:hover .tooltip {
   width: 100%;
   padding: 10px;
   border-radius: 10px;
-  color: #6A6A70;
+  color: #6a6a70;
   overflow-y: auto;
-  background-color: #2B2B2D;
+  background-color: #2b2b2d;
   white-space: pre-wrap;
   text-overflow: ellipsis;
   word-wrap: break-word;
@@ -1959,13 +1968,13 @@ button:hover .tooltip {
 .cwa_selected-text.expanded {
   min-height: 100px;
   height: auto;
-  overflow:auto;
+  overflow: auto;
 }
 
 .cwa_selected-text button {
   position: absolute;
   margin-top: 10px;
-  background-color: #4CAF50;
+  background-color: #4caf50;
   color: white;
   border: none;
   padding: 5px 10px;
@@ -1984,7 +1993,7 @@ button:hover .tooltip {
 
 .cwa_tooltip-web {
   left: 50%;
-  top: -180%;
+  top: -150%;
   position: absolute;
   background-color: black;
   color: white;
@@ -2007,9 +2016,101 @@ button:hover .tooltip {
   display: block;
 }
 
+.cwa_highlight-container:hover button,
+.cwa_summarize-container:hover button,
+.cwa_translate-container:hover button,
+.cwa_rewrite-container:hover button,
+.cwa_expand-container:hover button,
+.cwa_explain-container:hover button,
+.cwa_grammarcheck-container:hover button,
+.tools-container:hover button {
+  color: #05999e;
+}
+
 .cwa_color-options {
   display: flex;
   gap: 10px;
+}
+
+.cwa_language-select-tooltip {
+  position: absolute;
+  top: 150%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #282828;
+  border-radius: 10px;
+  padding: 10px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 200px;
+}
+
+.cwa_language-select-tooltip input {
+  width: 100%;
+  padding: 8px 10px 8px 35px;
+  margin-bottom: 10px;
+  border-radius: 7px;
+  border: 1px solid #ccc;
+  outline: none;
+}
+
+.cwa_language-select-tooltip input::placeholder {
+  color: #888;
+}
+
+.cwa_language-select-tooltip div {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.cwa_language-select-tooltip button {
+  margin: 2px 0;
+  padding: 10px 15px;
+  border: none;
+  background-color: transparent;
+  color: white;
+  text-align: left;
+  width: 100%;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cwa_language-select-tooltip button:hover {
+  background-color: #383838;
+}
+
+.cwa_language-select-tooltip button span {
+  font-size: 12px;
+  color: #888;
+}
+
+.cwa_language-select-tooltip div::-webkit-scrollbar {
+  width: 8px;
+}
+
+.cwa_language-select-tooltip div::-webkit-scrollbar-thumb {
+  background-color: #888;
+  border-radius: 4px;
+}
+
+.cwa_language-select-tooltip div::-webkit-scrollbar-thumb:hover {
+  background-color: #555;
+}
+
+.cwa_language-select-tooltip div::-webkit-scrollbar-track {
+  background-color: #282828;
+  border-radius: 4px;
+}
+
+.input-icon {
+  position: absolute;
+  top: 17px;
+  left: 15px;
 }
 
 @keyframes outer {

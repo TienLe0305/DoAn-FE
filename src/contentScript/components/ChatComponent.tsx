@@ -612,8 +612,8 @@ const ChatComponent = ({ user }) => {
   }, [contextMode]);
 
   return (
-    <> 
-      <div className="cwa_chat-content-container">  
+    <>
+      <div className="cwa_chat-content-container">
         {isOpenFile && (
           <FileChatComponent
             sendQuestion={sendQuestion}

@@ -58,14 +58,14 @@ const languageOptionStyles = {
 function QuestionComponent({ user }) {
   const { t, i18n } = useTranslation();
   const taskOptions = [
-    { value: "answer", label: t("Answer this question") },
-    { value: "explain", label: t("Explain this") },
-    { value: "translate", label: t("Translate") },
-    { value: "summarize", label: t("Summarize") },
-    { value: "improve", label: t("Improve writing skills") },
-    { value: "correct", label: t("Correct spelling and grammar") },
-    { value: "shorten", label: t("Shorten") },
-    { value: "lengthen", label: t("Lengthen") },
+    { value: "Answer", label: t("Answer this question") },
+    { value: "Explain", label: t("Explain this") },
+    { value: "Translate", label: t("Translate") },
+    { value: "Summarize", label: t("Summarize") },
+    { value: "Rewrite", label: t("Improve writing skills") },
+    { value: "GrammarCheck", label: t("Correct spelling and grammar") },
+    { value: "Shorten", label: t("Shorten") },
+    { value: "Expand", label: t("Lengthen") },
   ];
   const [language, setLanguage] = useState();
   const [selectedTask, setSelectedTask] = useState(taskOptions[0]);
@@ -112,40 +112,40 @@ function QuestionComponent({ user }) {
     );
 
     switch (option.value) {
-      case "answer":
+      case "Answer":
         setPromptText(
           "Your task as an AI is to generate a response in ${lang} to the following question: '${selection}'. Ensure your response is clear and accurate, and present it without wrapping in quotes."
         );
         break;
-      case "explain":
+      case "Explain":
         setPromptText("Please explain in ${lang}: '${selection}'");
         break;
-      case "translate":
+      case "Translate":
         setPromptText(
           "As an AI language translation expert, your task is to translate the provided text as '${selection}' into ${lang}. Your goal is to deliver a colloquial and authentic translation. Please provide only the output without any additional information or quotes."
         );
         break;
-      case "summarize":
+      case "Summarize":
         setPromptText(
           "As an AI trained in concise writing, your task is to condense the text within the quotes. Ensure the revised text is no more than half the length of the original while retaining its meaning. Present only the output without any additional information or wrapping it in quotes. Your response should be in the same language variety or dialect as that of the given text: '${selection}'"
         );
         break;
-      case "improve":
+      case "Rewrite":
         setPromptText(
           "As a proficient AI specialized in language comprehension and writing enhancement, your task is to review the text within the quotes and improve it while maintaining its original essence. Strive to keep the original meaning, structure, character length, and format intact to ensure coherence and readability. Provide only the improved version of the text without wrapping responses in quotes or changing the language of the text: '${selection}'"
         );
         break;
-      case "correct":
+      case "GrammarCheck":
         setPromptText(
           "As an AI trained in language correction, your task is to scrutinize the text within the quotes and rectify any spelling, syntax, or grammar errors without altering its original meaning or style. Your corrections should focus solely on spelling, syntax, and grammar mistakes without making any enhancements. If the original text is error-free, output it as it is without encasing responses in quotes: '${selection}'"
         );
         break;
-      case "shorten":
+      case "Shorten":
         setPromptText(
           "As an AI trained in concise writing, your task is to condense the text within the quotes. Ensure the revised text is no more than half the length of the original while retaining its meaning. Present only the output without any additional information or wrapping it in quotes. Your response should be in the same language variety or dialect as that of the given text: '${selection}'"
         );
         break;
-      case "lengthen":
+      case "Expand":
         setPromptText(
           "As an AI adept in the art of elaborative writing, your task is to rewrite the text enclosed within the quotes. Ensure that the revised text is more than double the length of the original while maintaining its original meaning. Deliver only the output without any extra information or quotes. Your response should mirror the language variety or dialect used in the given text: '${selection}'"
         );

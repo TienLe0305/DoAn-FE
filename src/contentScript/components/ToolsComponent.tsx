@@ -6,17 +6,23 @@ import {
   ExplainIcon,
   GrammarIcon,
   HighlightIcon,
+  LoadingMessageIcon,
+  LogoIcon,
   LogoIconForTools,
-  MoreToolsIcon,
   RewriteIcon,
+  SearchIcon,
   SummarizeIcon,
   TranslateIcon,
 } from "./SVG";
+import ReactMarkdown from "react-markdown";
+import languageOptions from "../utils/languages";
 
 const CHAT = process.env.API_CHAT;
 const CWA = process.env.API_DOMAIN;
 
 const ToolsComponent = ({ user }) => {
+  const [showLanguageSelect, setShowLanguageSelect] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   const [selectedText, setSelectedText] = useState("");
   const [popupPosition, setPopupPosition] = useState({ top: 0, left: 0 });
   const [currentFeature, setCurrentFeature] = useState("");
@@ -38,6 +44,13 @@ const ToolsComponent = ({ user }) => {
   const toolsPopupRef = useRef(null);
   const [isLoading, setIsLoading] = useState(false);
   const [outputText, setOutputText] = useState("");
+  const [isInteractingWithPopup, setIsInteractingWithPopup] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [selectedLanguage, setSelectedLanguage] = useState(languageOptions[0]);
+
+  const filteredLanguages = languageOptions.filter((language) =>
+    language.label.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   useEffect(() => {
     const handleMouseMove = (e) => {
@@ -66,6 +79,10 @@ const ToolsComponent = ({ user }) => {
 
   useEffect(() => {
     const handleMouseUp = async (event) => {
+      if (isInteractingWithPopup) {
+        return;
+      }
+
       const selected = window.getSelection().toString();
       if (selected && !summaryPopup.visible) {
         setSelectedText(selected);
@@ -78,12 +95,32 @@ const ToolsComponent = ({ user }) => {
         setSelectedText("");
       }
     };
+
+    const handleClickOutside = (event) => {
+      if (
+        toolsPopupRef.current &&
+        !toolsPopupRef.current.contains(event.target) &&
+        summaryPopupRef.current &&
+        !summaryPopupRef.current.contains(event.target) &&
+        !(
+          showLanguageSelect &&
+          event.target.closest(".cwa_language-select-tooltip")
+        )
+      ) {
+        setSelectedText("");
+        setShowLanguageSelect(false);
+        setSummaryPopup({ visible: false, position: { top: 0, left: 0 } });
+      }
+    };
+
     document.addEventListener("mouseup", handleMouseUp);
+    document.addEventListener("click", handleClickOutside);
 
     return () => {
       document.removeEventListener("mouseup", handleMouseUp);
+      document.removeEventListener("click", handleClickOutside);
     };
-  }, [summaryPopup.visible]);
+  }, [summaryPopup.visible, isInteractingWithPopup, showLanguageSelect]);
 
   const highlightText = (color) => {
     if (!savedRange) return;
@@ -146,6 +183,7 @@ const ToolsComponent = ({ user }) => {
     }
 
     setSelectedText("");
+    setIsInteractingWithPopup(false);
     setSavedRange(null);
   };
 
@@ -157,25 +195,10 @@ const ToolsComponent = ({ user }) => {
         visible: true,
         position: {
           top: toolsRect.top,
-          left: toolsRect.right + 10,
+          left: toolsRect.left,
         },
       });
       await getContextAnswer(selectedText, "Summarize");
-    }
-  };
-
-  const handleTranslateClick = async (event) => {
-    setCurrentFeature("Translate");
-    if (toolsPopupRef.current) {
-      const toolsRect = toolsPopupRef.current.getBoundingClientRect();
-      setSummaryPopup({
-        visible: true,
-        position: {
-          top: toolsRect.top,
-          left: toolsRect.right + 10,
-        },
-      });
-      await getContextAnswer(selectedText, "Translate");
     }
   };
 
@@ -187,7 +210,7 @@ const ToolsComponent = ({ user }) => {
         visible: true,
         position: {
           top: toolsRect.top,
-          left: toolsRect.right + 10,
+          left: toolsRect.left,
         },
       });
       await getContextAnswer(selectedText, "Rewrite");
@@ -202,7 +225,7 @@ const ToolsComponent = ({ user }) => {
         visible: true,
         position: {
           top: toolsRect.top,
-          left: toolsRect.right + 10,
+          left: toolsRect.left,
         },
       });
       await getContextAnswer(selectedText, "Expand");
@@ -217,7 +240,7 @@ const ToolsComponent = ({ user }) => {
         visible: true,
         position: {
           top: toolsRect.top,
-          left: toolsRect.right + 10,
+          left: toolsRect.left,
         },
       });
       await getContextAnswer(selectedText, "Explain");
@@ -232,10 +255,41 @@ const ToolsComponent = ({ user }) => {
         visible: true,
         position: {
           top: toolsRect.top,
-          left: toolsRect.right + 10,
+          left: toolsRect.left,
         },
       });
       await getContextAnswer(selectedText, "GrammarCheck");
+    }
+  };
+
+  const handleHighlightClick = (event) => {
+    setCurrentFeature("Highlight");
+    const buttonRect = event.currentTarget.getBoundingClientRect();
+    setHighlightPopup({
+      visible: true,
+      position: { top: buttonRect.height + 5, left: 0 },
+    });
+  };
+
+  const handleTranslateClick = (event) => {
+    setCurrentFeature("Translate");
+    setShowLanguageSelect((prevState) => !prevState);
+  };
+
+  const handleLanguageSelect = async (language) => {
+    setSelectedLanguage(language);
+    setShowLanguageSelect(false);
+
+    if (toolsPopupRef.current) {
+      const toolsRect = toolsPopupRef.current.getBoundingClientRect();
+      setSummaryPopup({
+        visible: true,
+        position: {
+          top: toolsRect.top,
+          left: toolsRect.left,
+        },
+      });
+      await getContextAnswer(selectedText, "Translate", language);
     }
   };
 
@@ -248,15 +302,6 @@ const ToolsComponent = ({ user }) => {
       });
       setIsDragging(true);
     }
-  };
-
-  const handleHighlightClick = (event) => {
-    setCurrentFeature("Highlight");
-    const buttonRect = event.currentTarget.getBoundingClientRect();
-    setHighlightPopup({
-      visible: true,
-      position: { top: buttonRect.height + 5, left: 0 },
-    });
   };
 
   const handleColorSelect = (color) => {
@@ -297,6 +342,33 @@ const ToolsComponent = ({ user }) => {
             style={{ backgroundColor: highlightColor }}
           ></div>
         )}
+        {tooltipText === "Translate" && showLanguageSelect && (
+          <div className="cwa_language-select-tooltip">
+            <input
+              type="text"
+              placeholder="Search language..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onClick={(e) => e.stopPropagation()}
+            />
+            <span className="input-icon">
+              <SearchIcon />
+            </span>
+            <div>
+              {filteredLanguages.map((language) => (
+                <button
+                  key={language.label}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleLanguageSelect(language.label);
+                  }}
+                >
+                  {language.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </button>
       <div className="cwa_tooltip-web">{tooltipText}</div>
     </div>
@@ -312,48 +384,31 @@ const ToolsComponent = ({ user }) => {
     ></div>
   );
 
-  const getContextAnswer = async (selection, tool) => {
+  const getContextAnswer = async (selection, tool, targetLanguage = "en") => {
     setIsLoading(true);
     setOutputText("");
-
     let prompt = "";
-
     switch (tool) {
       case "Summarize":
-        prompt =
-          "As an AI trained in concise writing, your task is to condense the text within the quotes. Ensure the revised text is no more than half the length of the original while retaining its meaning. Present only the output without any additional information or wrapping it in quotes. Your response should be in the same language variety or dialect as that of the given text: \n'" +
-          selection +
-          "'\n";
+        prompt = `As an AI trained in concise writing, your task is to condense the text within the quotes. Ensure the revised text is no more than half the length of the original while retaining its meaning. Present only the output without any additional information or wrapping it in quotes. Your response should be in the same language variety or dialect as that of the given text: '${selection}'`;
         break;
       case "Translate":
-        prompt =
-          "As an AI proficient in multiple languages, translate the text within the quotes to English. Your response should be accurate and contextually appropriate, retaining the original meaning. Present only the output without any additional information or wrapping it in quotes: \n'" +
-          selection +
-          "'\n";
+        prompt = `As an AI language translation expert, your task is to translate the provided text as '${selection}' into ${targetLanguage}. Your goal is to deliver a colloquial and authentic translation. Please provide only the output without any additional information or quotes.`;
         break;
       case "Rewrite":
-        prompt =
-          "As an AI skilled in language refinement, rewrite the text within the quotes to improve clarity, style, and coherence. Ensure the revised text maintains the original meaning. Present only the output without any additional information or wrapping it in quotes: \n'" +
-          selection +
-          "'\n";
+        prompt = `As a proficient AI specialized in language comprehension and writing enhancement, your task is to review the text within the quotes and improve it while maintaining its original essence. Strive to keep the original meaning, structure, character length, and format intact to ensure coherence and readability. Provide only the improved version of the text without wrapping responses in quotes or changing the language of the text: '${selection}'`;
         break;
       case "Expand":
-        prompt =
-          "As an AI proficient in elaboration, expand the text within the quotes to provide more detail and context. Ensure the expanded text remains relevant and accurate. Present only the output without any additional information or wrapping it in quotes: \n'" +
-          selection +
-          "'\n";
+        prompt = `As an AI adept in the art of elaborative writing, your task is to rewrite the text enclosed within the quotes. Ensure that the revised text is more than double the length of the original while maintaining its original meaning. Deliver only the output without any extra information or quotes. Your response should mirror the language variety or dialect used in the given text: '${selection}'`;
         break;
       case "Explain":
         prompt =
-          "As an AI skilled in simplification, explain the text within the quotes in a way that is easy to understand. Ensure the explanation is clear and concise, retaining the original meaning. Present only the output without any additional information or wrapping it in quotes: \n'" +
+          "As an AI expert in simplification, explain the text within quotes in an easily understandable way. Ensure the explanation is clear and concise while retaining the original meaning. Present only the output without additional information or quotation marks. Use the same language as the original text:\n'" +
           selection +
           "'\n";
         break;
       case "GrammarCheck":
-        prompt =
-          "As an AI proficient in grammar, check and correct any grammatical errors in the text within the quotes. Ensure the corrected text maintains the original meaning. Present only the output without any additional information or wrapping it in quotes: \n'" +
-          selection +
-          "'\n";
+        prompt = `As an AI trained in language correction, your task is to scrutinize the text within the quotes and rectify any spelling, syntax, or grammar errors without altering its original meaning or style. Your corrections should focus solely on spelling, syntax, and grammar mistakes without making any enhancements. If the original text is error-free, output it as it is without encasing responses in quotes: '${selection}'`;
         break;
       default:
         prompt = "";
@@ -381,10 +436,10 @@ const ToolsComponent = ({ user }) => {
     eventSource.addEventListener("done", () => {
       eventSource.close();
       setIsLoading(false);
+      setShowLanguageSelect(false);
+      setIsInteractingWithPopup(false);
     });
   };
-
-  const [isExpanded, setIsExpanded] = useState(false);
 
   return (
     <>
@@ -395,6 +450,8 @@ const ToolsComponent = ({ user }) => {
           top: `${popupPosition.top}px`,
           left: `${popupPosition.left}px`,
         }}
+        onMouseEnter={() => setIsInteractingWithPopup(true)}
+        onMouseLeave={() => setIsInteractingWithPopup(false)}
       >
         {renderToolButton(<HighlightIcon />, "Highlight")}
         {renderToolButton(<SummarizeIcon />, "Summarize")}
@@ -428,6 +485,8 @@ const ToolsComponent = ({ user }) => {
               top: `${summaryPopup.position.top}px`,
               left: `${summaryPopup.position.left}px`,
             }}
+            onMouseEnter={() => setIsInteractingWithPopup(true)}
+            onMouseLeave={() => setIsInteractingWithPopup(false)}
           >
             <div
               onMouseDown={handleDragStart}
@@ -435,7 +494,11 @@ const ToolsComponent = ({ user }) => {
                 isDragging ? "grabbing" : "grab"
               }`}
             >
-              <h4>{currentFeature}</h4>
+              {" "}
+              <div className= "cwa_summary-header-container">
+                <LogoIcon />
+                <h4>{currentFeature}</h4>
+              </div>
               <button
                 onClick={() => {
                   setSummaryPopup({
@@ -468,9 +531,13 @@ const ToolsComponent = ({ user }) => {
               </div>
               <div>
                 {isLoading ? (
-                  <p className="cwa_loading-text">Loading...</p>
+                  <p className="cwa_loading-text">
+                    <LoadingMessageIcon />
+                  </p>
                 ) : (
-                  <p className="cwa_output-text">{outputText}</p>
+                  <ReactMarkdown className="cwa_output-text">
+                    {outputText}
+                  </ReactMarkdown>
                 )}
               </div>
             </div>

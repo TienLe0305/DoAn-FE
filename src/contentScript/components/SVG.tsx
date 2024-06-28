@@ -1709,6 +1709,38 @@ const GrammarIcon = () => (
   </svg>
 );
 
+const SearchIcon = () => (
+  <svg
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="m21 21-6-6"
+      style={{
+        fill: "none",
+        stroke: "#2ca9bc",
+        strokeLinecap: "round",
+        strokeLinejoin: "round",
+        strokeWidth: 2,
+      }}
+    />
+    <circle
+      cx="10"
+      cy="10"
+      r="7"
+      style={{
+        fill: "none",
+        stroke: "#000",
+        strokeLinecap: "round",
+        strokeLinejoin: "round",
+        strokeWidth: 2,
+      }}
+    />
+  </svg>
+);
+
 export {
   SendIcon,
   ExitIcon,
@@ -1760,4 +1792,5 @@ export {
   ExpandIcon,
   ExplainIcon,
   GrammarIcon,
+  SearchIcon
 };
