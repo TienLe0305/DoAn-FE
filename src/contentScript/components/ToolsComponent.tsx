@@ -2,9 +2,13 @@ import React, { useEffect, useState, useRef } from "react";
 import { EventSourcePolyfill } from "event-source-polyfill";
 import {
   ClosesIcon,
+  ExpandIcon,
+  ExplainIcon,
+  GrammarIcon,
   HighlightIcon,
   LogoIconForTools,
   MoreToolsIcon,
+  RewriteIcon,
   SummarizeIcon,
   TranslateIcon,
 } from "./SVG";
@@ -15,11 +19,7 @@ const CWA = process.env.API_DOMAIN;
 const ToolsComponent = ({ user }) => {
   const [selectedText, setSelectedText] = useState("");
   const [popupPosition, setPopupPosition] = useState({ top: 0, left: 0 });
-  const [tooltip, setTooltip] = useState({
-    visible: false,
-    text: "",
-    position: { top: 0, left: 0 },
-  });
+  const [currentFeature, setCurrentFeature] = useState("");
   const [highlightPopup, setHighlightPopup] = useState({
     visible: false,
     position: { top: 0, left: 0 },
@@ -32,12 +32,10 @@ const ToolsComponent = ({ user }) => {
     visible: false,
     position: { top: 0, left: 0 },
   });
-
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const summaryPopupRef = useRef(null);
   const toolsPopupRef = useRef(null);
-
   const [isLoading, setIsLoading] = useState(false);
   const [outputText, setOutputText] = useState("");
 
@@ -87,22 +85,6 @@ const ToolsComponent = ({ user }) => {
     };
   }, [summaryPopup.visible]);
 
-  // const highlightText = (color) => {
-  //   if (!savedRange) return;
-
-  //   const span = document.createElement("span");
-  //   span.style.backgroundColor = color;
-
-  //   try {
-  //     savedRange.surroundContents(span);
-  //   } catch (error) {
-  //     console.error("Error surrounding contents: ", error);
-  //   }
-
-  //   setSelectedText("");
-  //   setSavedRange(null);
-  // };
-
   const highlightText = (color) => {
     if (!savedRange) return;
 
@@ -110,7 +92,6 @@ const ToolsComponent = ({ user }) => {
     const startContainer = range.startContainer;
     const endContainer = range.endContainer;
 
-    // Create a function to wrap text nodes in a span with the specified background color
     const wrapTextNodes = (node, color) => {
       if (node.nodeType === Node.TEXT_NODE && node.nodeValue.trim() !== "") {
         const span = document.createElement("span");
@@ -120,7 +101,6 @@ const ToolsComponent = ({ user }) => {
       }
     };
 
-    // Wrap start container text node if partially selected
     if (startContainer.nodeType === Node.TEXT_NODE) {
       const text = startContainer.nodeValue;
       const selectedText = text.substring(range.startOffset);
@@ -134,7 +114,6 @@ const ToolsComponent = ({ user }) => {
       wrapTextNodes(selectedNode, color);
     }
 
-    // Wrap end container text node if partially selected
     if (endContainer.nodeType === Node.TEXT_NODE) {
       const text = endContainer.nodeValue;
       const selectedText = text.substring(0, range.endOffset);
@@ -145,7 +124,6 @@ const ToolsComponent = ({ user }) => {
       wrapTextNodes(selectedNode, color);
     }
 
-    // Wrap fully selected text nodes within the range
     const walker = document.createTreeWalker(
       range.commonAncestorContainer,
       NodeFilter.SHOW_TEXT,
@@ -171,22 +149,8 @@ const ToolsComponent = ({ user }) => {
     setSavedRange(null);
   };
 
-  const handleMouseEnter = (text, event) => {
-    const buttonRect = event.target.getBoundingClientRect();
-    setTooltip({
-      visible: true,
-      text: text,
-      position: {
-        top: buttonRect.top - 30,
-        left: buttonRect.left + buttonRect.width / 2,
-      },
-    });
-  };
-
-  const handleMouseLeave = () =>
-    setTooltip({ visible: false, text: "", position: { top: 0, left: 0 } });
-
   const handleSummarizeClick = async (event) => {
+    setCurrentFeature("Summarize");
     if (toolsPopupRef.current) {
       const toolsRect = toolsPopupRef.current.getBoundingClientRect();
       setSummaryPopup({
@@ -196,7 +160,82 @@ const ToolsComponent = ({ user }) => {
           left: toolsRect.right + 10,
         },
       });
-      await getContextAnswer(selectedText);
+      await getContextAnswer(selectedText, "Summarize");
+    }
+  };
+
+  const handleTranslateClick = async (event) => {
+    setCurrentFeature("Translate");
+    if (toolsPopupRef.current) {
+      const toolsRect = toolsPopupRef.current.getBoundingClientRect();
+      setSummaryPopup({
+        visible: true,
+        position: {
+          top: toolsRect.top,
+          left: toolsRect.right + 10,
+        },
+      });
+      await getContextAnswer(selectedText, "Translate");
+    }
+  };
+
+  const handleRewriteClick = async (event) => {
+    setCurrentFeature("Rewrite");
+    if (toolsPopupRef.current) {
+      const toolsRect = toolsPopupRef.current.getBoundingClientRect();
+      setSummaryPopup({
+        visible: true,
+        position: {
+          top: toolsRect.top,
+          left: toolsRect.right + 10,
+        },
+      });
+      await getContextAnswer(selectedText, "Rewrite");
+    }
+  };
+
+  const handleExpandClick = async (event) => {
+    setCurrentFeature("Expand");
+    if (toolsPopupRef.current) {
+      const toolsRect = toolsPopupRef.current.getBoundingClientRect();
+      setSummaryPopup({
+        visible: true,
+        position: {
+          top: toolsRect.top,
+          left: toolsRect.right + 10,
+        },
+      });
+      await getContextAnswer(selectedText, "Expand");
+    }
+  };
+
+  const handleExplainClick = async (event) => {
+    setCurrentFeature("Explain");
+    if (toolsPopupRef.current) {
+      const toolsRect = toolsPopupRef.current.getBoundingClientRect();
+      setSummaryPopup({
+        visible: true,
+        position: {
+          top: toolsRect.top,
+          left: toolsRect.right + 10,
+        },
+      });
+      await getContextAnswer(selectedText, "Explain");
+    }
+  };
+
+  const handleGrammarCheckClick = async (event) => {
+    setCurrentFeature("GrammarCheck");
+    if (toolsPopupRef.current) {
+      const toolsRect = toolsPopupRef.current.getBoundingClientRect();
+      setSummaryPopup({
+        visible: true,
+        position: {
+          top: toolsRect.top,
+          left: toolsRect.right + 10,
+        },
+      });
+      await getContextAnswer(selectedText, "GrammarCheck");
     }
   };
 
@@ -212,6 +251,7 @@ const ToolsComponent = ({ user }) => {
   };
 
   const handleHighlightClick = (event) => {
+    setCurrentFeature("Highlight");
     const buttonRect = event.currentTarget.getBoundingClientRect();
     setHighlightPopup({
       visible: true,
@@ -225,28 +265,40 @@ const ToolsComponent = ({ user }) => {
     setHighlightPopup({ visible: false, position: { top: 0, left: 0 } });
   };
 
-  const renderToolButton = (icon, tooltip) => (
-    <div className={`cwa_${tooltip.toLowerCase()}-container`}>
+  const renderToolButton = (icon, tooltipText) => (
+    <div
+      className={`cwa_${tooltipText.toLowerCase()}-container`}
+      style={{ position: "relative" }}
+    >
       <button
-        className={`cwa_${tooltip.toLowerCase()}-button`}
-        onMouseEnter={(e) => handleMouseEnter(tooltip, e)}
-        onMouseLeave={handleMouseLeave}
+        className={`cwa_${tooltipText.toLowerCase()}-button`}
         onClick={
-          tooltip === "Highlight"
+          tooltipText === "Highlight"
             ? handleHighlightClick
-            : tooltip === "Summarize"
+            : tooltipText === "Summarize"
             ? handleSummarizeClick
+            : tooltipText === "Translate"
+            ? handleTranslateClick
+            : tooltipText === "Rewrite"
+            ? handleRewriteClick
+            : tooltipText === "Expand"
+            ? handleExpandClick
+            : tooltipText === "Explain"
+            ? handleExplainClick
+            : tooltipText === "GrammarCheck"
+            ? handleGrammarCheckClick
             : undefined
         }
       >
         {icon}
-        {tooltip === "Highlight" && (
+        {tooltipText === "Highlight" && (
           <div
             className="cwa_mark-color"
             style={{ backgroundColor: highlightColor }}
           ></div>
         )}
       </button>
+      <div className="cwa_tooltip-web">{tooltipText}</div>
     </div>
   );
 
@@ -260,13 +312,52 @@ const ToolsComponent = ({ user }) => {
     ></div>
   );
 
-  const getContextAnswer = async (selection) => {
+  const getContextAnswer = async (selection, tool) => {
     setIsLoading(true);
     setOutputText("");
-    const prompt =
-      "As an AI trained in concise writing, your task is to condense the text within the quotes. Ensure the revised text is no more than half the length of the original while retaining its meaning. Present only the output without any additional information or wrapping it in quotes. Your response should be in the same language variety or dialect as that of the given text: \n'" +
-      selection +
-      "'\n";
+
+    let prompt = "";
+
+    switch (tool) {
+      case "Summarize":
+        prompt =
+          "As an AI trained in concise writing, your task is to condense the text within the quotes. Ensure the revised text is no more than half the length of the original while retaining its meaning. Present only the output without any additional information or wrapping it in quotes. Your response should be in the same language variety or dialect as that of the given text: \n'" +
+          selection +
+          "'\n";
+        break;
+      case "Translate":
+        prompt =
+          "As an AI proficient in multiple languages, translate the text within the quotes to English. Your response should be accurate and contextually appropriate, retaining the original meaning. Present only the output without any additional information or wrapping it in quotes: \n'" +
+          selection +
+          "'\n";
+        break;
+      case "Rewrite":
+        prompt =
+          "As an AI skilled in language refinement, rewrite the text within the quotes to improve clarity, style, and coherence. Ensure the revised text maintains the original meaning. Present only the output without any additional information or wrapping it in quotes: \n'" +
+          selection +
+          "'\n";
+        break;
+      case "Expand":
+        prompt =
+          "As an AI proficient in elaboration, expand the text within the quotes to provide more detail and context. Ensure the expanded text remains relevant and accurate. Present only the output without any additional information or wrapping it in quotes: \n'" +
+          selection +
+          "'\n";
+        break;
+      case "Explain":
+        prompt =
+          "As an AI skilled in simplification, explain the text within the quotes in a way that is easy to understand. Ensure the explanation is clear and concise, retaining the original meaning. Present only the output without any additional information or wrapping it in quotes: \n'" +
+          selection +
+          "'\n";
+        break;
+      case "GrammarCheck":
+        prompt =
+          "As an AI proficient in grammar, check and correct any grammatical errors in the text within the quotes. Ensure the corrected text maintains the original meaning. Present only the output without any additional information or wrapping it in quotes: \n'" +
+          selection +
+          "'\n";
+        break;
+      default:
+        prompt = "";
+    }
 
     const eventSource = new EventSourcePolyfill(
       `${CWA}/${CHAT}?query=${encodeURIComponent(
@@ -308,19 +399,21 @@ const ToolsComponent = ({ user }) => {
         {renderToolButton(<HighlightIcon />, "Highlight")}
         {renderToolButton(<SummarizeIcon />, "Summarize")}
         {renderToolButton(<TranslateIcon />, "Translate")}
-        {renderToolButton(<MoreToolsIcon />, "More Tools")}
+        {renderToolButton(<RewriteIcon />, "Rewrite")}
+        {renderToolButton(<ExpandIcon />, "Expand")}
+        {renderToolButton(<ExplainIcon />, "Explain")}
+        {renderToolButton(<GrammarIcon />, "GrammarCheck")}
         {renderToolButton(<LogoIconForTools />, "Quick")}
-
         {highlightPopup.visible && (
           <div
             className="cwa_highlight-popup"
             style={{ left: `${highlightPopup.position.left}px` }}
           >
-            <div className="cưa_color-options">
-              {renderColorOption("rgba(250, 255, 10, 0.24)")}
-              {renderColorOption("rgba(255, 0, 0, 0.24)")}
-              {renderColorOption("rgba(0, 255, 0, 0.24)")}
-              {renderColorOption("rgba(0, 0, 255, 0.24)")}
+            <div className="cwa_color-options">
+              {renderColorOption("rgba(250, 255, 10)")}
+              {renderColorOption("rgba(255, 0, 0)")}
+              {renderColorOption("rgba(0, 255, 0)")}
+              {renderColorOption("rgba(0, 0, 255)")}
             </div>
           </div>
         )}
@@ -342,7 +435,7 @@ const ToolsComponent = ({ user }) => {
                 isDragging ? "grabbing" : "grab"
               }`}
             >
-              <h4>Summarize</h4>
+              <h4>{currentFeature}</h4>
               <button
                 onClick={() => {
                   setSummaryPopup({
@@ -384,8 +477,6 @@ const ToolsComponent = ({ user }) => {
           </div>
         </>
       )}
-
-      {tooltip.visible && <div className="cwa_tooltip">{tooltip.text}</div>}
     </>
   );
 };

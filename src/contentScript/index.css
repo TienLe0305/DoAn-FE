@@ -1795,6 +1795,10 @@
 .cwa_highlight-container,
 .cwa_summarize-container,
 .cwa_translate-container,
+.cwa_rewrite-container,
+.cwa_expand-container,
+.cwa_explain-container,
+.cwa_grammarcheck-container,
 .tools-container,
 .cwa_quick-container {
   position: relative;
@@ -1803,19 +1807,19 @@
 
 .cwa_highlight-container {
   border-right: 1px solid #ccc;
-  padding-right: 20px;
+  padding-right: 10px;
 }
 
 .cwa_quick-container {
   border-left: 1px solid #ccc;
-  padding-left: 20px;
+  padding-left: 10px;
 }
 
 .cwa_mark-color {
   position: absolute;
   left: 0;
   bottom: 0;
-  width: calc(100% - 15px);
+  width: calc(100% - 25px);
   height: 2px;
   border-radius: 1px;
   margin-left: 1px;
@@ -1828,12 +1832,17 @@ button:hover .tooltip {
 .cwa_highlight-button,
 .cwa_summarize-button,
 .cwa_translate-button,
+.cwa_rewrite-button,
+.cwa_expand-button,
+.cwa_explain-button,
+.cwa_grammarcheck-button,
 .tools-button,
 .cwa_quick-button {
   background: transparent;
   outline: none;
   border: none;
   color: white;
+  cursor: pointer;
 }
 
 .cwa_tools-popup {
@@ -1844,7 +1853,7 @@ button:hover .tooltip {
   padding: 10px;
   z-index: 1000;
   border-radius: 20px;
-  gap: 20px;
+  gap: 10px;
 }
 
 .cwa_tools-popup.flex {
@@ -1973,7 +1982,9 @@ button:hover .tooltip {
   line-height: 24px;
 }
 
-.cwa_tooltip {
+.cwa_tooltip-web {
+  left: 50%;
+  top: -180%;
   position: absolute;
   background-color: black;
   color: white;
@@ -1981,9 +1992,22 @@ button:hover .tooltip {
   border-radius: 5px;
   transform: translateX(-50%);
   z-index: 1001;
+  display: none;
 }
 
-.cưa_color-options {
+.cwa_highlight-container:hover .cwa_tooltip-web,
+.cwa_summarize-container:hover .cwa_tooltip-web,
+.cwa_translate-container:hover .cwa_tooltip-web,
+.cwa_rewrite-container:hover .cwa_tooltip-web,
+.cwa_expand-container:hover .cwa_tooltip-web,
+.cwa_explain-container:hover .cwa_tooltip-web,
+.cwa_grammarcheck-container:hover .cwa_tooltip-web,
+.tools-container:hover .cwa_tooltip-web,
+.cwa_quick-container:hover .cwa_tooltip-web {
+  display: block;
+}
+
+.cwa_color-options {
   display: flex;
   gap: 10px;
 }
