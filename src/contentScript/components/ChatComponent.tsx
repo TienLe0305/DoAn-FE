@@ -205,8 +205,6 @@ const ChatComponent = ({ user }) => {
       image: null,
     };
     setMessages((prevMessage) => [...prevMessage, loadingMessage]);
-    console.log(includeContext);
-
     const eventSource = new EventSourcePolyfill(
       `${CWA}/${CHAT}?query=${encodeURIComponent(
         text + followUpQuestionsPrompts
@@ -433,11 +431,6 @@ const ChatComponent = ({ user }) => {
     }, 1000);
   };
 
-  // const handleSuggestionClick = async (content) => {
-  //   sendQuestion(content);
-  //   await getAnswer(content);
-  // };
-
   const handleOpenUploadFile = () => {
     setIsOpenFile((prev) => !prev);
   };
@@ -619,8 +612,8 @@ const ChatComponent = ({ user }) => {
   }, [contextMode]);
 
   return (
-    <>
-      <div className="cwa_chat-content-container">
+    <> 
+      <div className="cwa_chat-content-container">  
         {isOpenFile && (
           <FileChatComponent
             sendQuestion={sendQuestion}

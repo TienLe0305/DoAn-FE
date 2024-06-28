@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 
 import { CloseCWA, LogoIcon } from "./SVG";
 import ChatBox from "./ChatBox";
+import ToolsComponent from "./ToolsComponent";
 
 const ContentScript = () => {
   const [user, setUser] = useState({
@@ -92,6 +93,7 @@ const ContentScript = () => {
           <ChatBox user={user} setIsOpen={setIsChatBoxVisible} />
         </div>
       </div>
+      <ToolsComponent user={user}/>
     </>
   );
 };
