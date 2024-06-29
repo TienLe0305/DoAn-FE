@@ -348,6 +348,10 @@
   background-color: #378ba5;
 }
 
+#CWA .cwa_outline-video {
+  box-shadow: none;
+}
+
 #CWA .cwa_container-icon {
   display: flex;
   transform: translateY(-50%);

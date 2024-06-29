@@ -6,6 +6,7 @@ import {
   QuestionIconSideBar,
   WriteIconSideBar,
   LogoIcon,
+  OutlineIcon,
 } from "./SVG";
 import ChatComponent from "./ChatComponent";
 import WriteComponent from "./WriteComponent";
@@ -46,6 +47,10 @@ const ChatBox = ({ user, setIsOpen }) => {
     setSelectedComponent(component);
   };
 
+  const handleOutlineVideoClick = () => {
+    window.location.href = "https://www.outline.video/";
+  };
+
   return (
     <div ref={chatBoxRef} id="CWA">
       <div
@@ -53,8 +58,8 @@ const ChatBox = ({ user, setIsOpen }) => {
           selectedComponent === "Write"
             ? "writing-component"
             : selectedComponent === "Question"
-            ? "question-component"
-            : ""
+              ? "question-component"
+              : ""
         }`}
       >
         <div
@@ -96,6 +101,12 @@ const ChatBox = ({ user, setIsOpen }) => {
             <span className="tooltip-text">{component}</span>
           </div>
         ))}
+        <div
+          className="cwa_btn-chat-side-bar cwa-btn-side-bar cwa_outline-video"
+          onClick={handleOutlineVideoClick}
+        > <OutlineIcon />
+          <span className="tooltip-text">Outline Video</span>
+        </div>
       </div>
     </div>
   );
