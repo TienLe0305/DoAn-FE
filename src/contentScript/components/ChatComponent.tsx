@@ -556,8 +556,8 @@ const ChatComponent = ({ user }) => {
             {isGetFile
               ? t("wait-read-file")
               : isGetUrl
-              ? t("wait-process-url")
-              : t("wait-process-img")}
+                ? t("wait-process-url")
+                : t("wait-process-img")}
           </h1>
         </div>
       ),
@@ -622,6 +622,7 @@ const ChatComponent = ({ user }) => {
             getAnswer={getAnswer}
             fileChatRef={fileChatRef}
             language={language}
+            setContextMode={setContextMode} // Truyền hàm này vào
           />
         )}
         {isOpenUrl && (
@@ -695,6 +696,7 @@ const ChatComponent = ({ user }) => {
         >
           <option value="usingWithPage">Using with page</option>
           <option value="usingRelevantSources">Using relevant sources</option>
+          <option value="usingFileData">Using file data</option>
         </select>
         <div className="cwa_new-chat-btn" onClick={handleNewChat}>
           <AddNewChatIcon isSelected={false} />

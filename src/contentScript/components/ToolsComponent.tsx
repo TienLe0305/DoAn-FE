@@ -1,7 +1,11 @@
 import React, { useEffect, useState, useRef } from "react";
 import { EventSourcePolyfill } from "event-source-polyfill";
 import {
+  BinIcon,
+  CheckIcon,
   ClosesIcon,
+  CopyColorIcon,
+  CopyIcon,
   ExpandIcon,
   ExplainIcon,
   GrammarIcon,
@@ -9,6 +13,7 @@ import {
   LoadingMessageIcon,
   LogoIcon,
   LogoIconForTools,
+  MoveToHiddenIcon,
   RewriteIcon,
   SearchIcon,
   SummarizeIcon,
@@ -47,6 +52,9 @@ const ToolsComponent = ({ user }) => {
   const [isInteractingWithPopup, setIsInteractingWithPopup] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState(languageOptions[0]);
+  const [highlights, setHighlights] = useState([]);
+  const [isHighlightListVisible, setIsHighlightListVisible] = useState(false);
+  const [copiedId, setCopiedId] = useState(null);
 
   const filteredLanguages = languageOptions.filter((language) =>
     language.label.toLowerCase().includes(searchTerm.toLowerCase())
@@ -124,6 +132,8 @@ const ToolsComponent = ({ user }) => {
 
   const highlightText = (color) => {
     if (!savedRange) return;
+    const highlightedSpans = [];
+    let highlightedText = "";
 
     const range = savedRange.cloneRange();
     const startContainer = range.startContainer;
@@ -133,8 +143,11 @@ const ToolsComponent = ({ user }) => {
       if (node.nodeType === Node.TEXT_NODE && node.nodeValue.trim() !== "") {
         const span = document.createElement("span");
         span.style.backgroundColor = color;
+        span.dataset.highlightId = Date.now().toString();
         node.parentNode.insertBefore(span, node);
         span.appendChild(node);
+        highlightedSpans.push(span);
+        highlightedText += node.nodeValue + " ";
       }
     };
 
@@ -182,9 +195,109 @@ const ToolsComponent = ({ user }) => {
       currentNode = walker.nextNode();
     }
 
+    setHighlights((prevHighlights) => [
+      ...prevHighlights,
+      {
+        id: Date.now().toString(),
+        spans: highlightedSpans,
+        color,
+        text: highlightedText.trim(),
+      },
+    ]);
+    setIsHighlightListVisible(true);
     setSelectedText("");
     setIsInteractingWithPopup(false);
     setSavedRange(null);
+  };
+
+  const removeHighlight = (highlightId) => {
+    const highlightToRemove = highlights.find((h) => h.id === highlightId);
+    if (highlightToRemove) {
+      highlightToRemove.spans.forEach((span) => {
+        const parent = span.parentNode;
+        while (span.firstChild) {
+          parent.insertBefore(span.firstChild, span);
+        }
+        parent.removeChild(span);
+      });
+      setHighlights((prevHighlights) =>
+        prevHighlights.filter((h) => h.id !== highlightId)
+      );
+    }
+  };
+
+  const toggleHighlightList = () => {
+    setIsHighlightListVisible(!isHighlightListVisible);
+  };
+
+  useEffect(() => {
+    const handleKeyPress = (event) => {
+      if (event.ctrlKey && event.key === "i") {
+        event.preventDefault();
+        setIsHighlightListVisible(true);
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyPress);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyPress);
+    };
+  }, []);
+
+  const HighlightList = ({
+    highlights,
+    removeHighlight,
+    isVisible,
+    onToggle,
+  }) => {
+    const [copiedId, setCopiedId] = useState(null);
+    if (highlights.length === 0) return null;
+    
+    return (
+      <div className={`cwa_highlight-list ${isVisible ? "" : "hidden"}`}>
+        <div className="cwa_highlight-header">
+          <h3>Highlight List</h3>
+          <button className="cwa_toggle-button" onClick={onToggle}>
+            <MoveToHiddenIcon />
+          </button>
+        </div>
+        {highlights.map((highlight) => (
+          <div key={highlight.id} className="cwa_highlight-item">
+            <span
+              className="cwa_highlight-color"
+              style={{ backgroundColor: highlight.color }}
+            ></span>
+            <span
+              className="cwa_highlight-text"
+              title={highlight.text}
+              data-tooltip={highlight.text}
+            >
+              {highlight.text}
+            </span>
+            <button
+              onClick={() => copyToClipboard(highlight.text, highlight.id)}
+            >
+              {copiedId === highlight.id ? <CheckIcon /> : <CopyColorIcon />}
+            </button>
+            <button onClick={() => removeHighlight(highlight.id)}>
+              <BinIcon />
+            </button>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  const copyToClipboard = (text, id) => {
+    navigator.clipboard.writeText(text).then(() => {
+      setCopiedId(id);
+      setTimeout(() => {
+        setCopiedId(null);
+      }, 2000);
+    }).catch(err => {
+      console.error('Failed to copy text: ', err);
+    });
   };
 
   const handleSummarizeClick = async (event) => {
@@ -321,18 +434,18 @@ const ToolsComponent = ({ user }) => {
           tooltipText === "Highlight"
             ? handleHighlightClick
             : tooltipText === "Summarize"
-            ? handleSummarizeClick
-            : tooltipText === "Translate"
-            ? handleTranslateClick
-            : tooltipText === "Rewrite"
-            ? handleRewriteClick
-            : tooltipText === "Expand"
-            ? handleExpandClick
-            : tooltipText === "Explain"
-            ? handleExplainClick
-            : tooltipText === "GrammarCheck"
-            ? handleGrammarCheckClick
-            : undefined
+              ? handleSummarizeClick
+              : tooltipText === "Translate"
+                ? handleTranslateClick
+                : tooltipText === "Rewrite"
+                  ? handleRewriteClick
+                  : tooltipText === "Expand"
+                    ? handleExpandClick
+                    : tooltipText === "Explain"
+                      ? handleExplainClick
+                      : tooltipText === "GrammarCheck"
+                        ? handleGrammarCheckClick
+                        : undefined
         }
       >
         {icon}
@@ -443,6 +556,12 @@ const ToolsComponent = ({ user }) => {
 
   return (
     <>
+      <HighlightList
+        highlights={highlights}
+        removeHighlight={removeHighlight}
+        isVisible={isHighlightListVisible}
+        onToggle={toggleHighlightList}
+      />
       <div
         ref={toolsPopupRef}
         className={`cwa_tools-popup ${selectedText ? "flex" : "none"}`}
@@ -466,11 +585,13 @@ const ToolsComponent = ({ user }) => {
             className="cwa_highlight-popup"
             style={{ left: `${highlightPopup.position.left}px` }}
           >
-            <div className="cwa_color-options">
-              {renderColorOption("rgba(250, 255, 10)")}
-              {renderColorOption("rgba(255, 0, 0)")}
-              {renderColorOption("rgba(0, 255, 0)")}
-              {renderColorOption("rgba(0, 0, 255)")}
+            <div className="cwa_highlight-container">
+              <div className="cwa_color-options">
+                {renderColorOption("rgba(250, 255, 10)")}
+                {renderColorOption("rgba(255, 0, 0)")}
+                {renderColorOption("rgba(0, 255, 0)")}
+                {renderColorOption("rgba(0, 0, 255)")}
+              </div>
             </div>
           </div>
         )}
@@ -495,7 +616,7 @@ const ToolsComponent = ({ user }) => {
               }`}
             >
               {" "}
-              <div className= "cwa_summary-header-container">
+              <div className="cwa_summary-header-container">
                 <LogoIcon />
                 <h4>{currentFeature}</h4>
               </div>

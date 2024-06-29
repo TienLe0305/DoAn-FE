@@ -12,6 +12,7 @@ const FileChatComponent = ({
   getAnswer,
   fileChatRef,
   language,
+  setContextMode,  // Thêm hàm này từ props
 }) => {
   const { t, i18n } = useTranslation();
   useEffect(() => {
@@ -24,6 +25,7 @@ const FileChatComponent = ({
     sendQuestion(`<file>${file.name}</file>`);
     setIsGetFile(true);
     setIsOpenFile(false);
+    setContextMode("usingFileData");  // Chuyển sang chế độ mới
     try {
       const response = await fetch(`${CWA}/${UPLOADFILE}`, {
         method: "POST",

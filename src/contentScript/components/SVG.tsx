@@ -1756,6 +1756,122 @@ const OutlineIcon = () => (
   </svg>
 );
 
+const BinIcon = () => (
+  <svg
+    width="18"
+    height="18"
+    viewBox="0 0 24 24"
+    data-name="Line Color"
+    xmlns="http://www.w3.org/2000/svg"
+    className="icon line-color"
+  >
+    <path
+      d="M17.24 16.11 18 7H6l.93 13.07a1 1 0 0 0 1 .93H11l1-2h2"
+      style={{
+        fill: "none",
+        stroke: "#000",
+        strokeLinecap: "round",
+        strokeLinejoin: "round",
+        strokeWidth: 2,
+      }}
+    />
+    <path
+      data-name="primary"
+      d="m17 7-.81-3.24a1 1 0 0 0-1-.76H8.78a1 1 0 0 0-1 .76L7 7Z"
+      style={{
+        fill: "none",
+        stroke: "#000",
+        strokeLinecap: "round",
+        strokeLinejoin: "round",
+        strokeWidth: 2,
+      }}
+    />
+    <path
+      d="M5 7h14m0 11.5a2.5 2.5 0 1 0-2.5 2.5 2.5 2.5 0 0 0 2.5-2.5"
+      style={{
+        fill: "none",
+        stroke: "#2ca9bc",
+        strokeLinecap: "round",
+        strokeLinejoin: "round",
+        strokeWidth: 2,
+      }}
+    />
+  </svg>
+);
+
+const MoveToHiddenIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+  >
+    <path
+      d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
+      stroke="#171717"
+      stroke-width="1.5"
+      stroke-miterlimit="10"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+    <path
+      d="M13.26 15.53L9.73999 12L13.26 8.46997"
+      stroke="#171717"
+      stroke-width="1.5"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+  </svg>
+);
+
+const CopyColorIcon = () => (
+  <svg
+    width="18"
+    height="18"
+    viewBox="0 0 24 24"
+    xmlns="http://www.w3.org/2000/svg"
+    className="icon new-custom"
+  >
+    <path
+      d="M6 5v16a1 1 0 0 0 1 1h12" // Thay đổi điểm bắt đầu và kết thúc của đường
+      style={{
+        fill: "none",
+        stroke: "#ff6347",
+        strokeLinecap: "round",
+        strokeLinejoin: "round",
+        strokeWidth: 2,
+      }} // Thay đổi màu sắc và sử dụng object style
+    />
+    <path
+      style={{
+        fill: "none",
+        stroke: "#000",
+        strokeLinecap: "round",
+        strokeLinejoin: "round",
+        strokeWidth: 2,
+      }}
+      d="M20 5v13H10V2h9z" // Thay đổi điểm bắt đầu và kết thúc của đường
+    />
+  </svg>
+);
+
+const CheckIcon = () => (
+  <svg
+    width="18"
+    height="18"
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <polyline points="20 6 9 17 4 12"></polyline>
+  </svg>
+);
+
 export {
   SendIcon,
   ExitIcon,
@@ -1808,5 +1924,9 @@ export {
   ExplainIcon,
   GrammarIcon,
   SearchIcon,
-  OutlineIcon
+  OutlineIcon,
+  BinIcon,
+  MoveToHiddenIcon,
+  CopyColorIcon,
+  CheckIcon
 };
