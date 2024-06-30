@@ -17,6 +17,7 @@ import {
   UploadImageIcon,
   PageSummaryIcon,
   SuggestionIcon,
+  VoiceIcon,
 } from "./SVG";
 import ChatHistoryList from "./ChatHistoryList";
 
@@ -114,10 +115,6 @@ const ChatComponent = ({ user }) => {
       if (result.language !== undefined) {
         setLanguage(result.language);
         i18n.changeLanguage(result.language);
-
-        const suggestions = languageSuggestions[result.language] || [];
-        const randomSuggestions = getRandomSuggestions(suggestions, 3);
-        setDisplayedSuggestions(randomSuggestions);
       }
     });
   }, []);
@@ -129,10 +126,6 @@ const ChatComponent = ({ user }) => {
           if (result.language !== undefined) {
             setLanguage(result.language);
             i18n.changeLanguage(result.language);
-
-            const suggestions = languageSuggestions[result.language] || [];
-            const randomSuggestions = getRandomSuggestions(suggestions, 3);
-            setDisplayedSuggestions(randomSuggestions);
           }
         });
       }
@@ -210,9 +203,7 @@ const ChatComponent = ({ user }) => {
         text + followUpQuestionsPrompts
       )}&user_email=${encodeURIComponent(user.email)}${
         fileName ? `&file_name=${encodeURIComponent(fileName)}` : ""
-      }&language=${encodeURIComponent(
-        language
-      )}&include_context=${includeContext}`
+      }&include_context=${includeContext}`
     );
 
     setIsDisable(true);
@@ -439,6 +430,56 @@ const ChatComponent = ({ user }) => {
     setIsOpenImg((prev) => !prev);
   };
 
+  const [voices, setVoices] = useState([]);
+  const [isReading, setIsReading] = useState(false);
+
+  useEffect(() => {
+    const synth = window.speechSynthesis;
+
+    const loadVoices = () => {
+      const availableVoices = synth.getVoices();
+      setVoices(availableVoices);
+    };
+
+    loadVoices();
+
+    if (synth.onvoiceschanged !== undefined) {
+      synth.onvoiceschanged = loadVoices;
+    }
+
+    return () => {
+      if (synth.onvoiceschanged !== undefined) {
+        synth.onvoiceschanged = null;
+      }
+    };
+  }, []);
+
+  const handleReadMessage = (text) => {
+    const utterance = new SpeechSynthesisUtterance(text);
+
+    let voiceLang;
+    switch (language) {
+      case "jp":
+        voiceLang = "ja-JP";
+        break;
+      case "vi":
+        voiceLang = "vi-VN";
+        break;
+      case "en":
+      default:
+        voiceLang = "en-US";
+        break;
+    }
+
+    utterance.lang = voiceLang;
+    const voice = voices.find((v) => v.lang.startsWith(voiceLang));
+    if (voice) {
+      utterance.voice = voice;
+    }
+
+    window.speechSynthesis.speak(utterance);
+  };
+
   const renderMessage = (message, index) => {
     if (message.type === "loading") {
       return (
@@ -518,6 +559,13 @@ const ChatComponent = ({ user }) => {
             >
               <CopyIcon />
               <span className="cwa_tooltip">{copied ? "Copied!" : "Copy"}</span>
+            </div>
+            <div
+              className="cwa_read-message"
+              onClick={() => handleReadMessage(message.text)}
+            >
+              <VoiceIcon />
+              <span className="cwa_tooltip">Read</span>
             </div>
           </div>
         </div>
@@ -608,7 +656,7 @@ const ChatComponent = ({ user }) => {
   };
 
   useEffect(() => {
-    setIncludeContext(contextMode === "usingWithPage");
+    setIncludeContext(contextMode === "usingWithPage" || contextMode === "usingFileData");
   }, [contextMode]);
 
   return (
@@ -622,7 +670,7 @@ const ChatComponent = ({ user }) => {
             getAnswer={getAnswer}
             fileChatRef={fileChatRef}
             language={language}
-            setContextMode={setContextMode} // Truyền hàm này vào
+            setContextMode={setContextMode}
           />
         )}
         {isOpenUrl && (
@@ -718,15 +766,6 @@ const ChatComponent = ({ user }) => {
           <FileIconSideBar isSelected={false} />
           <span className="tooltip-text-group-btn">{t("upload-file")}</span>
         </div>
-        {/* <div
-          className="cwa_get-url-btn"
-          onClick={() => {
-            handleOpenGetSummarizeUrl();
-          }}
-        >
-          <UrlIconSideBar isSelected={false} />
-          <span className="tooltip-text-group-btn">{t("current-tab")}</span>
-        </div> */}
         <div
           className="cwa_upload-img-btn"
           onClick={() => {

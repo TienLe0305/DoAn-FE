@@ -58,9 +58,9 @@ const languageOptionStyles = {
 function QuestionComponent({ user }) {
   const { t, i18n } = useTranslation();
   const taskOptions = [
+    { value: "Translate", label: t("Translate") },
     { value: "Answer", label: t("Answer this question") },
     { value: "Explain", label: t("Explain this") },
-    { value: "Translate", label: t("Translate") },
     { value: "Summarize", label: t("Summarize") },
     { value: "Rewrite", label: t("Improve writing skills") },
     { value: "GrammarCheck", label: t("Correct spelling and grammar") },
@@ -105,13 +105,14 @@ function QuestionComponent({ user }) {
 
   const handleTaskChange = (option) => {
     setSelectedTask(option);
-    setShowLanguageSelect(
-      option.value === "answer" ||
-        option.value === "explain" ||
-        option.value === "translate"
-    );
+    setShowLanguageSelect(option.value === "Translate");
 
     switch (option.value) {
+      case "Translate":
+        setPromptText(
+          "As an AI language translation expert, your task is to translate the provided text as '${selection}' into ${lang}. Your goal is to deliver a colloquial and authentic translation. Please provide only the output without any additional information or quotes."
+        );
+        break;
       case "Answer":
         setPromptText(
           "Your task as an AI is to generate a response in ${lang} to the following question: '${selection}'. Ensure your response is clear and accurate, and present it without wrapping in quotes."
@@ -119,11 +120,6 @@ function QuestionComponent({ user }) {
         break;
       case "Explain":
         setPromptText("Please explain in ${lang}: '${selection}'");
-        break;
-      case "Translate":
-        setPromptText(
-          "As an AI language translation expert, your task is to translate the provided text as '${selection}' into ${lang}. Your goal is to deliver a colloquial and authentic translation. Please provide only the output without any additional information or quotes."
-        );
         break;
       case "Summarize":
         setPromptText(
@@ -213,7 +209,7 @@ function QuestionComponent({ user }) {
         ...optionStyles,
         control: (provided, state) => ({
           ...provided,
-          width: "400px",
+          width: "695px",
           padding: "10px !important",
         }),
       };

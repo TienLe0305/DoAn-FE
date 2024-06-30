@@ -1214,9 +1214,11 @@
   white-space: pre-line;
 }
 
-#CWA .cwa_write-answer .cwa_copy-message {
+#CWA .cwa_write-answer .cwa_copy-message,
+#CWA .cwa_write-answer .cwa_read-message {
   margin-top: 10px;
 }
+
 
 #CWA .cwa_loading-icon {
   animation: spin 2s linear infinite;
@@ -1761,7 +1763,8 @@
   transform: translateX(0%) translateY(-50%) !important;
 }
 
-#CWA .cwa_copy-message {
+#CWA .cwa_copy-message,
+#CWA .cwa_read-message {
   position: relative;
   float: inline-end;
   cursor: pointer;
@@ -1785,7 +1788,8 @@
   margin-bottom: 5px;
 }
 
-#CWA .cwa_copy-message:hover .cwa_tooltip {
+#CWA .cwa_copy-message:hover .cwa_tooltip,
+#CWA .cwa_read-message:hover .cwa_tooltip {
   visibility: visible;
   opacity: 1;
 }

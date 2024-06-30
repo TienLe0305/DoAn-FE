@@ -253,7 +253,7 @@ const ToolsComponent = ({ user }) => {
   }) => {
     const [copiedId, setCopiedId] = useState(null);
     if (highlights.length === 0) return null;
-    
+
     return (
       <div className={`cwa_highlight-list ${isVisible ? "" : "hidden"}`}>
         <div className="cwa_highlight-header">
@@ -290,14 +290,17 @@ const ToolsComponent = ({ user }) => {
   };
 
   const copyToClipboard = (text, id) => {
-    navigator.clipboard.writeText(text).then(() => {
-      setCopiedId(id);
-      setTimeout(() => {
-        setCopiedId(null);
-      }, 2000);
-    }).catch(err => {
-      console.error('Failed to copy text: ', err);
-    });
+    navigator.clipboard
+      .writeText(text)
+      .then(() => {
+        setCopiedId(id);
+        setTimeout(() => {
+          setCopiedId(null);
+        }, 2000);
+      })
+      .catch((err) => {
+        console.error("Failed to copy text: ", err);
+      });
   };
 
   const handleSummarizeClick = async (event) => {
@@ -538,7 +541,6 @@ const ToolsComponent = ({ user }) => {
     let answer = "";
     eventSource.addEventListener("response", (event) => {
       const data = JSON.parse(event.data);
-      console.log(data.text);
 
       for (const char of data.text) {
         answer += char;
@@ -650,15 +652,17 @@ const ToolsComponent = ({ user }) => {
                   </button>
                 </div>
               </div>
-              <div>
-                {isLoading ? (
-                  <p className="cwa_loading-text">
-                    <LoadingMessageIcon />
-                  </p>
-                ) : (
+              <div
+                style={{ display: isLoading || outputText ? "block" : "none" }}
+              >
+                {(isLoading && outputText) || outputText ? (
                   <ReactMarkdown className="cwa_output-text">
                     {outputText}
                   </ReactMarkdown>
+                ) : (
+                  <p className="cwa_loading-text">
+                    <LoadingMessageIcon />
+                  </p>
                 )}
               </div>
             </div>

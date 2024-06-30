@@ -64,7 +64,7 @@ const ChatBox = ({ user, setIsOpen }) => {
       >
         <div
           className={`${
-            selectedComponent === "Write" ? "" : "cwa_box-chat-content"
+            (selectedComponent === "Write" || selectedComponent === "Question") ? "" : "cwa_box-chat-content"
           }`}
         >
           <div className="cwa_header">
