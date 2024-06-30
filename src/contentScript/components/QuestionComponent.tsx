@@ -103,52 +103,65 @@ function QuestionComponent({ user }) {
     responseRef.current?.scrollIntoView({ behavior: "instant" });
   }, [outputText]);
 
+  const [temperature, setTemperature] = useState(0.3);
+
   const handleTaskChange = (option) => {
     setSelectedTask(option);
     setShowLanguageSelect(option.value === "Translate");
+    let newTemperature = 0.3;
 
     switch (option.value) {
       case "Translate":
         setPromptText(
           "As an AI language translation expert, your task is to translate the provided text as '${selection}' into ${lang}. Your goal is to deliver a colloquial and authentic translation. Please provide only the output without any additional information or quotes."
         );
+        newTemperature = 0.3; 
         break;
       case "Answer":
         setPromptText(
           "Your task as an AI is to generate a response in ${lang} to the following question: '${selection}'. Ensure your response is clear and accurate, and present it without wrapping in quotes."
         );
+        newTemperature = 0.7;
         break;
       case "Explain":
         setPromptText("Please explain in ${lang}: '${selection}'");
+        newTemperature = 0.5; 
         break;
       case "Summarize":
         setPromptText(
           "As an AI trained in concise writing, your task is to condense the text within the quotes. Ensure the revised text is no more than half the length of the original while retaining its meaning. Present only the output without any additional information or wrapping it in quotes. Your response should be in the same language variety or dialect as that of the given text: '${selection}'"
         );
+        newTemperature = 0.4;
         break;
       case "Rewrite":
         setPromptText(
           "As a proficient AI specialized in language comprehension and writing enhancement, your task is to review the text within the quotes and improve it while maintaining its original essence. Strive to keep the original meaning, structure, character length, and format intact to ensure coherence and readability. Provide only the improved version of the text without wrapping responses in quotes or changing the language of the text: '${selection}'"
         );
+        newTemperature = 0.6;
         break;
       case "GrammarCheck":
         setPromptText(
           "As an AI trained in language correction, your task is to scrutinize the text within the quotes and rectify any spelling, syntax, or grammar errors without altering its original meaning or style. Your corrections should focus solely on spelling, syntax, and grammar mistakes without making any enhancements. If the original text is error-free, output it as it is without encasing responses in quotes: '${selection}'"
         );
+        newTemperature = 0.2;
         break;
       case "Shorten":
         setPromptText(
           "As an AI trained in concise writing, your task is to condense the text within the quotes. Ensure the revised text is no more than half the length of the original while retaining its meaning. Present only the output without any additional information or wrapping it in quotes. Your response should be in the same language variety or dialect as that of the given text: '${selection}'"
         );
+        newTemperature = 0.4; 
         break;
       case "Expand":
         setPromptText(
           "As an AI adept in the art of elaborative writing, your task is to rewrite the text enclosed within the quotes. Ensure that the revised text is more than double the length of the original while maintaining its original meaning. Deliver only the output without any extra information or quotes. Your response should mirror the language variety or dialect used in the given text: '${selection}'"
         );
+        newTemperature = 0.8;
         break;
       default:
         break;
     }
+  
+    setTemperature(newTemperature);
   };
 
   const handleLanguageChange = (option) => {
@@ -171,7 +184,7 @@ function QuestionComponent({ user }) {
         `\`\`\`${selection}\`\`\``
       )}&user_email=${encodeURIComponent(
         user.email
-      )}&prompt=${encodeURIComponent(prompt)}`
+      )}&prompt=${encodeURIComponent(prompt)}&temperature=${temperature}`
     );
 
     let answer = "";

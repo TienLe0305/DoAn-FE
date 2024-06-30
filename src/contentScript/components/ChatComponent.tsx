@@ -190,7 +190,15 @@ const ChatComponent = ({ user }) => {
     };
   }, [messages]);
 
-  const getAnswer = async (text, fileName = null, includeContext) => {
+  const getAnswer = async (
+    text,
+    fileName = null,
+    includeContext,
+    temperature = 0.7
+  ) => {
+    console.log(text, temperature);
+    
+
     let loadingMessage = {
       text: "Thinking...",
       avatar: urls.icon,
@@ -203,7 +211,7 @@ const ChatComponent = ({ user }) => {
         text + followUpQuestionsPrompts
       )}&user_email=${encodeURIComponent(user.email)}${
         fileName ? `&file_name=${encodeURIComponent(fileName)}` : ""
-      }&include_context=${includeContext}`
+      }&include_context=${includeContext}&temperature=${temperature}`
     );
 
     setIsDisable(true);
@@ -625,7 +633,7 @@ const ChatComponent = ({ user }) => {
       );
       if (response.status === 200) {
         setIsGetUrl(false);
-        getAnswer(prompt, null, true);
+        getAnswer(prompt, null, true, 0.4);
       } else {
         console.error("Đã xảy ra lỗi khi gửi url lên BE.");
       }
@@ -656,7 +664,9 @@ const ChatComponent = ({ user }) => {
   };
 
   useEffect(() => {
-    setIncludeContext(contextMode === "usingWithPage" || contextMode === "usingFileData");
+    setIncludeContext(
+      contextMode === "usingWithPage" || contextMode === "usingFileData"
+    );
   }, [contextMode]);
 
   return (

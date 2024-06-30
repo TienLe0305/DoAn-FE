@@ -504,27 +504,34 @@ const ToolsComponent = ({ user }) => {
     setIsLoading(true);
     setOutputText("");
     let prompt = "";
+    let temperature = 0.7;
     switch (tool) {
       case "Summarize":
         prompt = `As an AI trained in concise writing, your task is to condense the text within the quotes. Ensure the revised text is no more than half the length of the original while retaining its meaning. Present only the output without any additional information or wrapping it in quotes. Your response should be in the same language variety or dialect as that of the given text: '${selection}'`;
+        temperature = 0.4;
         break;
       case "Translate":
         prompt = `As an AI language translation expert, your task is to translate the provided text as '${selection}' into ${targetLanguage}. Your goal is to deliver a colloquial and authentic translation. Please provide only the output without any additional information or quotes.`;
+        temperature = 0.3;
         break;
       case "Rewrite":
         prompt = `As a proficient AI specialized in language comprehension and writing enhancement, your task is to review the text within the quotes and improve it while maintaining its original essence. Strive to keep the original meaning, structure, character length, and format intact to ensure coherence and readability. Provide only the improved version of the text without wrapping responses in quotes or changing the language of the text: '${selection}'`;
+        temperature = 0.6;
         break;
       case "Expand":
         prompt = `As an AI adept in the art of elaborative writing, your task is to rewrite the text enclosed within the quotes. Ensure that the revised text is more than double the length of the original while maintaining its original meaning. Deliver only the output without any extra information or quotes. Your response should mirror the language variety or dialect used in the given text: '${selection}'`;
+        temperature = 0.8;
         break;
       case "Explain":
         prompt =
           "As an AI expert in simplification, explain the text within quotes in an easily understandable way. Ensure the explanation is clear and concise while retaining the original meaning. Present only the output without additional information or quotation marks. Use the same language as the original text:\n'" +
           selection +
           "'\n";
+        temperature = 0.5;
         break;
       case "GrammarCheck":
         prompt = `As an AI trained in language correction, your task is to scrutinize the text within the quotes and rectify any spelling, syntax, or grammar errors without altering its original meaning or style. Your corrections should focus solely on spelling, syntax, and grammar mistakes without making any enhancements. If the original text is error-free, output it as it is without encasing responses in quotes: '${selection}'`;
+        temperature = 0.2;
         break;
       default:
         prompt = "";
@@ -535,7 +542,7 @@ const ToolsComponent = ({ user }) => {
         `\`\`\`${selection}\`\`\``
       )}&user_email=${encodeURIComponent(
         user.email
-      )}&prompt=${encodeURIComponent(prompt)}`
+      )}&prompt=${encodeURIComponent(prompt)}&temperature=${temperature}`
     );
 
     let answer = "";

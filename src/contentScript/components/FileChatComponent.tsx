@@ -12,7 +12,7 @@ const FileChatComponent = ({
   getAnswer,
   fileChatRef,
   language,
-  setContextMode,  // Thêm hàm này từ props
+  setContextMode,
 }) => {
   const { t, i18n } = useTranslation();
   useEffect(() => {
@@ -25,7 +25,7 @@ const FileChatComponent = ({
     sendQuestion(`<file>${file.name}</file>`);
     setIsGetFile(true);
     setIsOpenFile(false);
-    setContextMode("usingFileData");  // Chuyển sang chế độ mới
+    setContextMode("usingFileData");
     try {
       const response = await fetch(`${CWA}/${UPLOADFILE}`, {
         method: "POST",
@@ -34,7 +34,12 @@ const FileChatComponent = ({
       if (response.ok) {
         const fileName = file.name;
         setIsGetFile(false);
-        getAnswer(`What is the main topic of the document?`, fileName, true);
+        getAnswer(
+          `What is the main topic of the document?`,
+          fileName,
+          true,
+          0.4
+        );
       } else {
         console.error("Đã xảy ra lỗi khi gửi file lên BE.");
       }

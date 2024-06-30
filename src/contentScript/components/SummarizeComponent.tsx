@@ -5,7 +5,14 @@ import { useTranslation } from "react-i18next";
 const CWA = process.env.API_DOMAIN;
 const EXTRACTFROMURL = process.env.API_EXTRACT_FROM_URL;
 
-const SummarizeComponent = ({ sendQuestion, setIsGetUrl, setIsOpenUrl, getAnswer, urlChatRef, language }) => {
+const SummarizeComponent = ({
+  sendQuestion,
+  setIsGetUrl,
+  setIsOpenUrl,
+  getAnswer,
+  urlChatRef,
+  language,
+}) => {
   const [currentURL, setCurrentURL] = useState("");
   const { t, i18n } = useTranslation();
 
@@ -40,7 +47,12 @@ const SummarizeComponent = ({ sendQuestion, setIsGetUrl, setIsOpenUrl, getAnswer
       );
       if (response.status === 200) {
         setIsGetUrl(false);
-        getAnswer("Generate a detailed summary of the current page in Markdown format, highlighting 4-5 key points. Each key point should have a summary keyword in bold. Do not enclose the summary in a code block.", null, true); 
+        getAnswer(
+          "Generate a detailed summary of the current page in Markdown format, highlighting 4-5 key points. Each key point should have a summary keyword in bold. Do not enclose the summary in a code block.",
+          null,
+          true,
+          0.4
+        );
       } else {
         console.error("Đã xảy ra lỗi khi gửi url lên BE.");
       }
@@ -55,10 +67,7 @@ const SummarizeComponent = ({ sendQuestion, setIsGetUrl, setIsOpenUrl, getAnswer
 
   return (
     <div ref={urlChatRef} className="cwa_get-current-url">
-      <p>
-       
-        {t("get-main-content")}
-      </p>
+      <p>{t("get-main-content")}</p>
       <button
         className="cwa_get-url-button"
         onClick={() => {
