@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import Select from "react-select";
 import { EventSourcePolyfill } from "event-source-polyfill";
-import { CopyIcon, LoadingMessageIcon } from "./SVG";
+import { CopiedIcon, CopyIcon, LoadingMessageIcon } from "./SVG";
 import ReactMarkdown from "react-markdown";
 import languageOptions from "../utils/languages";
 import { useTranslation } from "react-i18next";
@@ -78,6 +78,7 @@ function QuestionComponent({ user }) {
   const [isLoading, setIsLoading] = useState(false);
   const [showLanguageSelect, setShowLanguageSelect] = useState(true);
   const [copied, setCopied] = useState(false);
+  const [temperature, setTemperature] = useState(0.3);
 
   const responseRef = useRef(null);
 
@@ -103,8 +104,6 @@ function QuestionComponent({ user }) {
     responseRef.current?.scrollIntoView({ behavior: "instant" });
   }, [outputText]);
 
-  const [temperature, setTemperature] = useState(0.3);
-
   const handleTaskChange = (option) => {
     setSelectedTask(option);
     setShowLanguageSelect(option.value === "Translate");
@@ -115,7 +114,7 @@ function QuestionComponent({ user }) {
         setPromptText(
           "As an AI language translation expert, your task is to translate the provided text as '${selection}' into ${lang}. Your goal is to deliver a colloquial and authentic translation. Please provide only the output without any additional information or quotes."
         );
-        newTemperature = 0.3; 
+        newTemperature = 0.3;
         break;
       case "Answer":
         setPromptText(
@@ -125,7 +124,7 @@ function QuestionComponent({ user }) {
         break;
       case "Explain":
         setPromptText("Please explain in ${lang}: '${selection}'");
-        newTemperature = 0.5; 
+        newTemperature = 0.5;
         break;
       case "Summarize":
         setPromptText(
@@ -149,7 +148,7 @@ function QuestionComponent({ user }) {
         setPromptText(
           "As an AI trained in concise writing, your task is to condense the text within the quotes. Ensure the revised text is no more than half the length of the original while retaining its meaning. Present only the output without any additional information or wrapping it in quotes. Your response should be in the same language variety or dialect as that of the given text: '${selection}'"
         );
-        newTemperature = 0.4; 
+        newTemperature = 0.4;
         break;
       case "Expand":
         setPromptText(
@@ -160,7 +159,7 @@ function QuestionComponent({ user }) {
       default:
         break;
     }
-  
+
     setTemperature(newTemperature);
   };
 
@@ -276,10 +275,10 @@ function QuestionComponent({ user }) {
         )}
         {!isLoading && outputText && (
           <div
-            className="cwa_copy-message"
+            className="cwa_copy-message-web"
             onClick={() => handleCopyMessage(outputText)}
           >
-            <CopyIcon />
+            {copied ? <CopiedIcon /> : <CopyIcon />}
             <span className="cwa_tooltip">{copied ? "Copied!" : "Copy"}</span>
           </div>
         )}

@@ -4,6 +4,7 @@ import {
   BinIcon,
   CheckIcon,
   ClosesIcon,
+  CopiedIcon,
   CopyColorIcon,
   CopyIcon,
   ExpandIcon,
@@ -55,6 +56,7 @@ const ToolsComponent = ({ user }) => {
   const [highlights, setHighlights] = useState([]);
   const [isHighlightListVisible, setIsHighlightListVisible] = useState(false);
   const [copiedId, setCopiedId] = useState(null);
+  const [copied, setCopied] = useState(false);
 
   const filteredLanguages = languageOptions.filter((language) =>
     language.label.toLowerCase().includes(searchTerm.toLowerCase())
@@ -129,6 +131,21 @@ const ToolsComponent = ({ user }) => {
       document.removeEventListener("click", handleClickOutside);
     };
   }, [summaryPopup.visible, isInteractingWithPopup, showLanguageSelect]);
+
+  useEffect(() => {
+    const handleKeyPress = (event) => {
+      if (event.ctrlKey && event.key === "i") {
+        event.preventDefault();
+        setIsHighlightListVisible(true);
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyPress);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyPress);
+    };
+  }, []);
 
   const highlightText = (color) => {
     if (!savedRange) return;
@@ -229,21 +246,6 @@ const ToolsComponent = ({ user }) => {
   const toggleHighlightList = () => {
     setIsHighlightListVisible(!isHighlightListVisible);
   };
-
-  useEffect(() => {
-    const handleKeyPress = (event) => {
-      if (event.ctrlKey && event.key === "i") {
-        event.preventDefault();
-        setIsHighlightListVisible(true);
-      }
-    };
-
-    document.addEventListener("keydown", handleKeyPress);
-
-    return () => {
-      document.removeEventListener("keydown", handleKeyPress);
-    };
-  }, []);
 
   const HighlightList = ({
     highlights,
@@ -563,6 +565,15 @@ const ToolsComponent = ({ user }) => {
     });
   };
 
+  const handleCopyMessage = (text) => {
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+
+    setTimeout(() => {
+      setCopied(false);
+    }, 1000);
+  };
+
   return (
     <>
       <HighlightList
@@ -670,6 +681,17 @@ const ToolsComponent = ({ user }) => {
                   <p className="cwa_loading-text">
                     <LoadingMessageIcon />
                   </p>
+                )}
+                {!isLoading && outputText && (
+                  <div
+                    className="cwa_copy-message"
+                    onClick={() => handleCopyMessage(outputText)}
+                  >
+                    {copied ? <CopiedIcon /> : <CopyIcon />}
+                    <span className="cwa_tooltip">
+                      {copied ? "Copied!" : "Copy"}
+                    </span>
+                  </div>
                 )}
               </div>
             </div>

@@ -11,12 +11,15 @@ import {
 import ChatComponent from "./ChatComponent";
 import WriteComponent from "./WriteComponent";
 import QuestionComponent from "./QuestionComponent";
+import { useTranslation } from "react-i18next";
 
 const urls = {
   icon: chrome.runtime.getURL("assets/images/icon.png"),
 };
 
 const ChatBox = ({ user, setIsOpen }) => {
+  const { t, i18n } = useTranslation();
+  const [language, setLanguage] = useState();
   const [selectedComponent, setSelectedComponent] = useState("Chat");
 
   const chatBoxRef = useRef(null);
@@ -26,6 +29,39 @@ const ChatBox = ({ user, setIsOpen }) => {
     { component: "Question", Icon: QuestionIconSideBar },
     { component: "Write", Icon: WriteIconSideBar },
   ];
+
+  useEffect(() => {
+    chrome.storage.local.get(["language"], (result) => {
+      if (result.language !== undefined) {
+        setLanguage(result.language);
+        i18n.changeLanguage(result.language);
+      }
+    });
+  }, []);
+
+  useEffect(() => {
+    const messageListener = (request) => {
+      if (request.settingUpdate) {
+        chrome.storage.local.get(["language"], (result) => {
+          if (result.language !== undefined) {
+            setLanguage(result.language);
+            i18n.changeLanguage(result.language);
+          }
+        });
+      }
+    };
+
+    chrome.runtime.onMessage.addListener(messageListener);
+    return () => {
+      chrome.runtime.onMessage.removeListener(messageListener);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (language) {
+      i18n.changeLanguage(language);
+    }
+  }, [language]);
 
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -73,7 +109,7 @@ const ChatBox = ({ user, setIsOpen }) => {
                 <LogoIcon />
                 <h3 className="cwa_h3">nebulAsisstant</h3>
               </div>
-              <p>Your everyday AI assistant companion</p>
+              <p>{t("Your everyday AI assistant companion")}</p>
             </div>
           </div>
           {selectedComponent === "Chat" && <ChatComponent user={user} />}

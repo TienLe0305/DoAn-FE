@@ -47,5 +47,12 @@
   "Type": "タイプ",
   "Tone": "音",
   "Length": "長さ",
-  "Languages": "言語"
+  "Languages": "言語",
+  "see-what": "このウェブサイトでnebulAssistantが可能にすることを見る",
+  "Generate page summary": "ページの要約を生成",
+  "Suggest question about this page": "このページについての質問を提案",
+  "Your everyday AI assistant companion": "あなたの毎日のAIアシスタント",
+  "Using with page": "ページを使用する",
+  "Using relevant sources": "関連ソースを使用する",
+  "Using file data": "ファイルデータを使用する"
 }

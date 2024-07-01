@@ -1,5 +1,5 @@
 import React from "react";
-import styled, { keyframes } from 'styled-components';
+import styled, { keyframes } from "styled-components";
 
 const LoadingIcon = () => (
   <svg className="snurra" width="48" height="48" viewBox="0 0 200 200">
@@ -772,7 +772,7 @@ const UploadImageIconInput = () => (
   >
     <path
       d="M21 5v14a1 1 0 0 1-.29.71L14 13l-3 3-2-2-5.71 5.71A1 1 0 0 1 3 19V5a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1"
-      style={{ fill: "#2ca9bc", strokeWidth: 2 }}
+      style={{ fill: "#2ca9bc", strokeWidth: "2px" }}
     />
     <path
       style={{
@@ -978,6 +978,21 @@ const CopyIcon = () => (
   </svg>
 );
 
+const CopiedIcon = () => (
+  <svg
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    data-name="Flat Color"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M10 18a1 1 0 0 1-.71-.29l-5-5a1 1 0 0 1 1.42-1.42l4.29 4.3 8.29-8.3a1 1 0 1 1 1.42 1.42l-9 9A1 1 0 0 1 10 18"
+      fill="#6c757d"
+    />
+  </svg>
+);
+
 const VoiceIcon = () => (
   <svg
     width="24"
@@ -989,7 +1004,46 @@ const VoiceIcon = () => (
       <path d="M24 0v24H0V0zM12.593 23.258l-.011.002-.071.035-.02.004-.014-.004-.071-.035q-.016-.005-.024.005l-.004.01-.017.428.005.02.01.013.104.074.015.004.012-.004.104-.074.012-.016.004-.017-.017-.427q-.004-.016-.017-.018m.265-.113-.013.002-.185.093-.01.01-.003.011.018.43.005.012.008.007.201.093q.019.005.029-.008l.004-.014-.034-.614q-.005-.018-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014-.034.614q.001.018.017.024l.015-.002.201-.093.01-.008.004-.011.017-.43-.003-.012-.01-.01z" />
       <path
         d="M12 3a1 1 0 0 1 .993.883L13 4v16a1 1 0 0 1-1.993.117L11 20V4a1 1 0 0 1 1-1M8 6a1 1 0 0 1 1 1v10a1 1 0 1 1-2 0V7a1 1 0 0 1 1-1m8 0a1 1 0 0 1 1 1v10a1 1 0 1 1-2 0V7a1 1 0 0 1 1-1M4 9a1 1 0 0 1 1 1v4a1 1 0 1 1-2 0v-4a1 1 0 0 1 1-1m16 0a1 1 0 0 1 .993.883L21 10v4a1 1 0 0 1-1.993.117L19 14v-4a1 1 0 0 1 1-1"
-        fill="#09244B"
+        fill="#6c757d"
+      />
+    </g>
+  </svg>
+);
+
+const ReadingIcon = ({ isReading }) => (
+  <svg
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <style>
+      {`
+      @keyframes wave {
+        0%, 100% { transform: scaleY(1); }
+        50% { transform: scaleY(1.2); }
+      }
+      .wave1 { animation: wave 1s ease-in-out infinite; }
+      .wave2 { animation: wave 1s ease-in-out infinite 0.2s; }
+      .wave3 { animation: wave 1s ease-in-out infinite 0.4s; }
+    `}
+    </style>
+    <g fill="none">
+      <path d="M24 0v24H0V0zM12.593 23.258l-.011.002-.071.035-.02.004-.014-.004-.071-.035q-.016-.005-.024.005l-.004.01-.017.428.005.02.01.013.104.074.015.004.012-.004.104-.074.012-.016.004-.017-.017-.427q-.004-.016-.017-.018m.265-.113-.013.002-.185.093-.01.01-.003.011.018.43.005.012.008.007.201.093q.019.005.029-.008l.004-.014-.034-.614q-.005-.018-.02-.022m-.715.002a.02.2 0 0 0-.027.006l-.006.014-.034.614q.001.018.017.024l.015-.002.201-.093.01-.008.004-.011.017-.43-.003-.012-.01-.01z" />
+      <path
+        d="M12 3a1 1 0 0 1 .993.883L13 4v16a1 1 0 0 1-1.993.117L11 20V4a1 1 0 0 1 1-1"
+        fill="#6c757d"
+        className={isReading ? "wave2" : ""}
+      />
+      <path
+        d="M8 6a1 1 0 0 1 1 1v10a1 1 0 1 1-2 0V7a1 1 0 0 1 1-1m8 0a1 1 0 0 1 1 1v10a1 1 0 1 1-2 0V7a1 1 0 0 1 1-1"
+        fill="#6c757d"
+        className={isReading ? "wave1" : ""}
+      />
+      <path
+        d="M4 9a1 1 0 0 1 1 1v4a1 1 0 1 1-2 0v-4a1 1 0 0 1 1-1m16 0a1 1 0 0 1 .993.883L21 10v4a1 1 0 0 1-1.993.117L19 14v-4a1 1 0 0 1 1-1"
+        fill="#6c757d"
+        className={isReading ? "wave3" : ""}
       />
     </g>
   </svg>
@@ -1401,8 +1455,8 @@ const PageSummaryIcon = () => (
         gradientUnits="userSpaceOnUse"
       >
         {" "}
-        <stop stop-color="#3733FF"></stop>{" "}
-        <stop offset="1" stop-color="#AD73FF"></stop>{" "}
+        <stop stop-color="#B0D6DF"></stop>{" "}
+        <stop offset="1" stop-color="#378BA5"></stop>{" "}
       </linearGradient>{" "}
     </defs>{" "}
   </svg>
@@ -1508,8 +1562,8 @@ const SuggestionIcon = () => (
         gradientUnits="userSpaceOnUse"
       >
         {" "}
-        <stop offset="0.0446053" stop-color="#3733FF"></stop>{" "}
-        <stop offset="0.929005" stop-color="#73B3FF"></stop>{" "}
+        <stop offset="0.0446053" stop-color="#B0D6DF"></stop>{" "}
+        <stop offset="0.929005" stop-color="#378BA5"></stop>{" "}
       </linearGradient>{" "}
       <linearGradient
         id="paint1_linear_1429_4315"
@@ -1520,8 +1574,8 @@ const SuggestionIcon = () => (
         gradientUnits="userSpaceOnUse"
       >
         {" "}
-        <stop offset="0.0446053" stop-color="#3733FF"></stop>{" "}
-        <stop offset="0.929005" stop-color="#73B3FF"></stop>{" "}
+        <stop offset="0.0446053" stop-color="#B0D6DF"></stop>{" "}
+        <stop offset="0.929005" stop-color="#378BA5"></stop>{" "}
       </linearGradient>{" "}
       <linearGradient
         id="paint2_linear_1429_4315"
@@ -1532,8 +1586,8 @@ const SuggestionIcon = () => (
         gradientUnits="userSpaceOnUse"
       >
         {" "}
-        <stop offset="0.0446053" stop-color="#3733FF"></stop>{" "}
-        <stop offset="0.929005" stop-color="#73B3FF"></stop>{" "}
+        <stop offset="0.0446053" stop-color="#B0D6DF"></stop>{" "}
+        <stop offset="0.929005" stop-color="#378BA5"></stop>{" "}
       </linearGradient>{" "}
     </defs>{" "}
   </svg>
@@ -1947,5 +2001,7 @@ export {
   MoveToHiddenIcon,
   CopyColorIcon,
   CheckIcon,
-  VoiceIcon
+  VoiceIcon,
+  ReadingIcon,
+  CopiedIcon
 };

@@ -1770,6 +1770,10 @@
   cursor: pointer;
 }
 
+#CWA .cwa_read-message {
+  margin-right: 10px;
+}
+
 #CWA .cwa_tooltip {
   visibility: hidden;
   background-color: #203532;
@@ -2232,6 +2236,34 @@ button:hover .tooltip {
   display: flex;
   align-items: center;
   margin-bottom: 10px;
+}
+
+.reading-icon {
+  animation: wave_voice 1s infinite;
+}
+
+.cwa_copy-message-web {
+  display: flex;
+  justify-content: start;
+  align-items: center;
+}
+
+@keyframes wave_voice {
+  0% {
+    transform: translateY(0);
+  }
+  25% {
+    transform: translateY(-2px);
+  }
+  50% {
+    transform: translateY(0);
+  }
+  75% {
+    transform: translateY(2px);
+  }
+  100% {
+    transform: translateY(0);
+  }
 }
 
 @keyframes outer {

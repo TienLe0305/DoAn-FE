@@ -46,5 +46,12 @@
   "Type": "Thể loại",
   "Tone": "Tone",
   "Length": "Độ dài",
-  "Languages": "Ngôn ngữ"
+  "Languages": "Ngôn ngữ",
+  "see-what": "Xem những gì có thể thực hiện với nebulAssistant trên trang web này",
+  "Generate page summary": "Tạo bản tóm tắt trang",
+  "Suggest question about this page": "Đề xuất câu hỏi về trang này",
+  "Your everyday AI assistant companion": "Người bạn trợ lý AI hàng ngày của bạn",
+  "Using with page": "Sử dụng với trang",
+  "Using relevant sources": "Sử dụng các nguồn tài nguyên liên quan",
+  "Using file data": "Sử dụng dữ liệu tệp"
 }

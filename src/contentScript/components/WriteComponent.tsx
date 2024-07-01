@@ -18,6 +18,7 @@ import {
   IconLanguage,
   LoadingMessageIcon,
   CopyIcon,
+  CopiedIcon,
 } from "./SVG";
 import { EventSourcePolyfill } from "event-source-polyfill";
 import languageOptions from "../utils/languages";
@@ -294,7 +295,7 @@ function WriteComponent({ user }) {
             className="cwa_copy-message"
             onClick={() => handleCopyMessage(response)}
           >
-            <CopyIcon />
+            {copied ? <CopiedIcon /> : <CopyIcon />}
             <span className="cwa_tooltip">{copied ? "Copied!" : "Copy"}</span>
           </div>
         )}

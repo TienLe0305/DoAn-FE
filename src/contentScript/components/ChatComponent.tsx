@@ -6,11 +6,9 @@ import { EventSourcePolyfill } from "event-source-polyfill";
 import {
   SendIcon,
   LoadingIcon,
-  ArrowButton,
   UploadFileIconInMessage,
   LoadingMessageIcon,
   FileIconSideBar,
-  UrlIconSideBar,
   AddNewChatIcon,
   OpenListConversationsIcon,
   CopyIcon,
@@ -18,6 +16,8 @@ import {
   PageSummaryIcon,
   SuggestionIcon,
   VoiceIcon,
+  ReadingIcon,
+  CopiedIcon,
 } from "./SVG";
 import ChatHistoryList from "./ChatHistoryList";
 
@@ -64,6 +64,7 @@ const followUpQuestionsPrompts = `
 - Follow-up questions should help the user understand the content better.
 - Follow-up questions should be short and concise.
 - Follow-up questions should be a single sentence.
+- Follow-up questions should be designed for the user, not for the ChatBot.
 - Follow-up questions should be formatted like the following:
 Follow-up questions:
 - <question 1>
@@ -71,21 +72,20 @@ Follow-up questions:
 and so on...
 - Always format the line 'Follow-up questions:' regardless of the current language, do not translate this line.`;
 
-const initialMessages = [
-  {
-    text: "How can I assist you today?",
-    avatar: urls.icon,
-    type: "answer",
-    image: null,
-  },
-];
-
 const ChatComponent = ({ user }) => {
   const { t, i18n } = useTranslation();
   const [language, setLanguage] = useState();
   const [isOpenFile, setIsOpenFile] = useState(false);
   const [isOpenUrl, setIsOpenUrl] = useState(false);
   const [isOpenImg, setIsOpenImg] = useState(false);
+  const initialMessages = [
+    {
+      text: t("initial-message"),
+      avatar: urls.icon,
+      type: "answer",
+      image: null,
+    },
+  ];
   const [messages, setMessages] = useState(initialMessages);
   const [isGetFile, setIsGetFile] = useState(false);
   const [isGetUrl, setIsGetUrl] = useState(false);
@@ -94,15 +94,15 @@ const ChatComponent = ({ user }) => {
   const [isSuggestions, setIsSuggestions] = useState(false);
   const [isDisable, setIsDisable] = useState(false);
   const [messageText, setMessageText] = useState("");
-  const [error, setError] = useState(null);
   const [authToken, setAuthToken] = useState(null);
   const [chatHistories, setChatHistories] = useState([]);
   const [isShowChatHistory, setIsShowChatHistory] = useState(false);
   const [chatHistoryId, setChatHistoryId] = useState(null);
-  const [copied, setCopied] = useState(false);
-  const [displayedSuggestions, setDisplayedSuggestions] = useState([]);
   const [contextMode, setContextMode] = useState("usingRelevantSources");
   const [includeContext, setIncludeContext] = useState(false);
+  const [voices, setVoices] = useState([]);
+  const [readingStates, setReadingStates] = useState({});
+  const [copiedStates, setCopiedStates] = useState({});
 
   const inputRef = useRef(null);
   const endOfMessagesRef = useRef(null);
@@ -140,11 +140,20 @@ const ChatComponent = ({ user }) => {
   useEffect(() => {
     if (language) {
       i18n.changeLanguage(language);
-      const suggestions = languageSuggestions[language] || [];
-      const randomSuggestions = getRandomSuggestions(suggestions, 3);
-      setDisplayedSuggestions(randomSuggestions);
     }
   }, [language]);
+
+  useEffect(() => {
+    const updatedInitialMessages = [
+      {
+        text: t("initial-message"),
+        avatar: urls.icon,
+        type: "answer",
+        image: null,
+      },
+    ];
+    setMessages(updatedInitialMessages);
+  }, [language, t]);
 
   useEffect(() => {
     chrome.storage.local.get("auth_token", (result) => {
@@ -190,15 +199,68 @@ const ChatComponent = ({ user }) => {
     };
   }, [messages]);
 
+  useEffect(() => {
+    setIncludeContext(
+      contextMode === "usingWithPage" || contextMode === "usingFileData"
+    );
+  }, [contextMode]);
+
+  useEffect(() => {
+    const currentChatMessages = localStorage.getItem("currentChatMessages");
+    const currentChatHistoryId = localStorage.getItem("currentChatHistoryId");
+    if (currentChatMessages) {
+      const parsedMessages = JSON.parse(currentChatMessages);
+      if (parsedMessages.length > 0) {
+        setMessages(parsedMessages);
+        if (currentChatHistoryId) {
+          setChatHistoryId(JSON.parse(currentChatHistoryId));
+        }
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (messages.length > 0) {
+      localStorage.setItem("currentChatMessages", JSON.stringify(messages));
+      if (chatHistoryId !== null) {
+        localStorage.setItem(
+          "currentChatHistoryId",
+          JSON.stringify(chatHistoryId)
+        );
+      }
+    } else {
+      localStorage.removeItem("currentChatMessages");
+      localStorage.removeItem("currentChatHistoryId");
+    }
+  }, [messages, chatHistoryId]);
+
+  useEffect(() => {
+    const synth = window.speechSynthesis;
+
+    const loadVoices = () => {
+      const availableVoices = synth.getVoices();
+      setVoices(availableVoices);
+    };
+
+    loadVoices();
+
+    if (synth.onvoiceschanged !== undefined) {
+      synth.onvoiceschanged = loadVoices;
+    }
+
+    return () => {
+      if (synth.onvoiceschanged !== undefined) {
+        synth.onvoiceschanged = null;
+      }
+    };
+  }, []);
+
   const getAnswer = async (
     text,
     fileName = null,
     includeContext,
     temperature = 0.7
   ) => {
-    console.log(text, temperature);
-    
-
     let loadingMessage = {
       text: "Thinking...",
       avatar: urls.icon,
@@ -322,35 +384,6 @@ const ChatComponent = ({ user }) => {
     setIsOpenImg(false);
   };
 
-  useEffect(() => {
-    const currentChatMessages = localStorage.getItem("currentChatMessages");
-    const currentChatHistoryId = localStorage.getItem("currentChatHistoryId");
-    if (currentChatMessages) {
-      const parsedMessages = JSON.parse(currentChatMessages);
-      if (parsedMessages.length > 0) {
-        setMessages(parsedMessages);
-        if (currentChatHistoryId) {
-          setChatHistoryId(JSON.parse(currentChatHistoryId));
-        }
-      }
-    }
-  }, []);
-
-  useEffect(() => {
-    if (messages.length > 0) {
-      localStorage.setItem("currentChatMessages", JSON.stringify(messages));
-      if (chatHistoryId !== null) {
-        localStorage.setItem(
-          "currentChatHistoryId",
-          JSON.stringify(chatHistoryId)
-        );
-      }
-    } else {
-      localStorage.removeItem("currentChatMessages");
-      localStorage.removeItem("currentChatHistoryId");
-    }
-  }, [messages, chatHistoryId]);
-
   const saveChatMessagesToStorage = (
     messages,
     chatHistoryId,
@@ -421,12 +454,18 @@ const ChatComponent = ({ user }) => {
     setIsShowChatHistory(false);
   };
 
-  const handleCopyMessage = (text) => {
+  const handleCopyMessage = (text, index) => {
     navigator.clipboard.writeText(text);
-    setCopied(true);
+    setCopiedStates((prevStates) => ({
+      ...prevStates,
+      [index]: true,
+    }));
 
     setTimeout(() => {
-      setCopied(false);
+      setCopiedStates((prevStates) => ({
+        ...prevStates,
+        [index]: false,
+      }));
     }, 1000);
   };
 
@@ -438,187 +477,177 @@ const ChatComponent = ({ user }) => {
     setIsOpenImg((prev) => !prev);
   };
 
-  const [voices, setVoices] = useState([]);
-  const [isReading, setIsReading] = useState(false);
+  const handleReadMessage = (text, index) => {
+    setReadingStates((prevStates) => {
+      const newState = { ...prevStates };
 
-  useEffect(() => {
-    const synth = window.speechSynthesis;
-
-    const loadVoices = () => {
-      const availableVoices = synth.getVoices();
-      setVoices(availableVoices);
-    };
-
-    loadVoices();
-
-    if (synth.onvoiceschanged !== undefined) {
-      synth.onvoiceschanged = loadVoices;
-    }
-
-    return () => {
-      if (synth.onvoiceschanged !== undefined) {
-        synth.onvoiceschanged = null;
+      if (newState[index]) {
+        window.speechSynthesis.cancel();
+        newState[index] = false;
+        return newState;
       }
-    };
-  }, []);
 
-  const handleReadMessage = (text) => {
-    const utterance = new SpeechSynthesisUtterance(text);
+      Object.keys(newState).forEach((key) => {
+        if (newState[key]) {
+          newState[key] = false;
+        }
+      });
 
-    let voiceLang;
-    switch (language) {
-      case "jp":
-        voiceLang = "ja-JP";
-        break;
-      case "vi":
-        voiceLang = "vi-VN";
-        break;
-      case "en":
-      default:
-        voiceLang = "en-US";
-        break;
-    }
+      const utterance = new SpeechSynthesisUtterance(text);
 
-    utterance.lang = voiceLang;
-    const voice = voices.find((v) => v.lang.startsWith(voiceLang));
-    if (voice) {
-      utterance.voice = voice;
-    }
+      let voiceLang;
+      switch (language) {
+        case "jp":
+          voiceLang = "ja-JP";
+          break;
+        case "vi":
+          voiceLang = "vi-VN";
+          break;
+        case "en":
+        default:
+          voiceLang = "en-US";
+          break;
+      }
 
-    window.speechSynthesis.speak(utterance);
+      utterance.lang = voiceLang;
+      const voice = voices.find((v) => v.lang.startsWith(voiceLang));
+      if (voice) {
+        utterance.voice = voice;
+      }
+
+      newState[index] = true;
+
+      utterance.onend = () => {
+        setReadingStates((prevStates) => ({
+          ...prevStates,
+          [index]: false,
+        }));
+      };
+
+      window.speechSynthesis.speak(utterance);
+
+      return newState;
+    });
   };
 
   const renderMessage = (message, index) => {
-    if (message.type === "loading") {
-      return (
-        <div key={index} className={`cwa_content-mess cwa_${message.type}`}>
-          <img className="cwa_message-avatar user" src={message.avatar} />
-          <div className={`cwa_message-content cwa_${message.type}`}>
-            <LoadingMessageIcon />
-          </div>
-        </div>
-      );
-    } else if (message.type === "file") {
-      return (
-        <div key={index} className={`cwa_content-mess cwa_${message.type}`}>
-          <img className="cwa_message-avatar user" src={message.avatar} />
-          <div className={`cwa_message-content cwa_${message.type}`}>
-            <UploadFileIconInMessage />
-            <div className="cwa_pdf-info">
-              <p>File</p>
-              <div className={`cwa_${message.type}`}>{message.text}</div>
-            </div>
-          </div>
-        </div>
-      );
-    } else if (message.type === "img") {
-      return (
-        <div key={index} className={`cwa_content-mess cwa_${message.type}`}>
-          <img className="cwa_message-avatar user" src={message.avatar} />
-          <div className={`cwa_message-content cwa_${message.type}`}>
+    switch (message.type) {
+      case "loading":
+        return (
+          <div key={index} className={`cwa_content-mess cwa_${message.type}`}>
             <img
-              className="cwa_upload-img"
-              src={message.image}
-              alt={message.text}
+              className="cwa_message-avatar user"
+              src={message.avatar}
+              alt="User avatar"
             />
+            <div className={`cwa_message-content cwa_${message.type}`}>
+              <LoadingMessageIcon />
+            </div>
           </div>
-        </div>
-      );
-    } else {
-      return (
-        <div key={index} className={`cwa_content-mess cwa_${message.type}`}>
-          <img className="cwa_message-avatar user" src={message.avatar} />
-          <div className={`cwa_message-content cwa_${message.type}`}>
-            <span className={`cwa_${message.type}`}>
-              <ReactMarkdown
-                remarkPlugins={[remarkGfm, remarkMath]}
-                rehypePlugins={[rehypeKatex]}
-                components={{
-                  code({ node, className, children, ...props }) {
-                    const match = /language-(\w+)/.exec(className || "");
-                    return match ? (
-                      <>
-                        <header>{match[1]}</header>
-                        <code
-                          className={className}
-                          {...props}
-                          dangerouslySetInnerHTML={{
-                            __html: hljs.highlight(
-                              children ? children.toString() : "",
-                              { language: match[1] }
-                            ).value,
-                          }}
-                        />
-                      </>
-                    ) : (
-                      <code className={className} {...props}>
-                        {children}
-                      </code>
-                    );
-                  },
-                }}
+        );
+
+      case "file":
+        return (
+          <div key={index} className={`cwa_content-mess cwa_${message.type}`}>
+            <img
+              className="cwa_message-avatar user"
+              src={message.avatar}
+              alt="User avatar"
+            />
+            <div className={`cwa_message-content cwa_${message.type}`}>
+              <UploadFileIconInMessage />
+              <div className="cwa_pdf-info">
+                <p>File</p>
+                <div className={`cwa_${message.type}`}>{message.text}</div>
+              </div>
+            </div>
+          </div>
+        );
+
+      case "img":
+        return (
+          <div key={index} className={`cwa_content-mess cwa_${message.type}`}>
+            <img
+              className="cwa_message-avatar user"
+              src={message.avatar}
+              alt="User avatar"
+            />
+            <div className={`cwa_message-content cwa_${message.type}`}>
+              <img
+                className="cwa_upload-img"
+                src={message.image}
+                alt={message.text}
+              />
+            </div>
+          </div>
+        );
+
+      default:
+        return (
+          <div key={index} className={`cwa_content-mess cwa_${message.type}`}>
+            <img
+              className="cwa_message-avatar user"
+              src={message.avatar}
+              alt="User avatar"
+            />
+            <div className={`cwa_message-content cwa_${message.type}`}>
+              <span className={`cwa_${message.type}`}>
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm, remarkMath]}
+                  rehypePlugins={[rehypeKatex]}
+                  components={{
+                    code({ node, className, children, ...props }) {
+                      const match = /language-(\w+)/.exec(className || "");
+                      return match ? (
+                        <>
+                          <header>{match[1]}</header>
+                          <code
+                            className={className}
+                            {...props}
+                            dangerouslySetInnerHTML={{
+                              __html: hljs.highlight(
+                                children ? children.toString() : "",
+                                { language: match[1] }
+                              ).value,
+                            }}
+                          />
+                        </>
+                      ) : (
+                        <code className={className} {...props}>
+                          {children}
+                        </code>
+                      );
+                    },
+                  }}
+                >
+                  {message.text}
+                </ReactMarkdown>
+              </span>
+              <div
+                className="cwa_copy-message"
+                onClick={() => handleCopyMessage(message.text, index)}
               >
-                {message.text}
-              </ReactMarkdown>
-            </span>
-            <div
-              className="cwa_copy-message"
-              onClick={() => handleCopyMessage(message.text)}
-            >
-              <CopyIcon />
-              <span className="cwa_tooltip">{copied ? "Copied!" : "Copy"}</span>
-            </div>
-            <div
-              className="cwa_read-message"
-              onClick={() => handleReadMessage(message.text)}
-            >
-              <VoiceIcon />
-              <span className="cwa_tooltip">Read</span>
+                {copiedStates[index] ? <CopiedIcon /> : <CopyIcon />}
+                <span className="cwa_tooltip">
+                  {copiedStates[index] ? "Copied!" : "Copy"}
+                </span>
+              </div>
+              <div
+                className="cwa_read-message"
+                onClick={() => handleReadMessage(message.text, index)}
+              >
+                {readingStates[index] ? (
+                  <ReadingIcon isReading={true} />
+                ) : (
+                  <VoiceIcon />
+                )}
+                <span className="cwa_tooltip">Read</span>
+              </div>
             </div>
           </div>
-        </div>
-      );
+        );
     }
   };
-
-  const renderSuggestionQuestions = useMemo(
-    () =>
-      isSuggestions && (
-        <div className="cwa_suggestion-question-container">
-          {followUpQuestions.map((question, index) => (
-            <button
-              key={index}
-              onClick={() => handleQuestionClick(question)}
-              className="cwa_suggestion-question-button"
-            >
-              {question}
-            </button>
-          ))}
-        </div>
-      ),
-    [isSuggestions, followUpQuestions]
-  );
-
-  const renderLoadingState = useMemo(
-    () =>
-      (isGetFile || isGetUrl || isGetImg) && (
-        <div className="cwa_wrapper-container-loading-pdf">
-          <div className="loader">
-            <div className="inner one"></div>
-            <div className="inner two"></div>
-            <div className="inner three"></div>
-          </div>
-          <h1>
-            {isGetFile
-              ? t("wait-read-file")
-              : isGetUrl
-                ? t("wait-process-url")
-                : t("wait-process-img")}
-          </h1>
-        </div>
-      ),
-    [isGetFile, isGetUrl, isGetImg]
-  );
 
   const sendURLToBackend = async (url, setIsGetUrl, getAnswer, prompt) => {
     try {
@@ -663,11 +692,44 @@ const ChatComponent = ({ user }) => {
     });
   };
 
-  useEffect(() => {
-    setIncludeContext(
-      contextMode === "usingWithPage" || contextMode === "usingFileData"
-    );
-  }, [contextMode]);
+  const renderSuggestionQuestions = useMemo(
+    () =>
+      isSuggestions && (
+        <div className="cwa_suggestion-question-container">
+          {followUpQuestions.map((question, index) => (
+            <button
+              key={index}
+              onClick={() => handleQuestionClick(question)}
+              className="cwa_suggestion-question-button"
+            >
+              {question}
+            </button>
+          ))}
+        </div>
+      ),
+    [isSuggestions, followUpQuestions]
+  );
+
+  const renderLoadingState = useMemo(
+    () =>
+      (isGetFile || isGetUrl || isGetImg) && (
+        <div className="cwa_wrapper-container-loading-pdf">
+          <div className="loader">
+            <div className="inner one"></div>
+            <div className="inner two"></div>
+            <div className="inner three"></div>
+          </div>
+          <h1>
+            {isGetFile
+              ? t("wait-read-file")
+              : isGetUrl
+                ? t("wait-process-url")
+                : t("wait-process-img")}
+          </h1>
+        </div>
+      ),
+    [isGetFile, isGetUrl, isGetImg]
+  );
 
   return (
     <>
@@ -712,8 +774,7 @@ const ChatComponent = ({ user }) => {
         />
         <div className="cwa_suggestion-container">
           <p>
-            Hi {user.name}, see what's possible with nebulAssistant in this
-            website
+            Hi {user.name}, {t("see-what")}
           </p>
           <div className="cwa_suggestion-card-list">
             <div
@@ -723,7 +784,7 @@ const ChatComponent = ({ user }) => {
               }}
             >
               <PageSummaryIcon />
-              <p>Generate page summary</p>
+              <p>{t("Generate page summary")}</p>
             </div>
             <div
               className="cwa_suggestion-card"
@@ -732,7 +793,7 @@ const ChatComponent = ({ user }) => {
               }}
             >
               <SuggestionIcon />
-              <p>Suggest question about this page</p>
+              <p>{t("Suggest question about this page")}</p>
             </div>
           </div>
         </div>
@@ -752,9 +813,11 @@ const ChatComponent = ({ user }) => {
           onChange={handleContextModeChange}
           className="cwa_custom-select"
         >
-          <option value="usingWithPage">Using with page</option>
-          <option value="usingRelevantSources">Using relevant sources</option>
-          <option value="usingFileData">Using file data</option>
+          <option value="usingWithPage">{t("Using with page")}</option>
+          <option value="usingRelevantSources">
+            {t("Using relevant sources")}
+          </option>
+          <option value="usingFileData">{t("Using file data")}</option>
         </select>
         <div className="cwa_new-chat-btn" onClick={handleNewChat}>
           <AddNewChatIcon isSelected={false} />

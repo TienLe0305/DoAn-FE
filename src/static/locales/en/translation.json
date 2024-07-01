@@ -41,11 +41,18 @@
   "Medium": "Medium",
   "Long": "Long",
   "The original text you want to reply to...": "The original text you want to reply to...",
-  "Subject that you want to write about..." : "Subject that you want to write about...",
+  "Subject that you want to write about...": "Subject that you want to write about...",
   "Composer": "Composer",
   "Answer": "Answer",
   "Type": "Type",
   "Tone": "Tone",
   "Length": "Length",
-  "Languages": "Languages"
+  "Languages": "Languages",
+  "see-what": "see what's possible with nebulAssistant in this website",
+  "Generate page summary": "Generate page summary",
+  "Suggest question about this page": "Suggest question about this page",
+  "Your everyday AI assistant companion": "Your everyday AI assistant companion",
+  "Using with page": "Using with page",
+  "Using relevant sources": "Using relevant sources",
+  "Using file data": "Using file data"
 }
